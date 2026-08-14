@@ -15,12 +15,12 @@ class UserRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_all(
+    def _filtered_query(
         self,
         search: Optional[str] = None,
         role: Optional[str] = None,
         status: Optional[str] = None,
-    ) -> Sequence[User]:
+    ):
         query = self.db.query(User)
 
         if search:
@@ -39,7 +39,31 @@ class UserRepository:
         if status and status.lower() != "all":
             query = query.filter(User.status == status)
 
-        return query.order_by(User.id.asc()).all()
+        return query
+
+    def get_all(
+        self,
+        search: Optional[str] = None,
+        role: Optional[str] = None,
+        status: Optional[str] = None,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> Sequence[User]:
+        return (
+            self._filtered_query(search, role, status)
+            .order_by(User.id.asc())
+            .limit(limit)
+            .offset(offset)
+            .all()
+        )
+
+    def count_filtered(
+        self,
+        search: Optional[str] = None,
+        role: Optional[str] = None,
+        status: Optional[str] = None,
+    ) -> int:
+        return self._filtered_query(search, role, status).with_entities(func.count(User.id)).scalar() or 0
 
     def get_by_id(self, user_id: int) -> Optional[User]:
         return self.db.query(User).filter(User.id == user_id).first()

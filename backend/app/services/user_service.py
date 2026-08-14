@@ -3,14 +3,14 @@ Business-logic layer. Translates API-level requests into repository
 calls and enforces rules that aren't pure data validation (e.g.
 "email must be unique", "user must exist").
 """
-from typing import Optional, Sequence
+from typing import Optional
 
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
-from app.schemas.user import UserCreate, UserUpdate
+from app.schemas.user import UserCreate, UserListResponse, UserUpdate
 
 
 class UserService:
@@ -22,8 +22,15 @@ class UserService:
         search: Optional[str] = None,
         role: Optional[str] = None,
         status_filter: Optional[str] = None,
-    ) -> Sequence[User]:
-        return self.repo.get_all(search=search, role=role, status=status_filter)
+        page: int = 1,
+        page_size: int = 50,
+    ) -> UserListResponse:
+        offset = (page - 1) * page_size
+        items = self.repo.get_all(
+            search=search, role=role, status=status_filter, limit=page_size, offset=offset
+        )
+        total = self.repo.count_filtered(search=search, role=role, status=status_filter)
+        return UserListResponse(items=items, total=total, page=page, page_size=page_size)
 
     def get_user(self, user_id: int) -> User:
         user = self.repo.get_by_id(user_id)

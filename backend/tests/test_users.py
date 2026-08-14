@@ -10,7 +10,7 @@ from sqlalchemy.pool import StaticPool
 
 from app.main import app
 from app.database import get_db, Base
-import app.models.user  # noqa: F401  (ensure model is registered on Base)
+from app.models import user  # noqa: F401  (ensure model is registered on Base)
 
 # --- Isolated test database -------------------------------------------
 TEST_DATABASE_URL = "sqlite:///:memory:"
@@ -68,9 +68,26 @@ def test_get_users_returns_created_user():
     client.post("/api/users", json=make_user())
     resp = client.get("/api/users")
     assert resp.status_code == 200
-    users = resp.json()
-    assert len(users) == 1
-    assert users[0]["email"] == "test.user@example.com"
+    body = resp.json()
+    assert body["total"] == 1
+    assert body["page"] == 1
+    assert len(body["items"]) == 1
+    assert body["items"][0]["email"] == "test.user@example.com"
+
+
+def test_get_users_paginates_with_page_size():
+    for i in range(3):
+        client.post("/api/users", json=make_user(email=f"page{i}@example.com"))
+    resp = client.get("/api/users", params={"page": 1, "page_size": 2})
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["total"] == 3
+    assert body["page"] == 1
+    assert body["page_size"] == 2
+    assert len(body["items"]) == 2
+
+    resp2 = client.get("/api/users", params={"page": 2, "page_size": 2})
+    assert len(resp2.json()["items"]) == 1
 
 
 def test_get_single_user():
@@ -157,7 +174,7 @@ def test_search_filters_by_name_email_phone():
 
     resp = client.get("/api/users", params={"search": "alice"})
     assert resp.status_code == 200
-    results = resp.json()
+    results = resp.json()["items"]
     assert len(results) == 1
     assert results[0]["name"] == "Alice Wonderland"
 
@@ -168,6 +185,6 @@ def test_role_and_status_filters():
 
     resp = client.get("/api/users", params={"role": "Admin"})
     assert resp.status_code == 200
-    results = resp.json()
+    results = resp.json()["items"]
     assert len(results) == 1
     assert results[0]["role"] == "Admin"

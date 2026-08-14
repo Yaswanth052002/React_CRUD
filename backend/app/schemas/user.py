@@ -2,7 +2,7 @@
 import re
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel, EmailStr, field_validator, ConfigDict
 
@@ -57,6 +57,13 @@ class UserOut(UserBase):
     id: int
     created_at: datetime
     updated_at: datetime
+
+
+class UserListResponse(BaseModel):
+    items: List[UserOut]
+    total: int
+    page: int
+    page_size: int
 
 
 class DashboardStats(BaseModel):
