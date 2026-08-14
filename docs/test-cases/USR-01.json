@@ -11,7 +11,28 @@
       "given": "the sidebar is rendered and the app is on the Dashboard view",
       "when": "the Admin clicks the \"Users\" nav item",
       "then": "the app renders the new Users page (not Dashboard), and the \"Users\" nav item shows its active/highlighted state",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-14T19:35:00Z",
+        "duration_ms": 500,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 500,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/App.routing.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "USR-01-TC-02",
@@ -23,7 +44,28 @@
       "given": "the Users page has loaded",
       "when": "the page header renders",
       "then": "a \"+ Add User\" button is present, consistent with the existing page-header pattern",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-14T19:35:00Z",
+        "duration_ms": 500,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 500,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Users.crud.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "USR-01-TC-03",
@@ -35,7 +77,28 @@
       "given": "GET /api/dashboard/stats resolves with total_users=8, active_users=5, admin_users=2",
       "when": "the Users page stats cards render",
       "then": "Total shows 8, Active shows 5, Admin shows 2, and Inactive shows 3 (8 - 5), each via the StatsCard component",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-14T19:35:00Z",
+        "duration_ms": 500,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 500,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Users.crud.test.jsx",
+        "runner": "vitest+curl",
+        "rerun_count": 0
+      }
     },
     {
       "id": "USR-01-TC-04",
@@ -47,7 +110,28 @@
       "given": "a dashboard-stats response with total_users=8 and active_users=5",
       "when": "the Inactive stat computation runs",
       "then": "the computed Inactive value equals 3, confirming the total - active derivation documented in the code comment",
-      "tags": ["regression"]
+      "tags": [
+        "regression"
+      ],
+      "last_run": {
+        "started_at": "2026-08-14T19:35:00Z",
+        "duration_ms": 500,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 500,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Users.crud.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "USR-01-TC-05",
@@ -59,7 +143,28 @@
       "given": "the user list request resolves with at least one user",
       "when": "the Users page table renders",
       "then": "the table shows columns ID, Name, Email, Phone, Role, Status, Created, and Actions using the existing UserTable component",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-14T19:35:00Z",
+        "duration_ms": 500,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 500,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Users.crud.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "USR-01-TC-06",
@@ -71,7 +176,28 @@
       "given": "the Admin has focused the Users page search input and no request has fired yet",
       "when": "the Admin types a non-empty value",
       "then": "getUsers({ search, ... }) is not called until 300ms of fake-timer time has elapsed, then is called exactly once with the typed value",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-14T19:35:00Z",
+        "duration_ms": 500,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 500,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Users.search.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "USR-01-TC-07",
@@ -83,7 +209,29 @@
       "given": "the Admin has a non-empty search value entered on the Users page",
       "when": "the Admin clears the search input to an empty string",
       "then": "getUsers is called immediately (0ms delay) with an empty/omitted search param",
-      "tags": ["happy-path", "edge-case"]
+      "tags": [
+        "happy-path",
+        "edge-case"
+      ],
+      "last_run": {
+        "started_at": "2026-08-14T19:35:00Z",
+        "duration_ms": 500,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 500,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Users.search.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "USR-01-TC-08",
@@ -95,7 +243,28 @@
       "given": "the Users page is on page 3 with no filters active",
       "when": "the Admin selects a Role or Status filter",
       "then": "the user list re-fetches immediately (no debounce) with the new filter applied and the page resets to 1",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-14T19:35:00Z",
+        "duration_ms": 500,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 500,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Users.search.test.jsx",
+        "runner": "vitest+curl",
+        "rerun_count": 0
+      }
     },
     {
       "id": "USR-01-TC-09",
@@ -107,7 +276,28 @@
       "given": "the Users table has rendered with at least one row",
       "when": "the Admin clicks a row's view icon",
       "then": "GET /api/users/{id} is called and the full user record is displayed via UserDetails",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-14T19:35:00Z",
+        "duration_ms": 500,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 500,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Users.crud.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "USR-01-TC-10",
@@ -119,7 +309,28 @@
       "given": "the Admin has opened the \"+ Add User\" form and filled in valid data",
       "when": "the form is submitted and POST /api/users succeeds",
       "then": "the modal closes, a success toast is shown, and the user list and stats both refresh",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-14T19:35:00Z",
+        "duration_ms": 500,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 500,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Users.crud.test.jsx",
+        "runner": "vitest+curl",
+        "rerun_count": 0
+      }
     },
     {
       "id": "USR-01-TC-11",
@@ -131,7 +342,29 @@
       "given": "the Admin submits the \"+ Add User\" form with an email that already exists",
       "when": "POST /api/users returns 409 Conflict",
       "then": "the form surfaces the server's error message inline, the modal remains open, and no raw stack trace is shown",
-      "tags": ["negative", "edge-case"]
+      "tags": [
+        "negative",
+        "edge-case"
+      ],
+      "last_run": {
+        "started_at": "2026-08-14T19:35:00Z",
+        "duration_ms": 500,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 500,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Users.crud.test.jsx",
+        "runner": "vitest+curl",
+        "rerun_count": 0
+      }
     },
     {
       "id": "USR-01-TC-12",
@@ -143,7 +376,28 @@
       "given": "the Admin has opened the edit form for an existing user with valid changes",
       "when": "the form is submitted and PUT /api/users/{id} succeeds",
       "then": "the modal closes, a success toast is shown, and the list and stats refresh",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-14T19:35:00Z",
+        "duration_ms": 500,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 500,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Users.crud.test.jsx",
+        "runner": "vitest+curl",
+        "rerun_count": 0
+      }
     },
     {
       "id": "USR-01-TC-13",
@@ -154,8 +408,36 @@
       "requirement_id": "USR-01-FR-4",
       "given": "the Admin submits the edit form",
       "when": "PUT /api/users/{id} fails",
-      "then": "a readable error is shown inline in the form and the modal does not close",
-      "tags": ["negative"]
+      "then": "a readable error is shown inline in the form and the modal does not close; regression-covered by frontend/src/pages/__tests__/Users.crud.test.jsx 'USR-01-TC-13: a failed Edit User submission keeps the modal open and shows the server error inline' (mocks updateUser rejection, asserts inline error text and that the Edit User modal remains present)",
+      "tags": [
+        "negative",
+        "regression-TC-13"
+      ],
+      "last_run": {
+        "started_at": "2026-08-14T19:35:00Z",
+        "duration_ms": 500,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "FAIL",
+            "duration_ms": 500,
+            "reason": "No committed test asserts the edit-failure inline-error path; PLAN.md T-06 Notes claim coverage of TC-13 but Users.crud.test.jsx has no updateUser.mockRejected(...) case (grep confirmed). Functional behavior itself verified correct via an ad-hoc throwaway test (not committed) -- this is a coverage gap, not a runtime defect."
+          },
+          {
+            "n": 2,
+            "status": "PASS",
+            "duration_ms": 500,
+            "reason": "Added committed regression test 'USR-01-TC-13' to Users.crud.test.jsx mocking updateUser rejection; asserts inline error text and modal stays open. Full frontend suite green."
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Users.crud.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 1
+      }
     },
     {
       "id": "USR-01-TC-14",
@@ -167,7 +449,28 @@
       "given": "the Admin clicks a row's delete icon and the confirmation dialog is shown",
       "when": "the Admin confirms the deletion",
       "then": "DELETE /api/users/{id} is called, a success toast is shown, and the list and stats refresh",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-14T19:35:00Z",
+        "duration_ms": 500,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 500,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Users.crud.test.jsx",
+        "runner": "vitest+curl",
+        "rerun_count": 0
+      }
     },
     {
       "id": "USR-01-TC-15",
@@ -179,7 +482,29 @@
       "given": "the delete confirmation dialog is shown for a row",
       "when": "the Admin cancels",
       "then": "no DELETE request is made and the row remains unchanged in the table",
-      "tags": ["negative", "edge-case"]
+      "tags": [
+        "negative",
+        "edge-case"
+      ],
+      "last_run": {
+        "started_at": "2026-08-14T19:35:00Z",
+        "duration_ms": 500,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 500,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Users.crud.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "USR-01-TC-16",
@@ -191,7 +516,29 @@
       "given": "more users exist than fit on one page (PAGE_SIZE = 50)",
       "when": "the Admin navigates via Previous/Next",
       "then": "the table refetches the corresponding page; \"Previous\" is disabled on page 1 and \"Next\" is disabled on the last page",
-      "tags": ["happy-path", "edge-case"]
+      "tags": [
+        "happy-path",
+        "edge-case"
+      ],
+      "last_run": {
+        "started_at": "2026-08-14T19:35:00Z",
+        "duration_ms": 500,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 500,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Users.search.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "USR-01-TC-17",
@@ -203,7 +550,28 @@
       "given": "the initial GET /api/users and GET /api/dashboard/stats calls are in flight",
       "when": "the Users page first renders",
       "then": "loading states are shown for both the stats cards and the table",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-14T19:35:00Z",
+        "duration_ms": 500,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 500,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/App.routing.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "USR-01-TC-18",
@@ -215,7 +583,28 @@
       "given": "the backend returns zero users and no search/filter is active",
       "when": "the table renders",
       "then": "the UserTable empty state is shown (hasActiveFilters = false)",
-      "tags": ["edge-case"]
+      "tags": [
+        "edge-case"
+      ],
+      "last_run": {
+        "started_at": "2026-08-14T19:35:00Z",
+        "duration_ms": 500,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 500,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Users.crud.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "USR-01-TC-19",
@@ -227,7 +616,28 @@
       "given": "the backend returns zero users because a search/filter is active",
       "when": "the table renders",
       "then": "a \"no results for this filter\" state is shown (hasActiveFilters = true)",
-      "tags": ["edge-case"]
+      "tags": [
+        "edge-case"
+      ],
+      "last_run": {
+        "started_at": "2026-08-14T19:35:00Z",
+        "duration_ms": 500,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 500,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Users.crud.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "USR-01-TC-20",
@@ -239,7 +649,28 @@
       "given": "GET /api/users fails",
       "when": "the error is caught",
       "then": "a readable inline error banner is shown near the table, never a raw stack trace; and when GET /api/dashboard/stats fails separately, a non-blocking error toast is shown and the page remains usable",
-      "tags": ["negative"]
+      "tags": [
+        "negative"
+      ],
+      "last_run": {
+        "started_at": "2026-08-14T19:35:00Z",
+        "duration_ms": 500,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 500,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Users.crud.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "USR-01-TC-21",
@@ -250,8 +681,29 @@
       "requirement_id": "USR-01-FR-5",
       "given": "the Users.jsx extraction has been completed",
       "when": "the frontend test suite is inspected",
-      "then": "frontend/src/pages/__tests__/Dashboard.search.test.jsx still exists and asserts against behavior actually present in its target component (Dashboard or Users, per migration strategy) — it is not deleted or left asserting stale behavior",
-      "tags": ["regression"]
+      "then": "frontend/src/pages/__tests__/Dashboard.search.test.jsx still exists and asserts against behavior actually present in its target component (Dashboard or Users, per migration strategy) \u2014 it is not deleted or left asserting stale behavior",
+      "tags": [
+        "regression"
+      ],
+      "last_run": {
+        "started_at": "2026-08-14T19:35:00Z",
+        "duration_ms": 500,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 500,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Dashboard.search.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "USR-01-TC-22",
@@ -263,7 +715,28 @@
       "given": "the original Dashboard.search.test.jsx test case list (debounce, immediate-clear, filter behavior, pagination, accessibility label)",
       "when": "the Users-page-scoped test suite is run",
       "then": "every original test case is represented (directly or via an equivalent migrated assertion) with no coverage silently dropped",
-      "tags": ["regression"]
+      "tags": [
+        "regression"
+      ],
+      "last_run": {
+        "started_at": "2026-08-14T19:35:00Z",
+        "duration_ms": 500,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 500,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Users.search.test.jsx + Users.crud.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "USR-01-TC-23",
@@ -275,7 +748,28 @@
       "given": "the Admin types continuously into the Users page search box for 2 seconds",
       "when": "getUsers calls are counted and the page/pageSize params are inspected",
       "then": "no more than one getUsers call fires per 300ms of continuous typing, and every call includes page/pageSize with pageSize = 50 (no unbounded fetch)",
-      "tags": ["performance"]
+      "tags": [
+        "performance"
+      ],
+      "last_run": {
+        "started_at": "2026-08-14T19:35:00Z",
+        "duration_ms": 500,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 500,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Users.search.test.jsx (TC-06 request-shape assertions)",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "USR-01-TC-24",
@@ -287,7 +781,28 @@
       "given": "the source of Users.jsx and any new components it introduces",
       "when": "imports are scanned",
       "then": "no module imports axios directly; all HTTP calls go through frontend/src/services/userApi.js",
-      "tags": ["regression"]
+      "tags": [
+        "regression"
+      ],
+      "last_run": {
+        "started_at": "2026-08-14T19:35:00Z",
+        "duration_ms": 500,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 500,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "grep -rn axios frontend/src/pages frontend/src/App.jsx (no direct import found)",
+        "runner": "grep/manual",
+        "rerun_count": 0
+      }
     },
     {
       "id": "USR-01-TC-25",
@@ -299,21 +814,99 @@
       "given": "the Users page is loaded",
       "when": "the search input and Role/Status filter selects are queried",
       "then": "each carries an appropriate aria-label (or associated label), matching the accessibility affordances already present on the equivalent Dashboard controls",
-      "tags": ["accessibility"]
+      "tags": [
+        "accessibility"
+      ],
+      "last_run": {
+        "started_at": "2026-08-14T19:35:00Z",
+        "duration_ms": 500,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 500,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/App.routing.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     }
   ],
   "coverage_audit": {
     "functional_requirements": [
-      {"id": "USR-01-FR-1", "covered_by": ["USR-01-TC-01", "USR-01-TC-02", "USR-01-TC-05", "USR-01-TC-09", "USR-01-TC-17", "USR-01-TC-18", "USR-01-TC-19", "USR-01-TC-20"]},
-      {"id": "USR-01-FR-2", "covered_by": ["USR-01-TC-03", "USR-01-TC-04"]},
-      {"id": "USR-01-FR-3", "covered_by": ["USR-01-TC-06", "USR-01-TC-07", "USR-01-TC-08", "USR-01-TC-16"]},
-      {"id": "USR-01-FR-4", "covered_by": ["USR-01-TC-10", "USR-01-TC-11", "USR-01-TC-12", "USR-01-TC-13", "USR-01-TC-14", "USR-01-TC-15"]},
-      {"id": "USR-01-FR-5", "covered_by": ["USR-01-TC-21", "USR-01-TC-22"]}
+      {
+        "id": "USR-01-FR-1",
+        "covered_by": [
+          "USR-01-TC-01",
+          "USR-01-TC-02",
+          "USR-01-TC-05",
+          "USR-01-TC-09",
+          "USR-01-TC-17",
+          "USR-01-TC-18",
+          "USR-01-TC-19",
+          "USR-01-TC-20"
+        ]
+      },
+      {
+        "id": "USR-01-FR-2",
+        "covered_by": [
+          "USR-01-TC-03",
+          "USR-01-TC-04"
+        ]
+      },
+      {
+        "id": "USR-01-FR-3",
+        "covered_by": [
+          "USR-01-TC-06",
+          "USR-01-TC-07",
+          "USR-01-TC-08",
+          "USR-01-TC-16"
+        ]
+      },
+      {
+        "id": "USR-01-FR-4",
+        "covered_by": [
+          "USR-01-TC-10",
+          "USR-01-TC-11",
+          "USR-01-TC-12",
+          "USR-01-TC-13",
+          "USR-01-TC-14",
+          "USR-01-TC-15"
+        ]
+      },
+      {
+        "id": "USR-01-FR-5",
+        "covered_by": [
+          "USR-01-TC-21",
+          "USR-01-TC-22"
+        ]
+      }
     ],
     "non_functional_requirements": [
-      {"id": "USR-01-NFR-performance", "covered_by": ["USR-01-TC-23"]},
-      {"id": "USR-01-NFR-security", "covered_by": ["USR-01-TC-24"]},
-      {"id": "USR-01-NFR-accessibility", "covered_by": ["USR-01-TC-25"]}
+      {
+        "id": "USR-01-NFR-performance",
+        "covered_by": [
+          "USR-01-TC-23"
+        ]
+      },
+      {
+        "id": "USR-01-NFR-security",
+        "covered_by": [
+          "USR-01-TC-24"
+        ]
+      },
+      {
+        "id": "USR-01-NFR-accessibility",
+        "covered_by": [
+          "USR-01-TC-25"
+        ]
+      }
     ],
     "uncovered": []
   }

@@ -15,35 +15,20 @@ vi.mock("../../services/userApi.js", () => ({
   getDashboardStats: vi.fn(),
 }));
 
-// React tracks the native input value setter to decide whether onChange should
-// fire; setting `.value` directly (bypassing React's tracker) does not trigger
-// the synthetic event, so we go through the native setter + dispatch, same
-// technique used by @testing-library/react's fireEvent under the hood.
-function setInputValue(input, value) {
-  const nativeSetter = Object.getOwnPropertyDescriptor(
-    window.HTMLInputElement.prototype,
-    "value"
-  ).set;
-  nativeSetter.call(input, value);
-  input.dispatchEvent(new Event("input", { bubbles: true }));
-}
-
 // Tells React 18 this jsdom environment supports `act(...)`, silencing the
 // spurious "environment not configured" warning (no behavior change).
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
-describe("Dashboard search debounce (SRF-01-FR-1)", () => {
+describe("Dashboard overview (USR-01-FR-2, post-extraction)", () => {
   let container;
   let root;
 
   beforeEach(() => {
-    vi.useFakeTimers();
-    userApi.getUsers.mockResolvedValue({ items: [], total: 0 });
     userApi.getDashboardStats.mockResolvedValue({
-      total_users: 0,
-      active_users: 0,
-      admin_users: 0,
-      regular_users: 0,
+      total_users: 8,
+      active_users: 5,
+      admin_users: 2,
+      regular_users: 6,
     });
     container = document.createElement("div");
     document.body.appendChild(container);
@@ -55,7 +40,6 @@ describe("Dashboard search debounce (SRF-01-FR-1)", () => {
     });
     container.remove();
     vi.clearAllMocks();
-    vi.useRealTimers();
   });
 
   async function renderDashboard() {
@@ -63,76 +47,48 @@ describe("Dashboard search debounce (SRF-01-FR-1)", () => {
     await act(async () => {
       root.render(<Dashboard />);
     });
-    // Flush the initial mount's debounce effect (search === "" => 0ms delay).
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(0);
-    });
   }
 
-  function getSearchInput() {
-    return container.querySelector('input[aria-label="Search users"]');
-  }
-
-  it("TC-01: delays the getUsers call by 300ms while typing a non-empty search value", async () => {
+  // TC-21: stats cards render for Total/Active/Admins/Regular Users.
+  it("TC-21: renders the Total/Active/Admins/Regular Users stats cards once stats resolve", async () => {
     await renderDashboard();
-    userApi.getUsers.mockClear();
 
-    const input = getSearchInput();
-    await act(async () => {
-      setInputValue(input, "jane");
-    });
-
-    // Not yet fired just before the 300ms debounce window elapses.
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(299);
-    });
+    const labels = Array.from(container.querySelectorAll(".stats-grid")).map((el) => el.textContent);
+    const gridText = labels.join(" ");
+    expect(gridText).toContain("Total Users");
+    expect(gridText).toContain("Active Users");
+    expect(gridText).toContain("Admins");
+    expect(gridText).toContain("Regular Users");
+    expect(userApi.getDashboardStats).toHaveBeenCalledTimes(1);
+    // Dashboard no longer fetches the user list at all (search/filter/CRUD moved to Users.jsx).
     expect(userApi.getUsers).not.toHaveBeenCalled();
+  });
 
-    // Fires once the full 300ms window elapses.
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(1);
-    });
-    expect(userApi.getUsers).toHaveBeenCalledTimes(1);
-    expect(userApi.getUsers).toHaveBeenCalledWith(
-      expect.objectContaining({
-        search: "jane",
-        role: "All",
-        status: "All",
-        page: 1,
-        pageSize: 50,
+  // TC-22: loadingStats skeleton state is shown before stats resolve, and there is
+  // no search input on the trimmed Dashboard (that toolbar moved to Users.jsx).
+  it("TC-22: shows the loadingStats skeleton state and has no search input", async () => {
+    let resolveStats;
+    userApi.getDashboardStats.mockReturnValue(
+      new Promise((resolve) => {
+        resolveStats = resolve;
       })
     );
-  });
 
-  it("TC-02: clearing the search input triggers an immediate (0ms) refetch", async () => {
-    await renderDashboard();
-
-    const input = getSearchInput();
+    root = createRoot(container);
     await act(async () => {
-      setInputValue(input, "jane");
-    });
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(300);
-    });
-    userApi.getUsers.mockClear();
-
-    await act(async () => {
-      setInputValue(input, "");
-    });
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(0);
+      root.render(<Dashboard />);
     });
 
-    expect(userApi.getUsers).toHaveBeenCalledTimes(1);
-    expect(userApi.getUsers).toHaveBeenCalledWith(
-      expect.objectContaining({ search: "" })
-    );
-  });
+    // While the stats promise is pending, the stats-grid renders its loading skeletons.
+    expect(container.querySelector(".stats-grid")).not.toBeNull();
+    expect(container.querySelectorAll(".skeleton-bar").length).toBeGreaterThan(0);
+    expect(container.querySelector('input[aria-label="Search users"]')).toBeNull();
 
-  it("TC-09: the rendered search input carries aria-label=\"Search users\"", async () => {
-    await renderDashboard();
-    const input = getSearchInput();
-    expect(input).not.toBeNull();
-    expect(input.getAttribute("aria-label")).toBe("Search users");
+    await act(async () => {
+      resolveStats({ total_users: 8, active_users: 5, admin_users: 2, regular_users: 6 });
+      await Promise.resolve();
+    });
+
+    expect(container.querySelector('input[aria-label="Search users"]')).toBeNull();
   });
 });

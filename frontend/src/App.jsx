@@ -2,6 +2,7 @@ import { useState } from "react";
 import Sidebar from "./components/Sidebar.jsx";
 import Header from "./components/Header.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
+import Users from "./pages/Users.jsx";
 
 function SettingsPlaceholder({ onMenuClick }) {
   return (
@@ -40,7 +41,7 @@ export default function App() {
   return (
     <div className="app-shell">
       <Sidebar
-        activeView={activeView === "users" ? "dashboard" : activeView}
+        activeView={activeView}
         onNavigate={setActiveView}
         userCount={userCount}
         isOpen={sidebarOpen}
@@ -49,6 +50,8 @@ export default function App() {
       <div className="main-col">
         {activeView === "settings" ? (
           <SettingsPlaceholder onMenuClick={() => setSidebarOpen(true)} />
+        ) : activeView === "users" ? (
+          <Users onMenuClick={() => setSidebarOpen(true)} onUserCountChange={setUserCount} />
         ) : (
           <Dashboard onMenuClick={() => setSidebarOpen(true)} onUserCountChange={setUserCount} />
         )}
