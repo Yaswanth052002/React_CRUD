@@ -1,0 +1,13 @@
+
+> user-management-crud-frontend@1.0.0 build
+> vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 95 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.75 kB │ gzip:  0.41 kB
+dist/assets/index-zLYiSP49.css   17.06 kB │ gzip:  4.08 kB
+dist/assets/index-IN39gEqN.js   218.78 kB │ gzip: 71.51 kB
+✓ built in 535ms

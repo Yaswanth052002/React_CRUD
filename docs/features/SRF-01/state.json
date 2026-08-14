@@ -16,6 +16,16 @@
   "plan": "complete",
   "plan_validation": "PASS",
   "plan_validation_rounds": 1,
+  "impl_tasks": [
+    {"id": "T-01", "title": "Author Dashboard.search.test.jsx debounce/clear/a11y spec", "status": "done", "completed_at": "2026-08-14T16:37:19Z", "files_touched": ["frontend/src/pages/__tests__/Dashboard.search.test.jsx"]},
+    {"id": "T-02", "title": "Re-verify backend regression suite stays green", "status": "done", "completed_at": "2026-08-14T16:38:00Z", "files_touched": []}
+  ],
+  "agent_flags": [
+    {"flag_id": "AF-01", "kind": "other", "summary": "typecheck dimension N/A — no static type checker configured for either stack (pre-existing)", "source": "docs/config/project-commands.yaml", "task_id": null, "raised_at": "2026-08-14T16:45:00Z", "raised_by": "implementation-agent", "status": "defer", "decision": "Flag deferred — see rationale.", "decided_by": "yaswanth.panthangi@apexon.com", "decided_at": "2026-08-14T17:15:00Z", "rationale": "Adding a type checker (mypy/TS) repo-wide is out of scope for a search/filter story", "carry_forward_ref": "AF-01-carry"},
+    {"flag_id": "AF-02", "kind": "other", "summary": "lint dimension N/A — no eslint/ruff configured for either stack (pre-existing)", "source": "docs/config/project-commands.yaml", "task_id": null, "raised_at": "2026-08-14T16:45:00Z", "raised_by": "implementation-agent", "status": "defer", "decision": "Flag deferred — see rationale.", "decided_by": "yaswanth.panthangi@apexon.com", "decided_at": "2026-08-14T17:15:00Z", "rationale": "Adding lint tooling (eslint/ruff) repo-wide is out of scope for a search/filter story", "carry_forward_ref": "AF-02-carry"},
+    {"flag_id": "AF-03", "kind": "other", "summary": "design_check dimension N/A — no a11y/console/lighthouse tooling exists; integrations.design=none for this story (pre-existing)", "source": "docs/config/project-commands.yaml", "task_id": null, "raised_at": "2026-08-14T16:45:00Z", "raised_by": "implementation-agent", "status": "reject", "decision": "Flag rejected as noise — see rationale.", "decided_by": "yaswanth.panthangi@apexon.com", "decided_at": "2026-08-14T17:15:00Z", "rationale": "integrations.design=none was an explicit /arh-init decision; not a gap for this backend/API-adjacent story to fix", "carry_forward_ref": null},
+    {"flag_id": "AF-04", "kind": "risky-pattern", "summary": "react runtime check is boot-only (200 + empty pre-hydration div) — no E2E/browser-automation runner exists to verify actual render (pre-existing)", "source": "docs/config/stack-smoke.md", "task_id": null, "raised_at": "2026-08-14T16:45:00Z", "raised_by": "implementation-agent", "status": "defer", "decision": "Flag deferred — see rationale.", "decided_by": "yaswanth.panthangi@apexon.com", "decided_at": "2026-08-14T17:15:00Z", "rationale": "No E2E runner exists repo-wide; adding one is disproportionate for a single test-file story", "carry_forward_ref": "AF-04-carry"}
+  ],
   "pending_carry_forward": [
     {
       "item_id": "SRF-01-perf-p95-measurement",
@@ -26,7 +36,64 @@
       "added_by": "plan-implementation/03-tasks (risk accepted)",
       "resolved_at": null,
       "evidence": null
+    },
+    {
+      "item_id": "AF-01-carry",
+      "kind": "finding",
+      "reason": "Adding a type checker (mypy/TS) repo-wide is out of scope for a search/filter story",
+      "owner": "yaswanth.panthangi@apexon.com",
+      "added_at": "2026-08-14T17:15:00Z",
+      "added_by": "human-review/02-apply",
+      "resolved_at": null,
+      "evidence": null
+    },
+    {
+      "item_id": "AF-02-carry",
+      "kind": "finding",
+      "reason": "Adding lint tooling (eslint/ruff) repo-wide is out of scope for a search/filter story",
+      "owner": "yaswanth.panthangi@apexon.com",
+      "added_at": "2026-08-14T17:15:00Z",
+      "added_by": "human-review/02-apply",
+      "resolved_at": null,
+      "evidence": null
+    },
+    {
+      "item_id": "AF-04-carry",
+      "kind": "finding",
+      "reason": "No E2E runner exists repo-wide; adding one is disproportionate for a single test-file story",
+      "owner": "yaswanth.panthangi@apexon.com",
+      "added_at": "2026-08-14T17:15:00Z",
+      "added_by": "human-review/02-apply",
+      "resolved_at": null,
+      "evidence": null
     }
   ],
-  "last_updated": "2026-08-14T14:05:00Z"
+  "impl_evidence": {
+    "session_ended_at": "2026-08-14T16:45:00Z",
+    "rounds": 1,
+    "checks": {
+      "typecheck":    {"status": "N/A",  "source": "project-commands.yaml typecheck:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": "AF-01", "ran_at": null},
+      "unit_tests":   {"status": "PASS", "source": "project-commands.yaml test_unit:", "command": "cd backend && pytest", "exit_code": 0, "evidence_path": "docs/features/SRF-01/evidence/unit-tests.log", "flag_id": null, "ran_at": "2026-08-14T16:40:00Z", "notes": "16/16 passed (backend). Frontend suite also re-run for T-01 traceability, captured separately at evidence/unit-tests-frontend.log: 4/4 passed (npm run test) — not the config-mapped unit_tests source, kept as supporting evidence."},
+      "lint":         {"status": "N/A",  "source": "project-commands.yaml lint:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": "AF-02", "ran_at": null},
+      "runtime":      {"status": "PASS", "source": "stack-smoke.md Run:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": "AF-04", "ran_at": "2026-08-14T16:42:00Z", "stacks": [
+                        {"stack": "fastapi", "status": "PASS", "command": "cd backend && uvicorn app.main:app --port 8011", "exit_code": null, "evidence_path": "docs/features/SRF-01/evidence/runtime-fastapi.log", "boot_log_scan": "clean", "check": "GET /api/health -> 200"},
+                        {"stack": "react", "status": "PASS", "command": "cd frontend && npm run dev -- --port 5183", "exit_code": null, "evidence_path": "docs/features/SRF-01/evidence/runtime-react.log", "boot_log_scan": "clean", "check": "GET / -> 200, boot-only (empty <div id=\"root\"></div> pre-hydration, expected for SPA)", "render_check": "unavailable"}
+                      ]},
+      "compile":      {"status": "PASS", "source": "project-commands.yaml build:", "command": "cd frontend && npm run build", "exit_code": 0, "evidence_path": "docs/features/SRF-01/evidence/compile.log", "flag_id": null, "ran_at": "2026-08-14T16:41:00Z"},
+      "design_check": {"status": "N/A",  "source": "project-commands.yaml design_check:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": "AF-03", "ran_at": null}
+    }
+  },
+  "review": "PASS",
+  "review_report": "docs/features/SRF-01/REVIEW.md",
+  "security": "PASS",
+  "security_findings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "tool_missing": []
+  },
+  "security_report": "docs/features/SRF-01/SECURITY-20260814.md",
+  "phase": "security-reviewed",
+  "last_updated": "2026-08-14T18:00:00Z"
 }
