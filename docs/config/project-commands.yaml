@@ -1,0 +1,34 @@
+# Project commands
+# Consolidated build/test/lint/format entry points for both declared stacks
+# (react, fastapi — see docs/adr/0001-tech-stack.md).
+#
+# Gaps (do not treat as accidental omissions — see docs/adr/0001-tech-stack.md
+# § Consequences): no lint or formatter is configured for either stack yet.
+
+typecheck:           (n/a — no TypeScript/mypy configured; react uses plain JSX, fastapi has no static type checker wired)
+test:                (cd frontend && npm run test) && (cd backend && pytest)
+test_unit:           (cd backend && pytest) # fastapi has the only unit suite today; frontend has no test files yet despite vitest being wired
+test_integration:    (n/a — no integration suite configured)
+test_e2e:            (n/a — no e2e suite configured)
+lint:                (n/a — no linter configured for react or fastapi; TODO — add eslint + ruff/flake8)
+format:              (n/a — no formatter configured for react or fastapi; TODO — add prettier + black/ruff format)
+build:               cd frontend && npm run build
+
+# Optional — design_check. react is a declared frontend stack (ADR-0001) but
+# no accessibility/console-error/lighthouse tooling exists in this repo.
+# Left blank per skill contract: /arh-implement will raise an evidence-na
+# agent flag rather than silently pass.
+design_check:
+
+# Per-extension overrides (post-edit hooks use these)
+typecheck_for_ts:    (n/a — frontend is plain JSX, no TypeScript)
+typecheck_for_py:    (n/a — no mypy/pyright configured)
+format_for_ts:       (n/a — no formatter configured)
+format_for_py:       (n/a — no formatter configured)
+
+# Preflight: dep-install + smoke-import commands. Non-zero exit fails
+# validate-feature Phase 1.
+preflight:
+  - cd frontend && npm install
+  - cd backend && pip install -r requirements.txt
+  - cd backend && python -c "import app.main"

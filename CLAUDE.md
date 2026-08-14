@@ -42,13 +42,37 @@ Helpers: `/arh-trace`, `/arh-explain <id>`, `/arh-sync`, `harness carry-forward 
 <!-- Harness scaffold — sections below filled by /arh-init Phase 4 (bootstrap-agent) -->
 
 ## Conventions
-<!-- TODO -->
+
+- Components never call Axios directly — every HTTP call goes through `frontend/src/services/userApi.js`.
+- Backend layering must not be bypassed: `api → service → repository → models`.
+- Email uniqueness is enforced server-side (`409 Conflict` on duplicate).
+- Never surface raw stack traces to users — always return readable error messages.
+- Every mutation shows a loading state, a success toast, and a readable error on failure (frontend UX convention).
 
 ## Personas
-<!-- TODO -->
+
+- **Admin** — manages all user accounts (create, update, delete, view any record).
+- **Regular User** — the managed record/role (`role: User` in the data model); not an active operator of the dashboard itself.
 
 ## Domain glossary
-<!-- TODO -->
+
+- **User record** — a row in the `users` table (name, email, phone, role, status) managed via the CRUD dashboard.
+- **Role** — enum on a user record: `Admin` or `User`, distinct from the Admin/Regular-User personas above but aligned with them.
+- **Status** — enum on a user record: `Active` or `Inactive`, controlling whether the account is considered active.
 
 ## Target platforms
-<!-- TODO: e.g. iOS 17+, Web (Chrome 120+), Linux servers -->
+
+- Desktop web browsers only (no mobile-specific support).
+- Generic internal admin tool — no regulated domain (no HIPAA/PCI/SOC2); standard PII hygiene only for name/email/phone.
+
+## Branch conventions
+
+- `feature/<id>`, `bugfix/<id>`, `hotfix/<id>`, `chore/<id>`.
+
+## Commit format
+
+- Conventional Commits (`type(scope): summary`).
+
+## PR conventions
+
+- Title: Conventional-Commit-style summary. Body sections: Summary, Test plan, Migration (when applicable), Carry-forward (unrelated issues noticed but not fixed inline).
