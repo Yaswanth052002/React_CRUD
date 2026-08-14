@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Program — Wave Gantt</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: #f1f5f9; color: #1e293b; }
+
+    #app-header {
+      position: sticky; top: 0; z-index: 20;
+      background: #1e293b; color: #f8fafc;
+      padding: 12px 20px; display: flex; align-items: center; gap: 12px;
+    }
+    #app-header h1 { font-size: 15px; font-weight: 600; }
+    #app-header .meta { font-size: 12px; color: #94a3b8; margin-left: auto; }
+
+#gantt-wrap { overflow-x: auto; padding: 16px 20px 32px; }
+    #gantt { display: flex; gap: 8px; align-items: flex-start; }
+
+    .wave-col { flex: 0 0 168px; }
+    .wave-header {
+      text-align: center; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em; color: #64748b;
+      background: #e2e8f0; border-radius: 4px; padding: 6px 0; margin-bottom: 8px;
+    }
+
+    .story-bar {
+      position: relative; height: 40px; margin-bottom: 6px;
+      border-radius: 5px; overflow: hidden; cursor: default;
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+    .story-bar:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.18); }
+
+    .bar-bg   { position: absolute; inset: 0; }
+    .bar-fill { position: absolute; top: 0; left: 0; bottom: 0; }
+    .bar-text {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      justify-content: center; padding: 0 8px; pointer-events: none; overflow: hidden;
+    }
+    .bar-id    { font-size: 10px; font-weight: 700; color: rgba(0,0,0,0.75); line-height: 1; white-space: nowrap; }
+    .bar-title { font-size: 10px; color: rgba(0,0,0,0.58); line-height: 1.3; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bar-effort { position: absolute; top: 4px; right: 5px; font-size: 9px; font-weight: 700; color: rgba(0,0,0,0.4); }
+
+  </style>
+</head>
+<body>
+
+<div id="app-header">
+  <h1>Program — Wave Gantt</h1>
+  <span class="meta" id="meta-line"></span>
+</div>
+<div id="gantt-wrap"><div id="gantt"></div></div>
+
+<script>
+  const STORIES    = /* GANTT_STORIES */ [];
+  const WAVE_COUNT = /* GANTT_WAVE_COUNT */ 0;
+
+  const PALETTE = ['#3b82f6','#10b981','#f59e0b','#8b5cf6','#f97316','#ef4444','#14b8a6','#ec4899','#06b6d4','#84cc16'];
+  const epicColorMap = {};
+  let paletteIdx = 0;
+  function epicColor(epic) {
+    if (!epicColorMap[epic]) epicColorMap[epic] = PALETTE[paletteIdx++ % PALETTE.length];
+    return epicColorMap[epic];
+  }
+  STORIES.forEach(s => epicColor(s.epic));
+
+  // ── Group by wave ─────────────────────────────────────────────────────────────
+  const byWave = {};
+  for (let w = 1; w <= WAVE_COUNT; w++) byWave[w] = [];
+  STORIES.forEach(s => byWave[s.wave].push(s));
+
+  // ── Meta ──────────────────────────────────────────────────────────────────────
+  document.getElementById('meta-line').textContent =
+    `${STORIES.length} stories · ${WAVE_COUNT} waves`;
+
+  // ── Render bars ───────────────────────────────────────────────────────────────
+  const gantt = document.getElementById('gantt');
+  for (let w = 1; w <= WAVE_COUNT; w++) {
+    const col = document.createElement('div');
+    col.className = 'wave-col';
+
+    const hdr = document.createElement('div');
+    hdr.className = 'wave-header';
+    hdr.textContent = `Wave ${w}`;
+    col.appendChild(hdr);
+
+    (byWave[w] || []).forEach(story => {
+      const color    = epicColor(story.epic);
+      const progress = Math.max(0, Math.min(100, story.progress || 0));
+
+      const bar = document.createElement('div');
+      bar.className = 'story-bar';
+      bar.innerHTML = `
+        <div class="bar-bg"   style="background:${color};opacity:0.22"></div>
+        <div class="bar-fill" style="background:${color};opacity:0.85;width:${progress}%"></div>
+        <div class="bar-text">
+          <div class="bar-id">${story.id}</div>
+          <div class="bar-title">${story.title}</div>
+        </div>
+        <div class="bar-effort">${story.effort}</div>
+      `;
+
+      col.appendChild(bar);
+    });
+
+    gantt.appendChild(col);
+  }
+
+</script>
+</body>
+</html>

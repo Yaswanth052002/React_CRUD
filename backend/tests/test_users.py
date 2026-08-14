@@ -1,0 +1,173 @@
+"""
+End-to-end API tests using FastAPI's TestClient against an isolated
+in-memory SQLite database (separate from the dev users.db file).
+"""
+import pytest
+from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.pool import StaticPool
+
+from app.main import app
+from app.database import get_db, Base
+import app.models.user  # noqa: F401  (ensure model is registered on Base)
+
+# --- Isolated test database -------------------------------------------
+TEST_DATABASE_URL = "sqlite:///:memory:"
+
+engine = create_engine(
+    TEST_DATABASE_URL,
+    connect_args={"check_same_thread": False},
+    poolclass=StaticPool,
+)
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
+def override_get_db():
+    db = TestingSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+app.dependency_overrides[get_db] = override_get_db
+
+client = TestClient(app)
+
+
+@pytest.fixture(autouse=True)
+def _reset_db():
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+    yield
+
+
+def make_user(**overrides):
+    payload = {
+        "name": "Test User",
+        "email": "test.user@example.com",
+        "phone": "9876500000",
+        "role": "User",
+        "status": "Active",
+    }
+    payload.update(overrides)
+    return payload
+
+
+def test_create_user():
+    resp = client.post("/api/users", json=make_user())
+    assert resp.status_code == 201
+    body = resp.json()
+    assert body["name"] == "Test User"
+    assert body["email"] == "test.user@example.com"
+    assert "id" in body
+
+
+def test_get_users_returns_created_user():
+    client.post("/api/users", json=make_user())
+    resp = client.get("/api/users")
+    assert resp.status_code == 200
+    users = resp.json()
+    assert len(users) == 1
+    assert users[0]["email"] == "test.user@example.com"
+
+
+def test_get_single_user():
+    created = client.post("/api/users", json=make_user()).json()
+    resp = client.get(f"/api/users/{created['id']}")
+    assert resp.status_code == 200
+    assert resp.json()["id"] == created["id"]
+
+
+def test_get_user_not_found():
+    resp = client.get("/api/users/9999")
+    assert resp.status_code == 404
+
+
+def test_update_user():
+    created = client.post("/api/users", json=make_user()).json()
+    updated_payload = make_user(name="Updated Name", role="Admin")
+    resp = client.put(f"/api/users/{created['id']}", json=updated_payload)
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["name"] == "Updated Name"
+    assert body["role"] == "Admin"
+
+
+def test_update_user_not_found():
+    resp = client.put("/api/users/9999", json=make_user())
+    assert resp.status_code == 404
+
+
+def test_delete_user():
+    created = client.post("/api/users", json=make_user()).json()
+    resp = client.delete(f"/api/users/{created['id']}")
+    assert resp.status_code == 204
+
+    resp = client.get(f"/api/users/{created['id']}")
+    assert resp.status_code == 404
+
+
+def test_delete_user_not_found():
+    resp = client.delete("/api/users/9999")
+    assert resp.status_code == 404
+
+
+def test_duplicate_email_rejected():
+    client.post("/api/users", json=make_user(email="dup@example.com"))
+    resp = client.post("/api/users", json=make_user(email="dup@example.com", name="Someone Else"))
+    assert resp.status_code == 409
+
+
+def test_invalid_email_validation_error():
+    resp = client.post("/api/users", json=make_user(email="not-an-email"))
+    assert resp.status_code == 422
+
+
+def test_invalid_phone_validation_error():
+    resp = client.post("/api/users", json=make_user(phone="abc"))
+    assert resp.status_code == 422
+
+
+def test_missing_required_field():
+    payload = make_user()
+    del payload["name"]
+    resp = client.post("/api/users", json=payload)
+    assert resp.status_code == 422
+
+
+def test_dashboard_stats():
+    client.post("/api/users", json=make_user(email="a@example.com", role="Admin", status="Active"))
+    client.post("/api/users", json=make_user(email="b@example.com", role="User", status="Active"))
+    client.post("/api/users", json=make_user(email="c@example.com", role="User", status="Inactive"))
+
+    resp = client.get("/api/dashboard/stats")
+    assert resp.status_code == 200
+    stats = resp.json()
+    assert stats["total_users"] == 3
+    assert stats["active_users"] == 2
+    assert stats["admin_users"] == 1
+    assert stats["regular_users"] == 2
+
+
+def test_search_filters_by_name_email_phone():
+    client.post("/api/users", json=make_user(name="Alice Wonderland", email="alice@example.com"))
+    client.post("/api/users", json=make_user(name="Bob Builder", email="bob@example.com", phone="9876511111"))
+
+    resp = client.get("/api/users", params={"search": "alice"})
+    assert resp.status_code == 200
+    results = resp.json()
+    assert len(results) == 1
+    assert results[0]["name"] == "Alice Wonderland"
+
+
+def test_role_and_status_filters():
+    client.post("/api/users", json=make_user(email="admin1@example.com", role="Admin"))
+    client.post("/api/users", json=make_user(email="user1@example.com", role="User"))
+
+    resp = client.get("/api/users", params={"role": "Admin"})
+    assert resp.status_code == 200
+    results = resp.json()
+    assert len(results) == 1
+    assert results[0]["role"] == "Admin"

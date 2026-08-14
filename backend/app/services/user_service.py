@@ -1,0 +1,63 @@
+"""
+Business-logic layer. Translates API-level requests into repository
+calls and enforces rules that aren't pure data validation (e.g.
+"email must be unique", "user must exist").
+"""
+from typing import Optional, Sequence
+
+from fastapi import HTTPException, status
+from sqlalchemy.orm import Session
+
+from app.models.user import User
+from app.repositories.user_repository import UserRepository
+from app.schemas.user import UserCreate, UserUpdate
+
+
+class UserService:
+    def __init__(self, db: Session):
+        self.repo = UserRepository(db)
+
+    def list_users(
+        self,
+        search: Optional[str] = None,
+        role: Optional[str] = None,
+        status_filter: Optional[str] = None,
+    ) -> Sequence[User]:
+        return self.repo.get_all(search=search, role=role, status=status_filter)
+
+    def get_user(self, user_id: int) -> User:
+        user = self.repo.get_by_id(user_id)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"User with id {user_id} was not found",
+            )
+        return user
+
+    def create_user(self, payload: UserCreate) -> User:
+        existing = self.repo.get_by_email(payload.email)
+        if existing:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"A user with email '{payload.email}' already exists",
+            )
+        return self.repo.create(payload.model_dump())
+
+    def update_user(self, user_id: int, payload: UserUpdate) -> User:
+        user = self.get_user(user_id)
+
+        existing = self.repo.get_by_email(payload.email)
+        if existing and existing.id != user_id:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"A user with email '{payload.email}' already exists",
+            )
+
+        return self.repo.update(user, payload.model_dump())
+
+    def delete_user(self, user_id: int) -> None:
+        user = self.get_user(user_id)
+        self.repo.delete(user)
+
+    def dashboard_stats(self) -> dict:
+        return self.repo.stats()

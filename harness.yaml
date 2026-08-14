@@ -1,0 +1,34 @@
+apiVersion: harness.dev/v1
+kind: Harness
+template_version: 0.1.0
+project:
+  name: react-python-crud
+  description: "react-python-crud harnessFull-stack CRUD application using React frontend, Python FastAPI backend, and AgentRise
+    Harness"
+stacks:
+  - id: react
+    framework: react
+    version: '18'
+    package_manager: npm
+    test_runner: jest
+    paths:
+      - frontend/**
+  - id: fastapi
+    framework: fastapi
+    version: '0.115'
+    package_manager: pip
+    test_runner: pytest
+    paths:
+      - backend/**
+integrations:
+  doc_tracker: local
+  issue_tracker: none
+  design: none
+  vcs: github
+  ci: github-actions
+governance:
+  profile: standard
+permissions:
+  allow_extra: []
+targets:
+  - claude-code

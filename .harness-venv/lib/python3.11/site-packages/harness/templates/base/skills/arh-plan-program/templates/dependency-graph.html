@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dependency Graph</title>
+  <!-- NOTE: CDN dependencies below require network access. For offline/air-gapped environments,
+       download these libraries locally and update paths, or inline as data URIs. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.5/dagre.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.5.0/cytoscape-dagre.js"></script>
+  <style>
+    /* ── Dark mode (default) ── */
+    :root {
+      /* Layout */
+      --topbar-h:   44px;
+      --drawer-h:   286px;
+
+      /* Surfaces */
+      --bg:         #1a1d24;
+      --bg-rgb:     26, 29, 36;
+      --card:       #252830;
+      --card2:      #1e2128;
+
+      /* Text */
+      --text:       #e8eaf0;
+      --text-sec:   #8892a4;
+      --text-muted: #6b7585;
+
+      /* Borders */
+      --border:      rgba(255,255,255,0.12);
+      --border-soft: rgba(255,255,255,0.08);
+
+      /* ── Status colours — single source of truth ──────────────────────────
+         -base  used for dots, left-border, edge lines, legend bars
+         -txt   lightened for badge / chip text on dark bg                  */
+      --c-dft:      #6B7280;  --c-dft-txt:  #9CA3AF;
+      --c-int:      #A855F7;  --c-int-txt:  #C084FC;
+      --c-res:      #3B82F6;  --c-res-txt:  #93C5FD;
+      --c-pla:      #22C55E;  --c-pla-txt:  #86EFAC;
+      --c-bui:      #84CC16;  --c-bui-txt:  #BEF264;
+      --c-val:      #F97316;  --c-val-txt:  #FDB975;
+      --c-rev:      #EF4444;  --c-rev-txt:  #FCA5A5;
+      --c-don:      #6ab12c;  --c-don-txt:  #6EE7B7;
+      --c-blocked:  #E24B4A;  --c-blocked-txt: #F09595;
+      --c-crit:     #BA7517;  --c-crit-txt: #FAC775;
+
+      /* Edge / link colours */
+      --c-dep:      #378ADD;   /* dependency highlight, link text        */
+      --c-hard:     #6366F1;   /* hard-dependency edge                   */
+      --c-edge:     #52596b;   /* default soft edge                      */
+
+      /* Research verdicts */
+      --c-rv-go:    #6ab12c;  --c-rv-go-txt:    #97C459;
+      --c-rv-cond:  #BA7517;  --c-rv-cond-txt:  #FAC775;
+      --c-rv-spike: #E24B4A;  --c-rv-spike-txt: #F09595;
+    }
+
+    /* ── Light mode ── */
+    :root[data-theme="light"] {
+      --bg:         #f5f7fb;
+      --bg-rgb:     245, 247, 251;
+      --card:       #ffffff;
+      --card2:      #f9fafc;
+      --text:       #0f172a;
+      --text-sec:   #475569;
+      --text-muted: #94a3b8;
+      --border:      rgba(15,23,42,0.08);
+      --border-soft: rgba(15,23,42,0.05);
+
+      /* Darken status text for readability on white cards */
+      --c-dft-txt:  #374151;
+      --c-int-txt:  #6D28D9;
+      --c-res-txt:  #1D4ED8;
+      --c-pla-txt:  #15803D;
+      --c-bui-txt:  #4D7C0F;
+      --c-val-txt:  #C2410C;
+      --c-rev-txt:  #B91C1C;
+      --c-don:      #16a34a;  --c-don-txt:  #15803D;
+      --c-blocked:  #dc2626;  --c-blocked-txt: #B91C1C;
+      --c-crit:     #d97706;  --c-crit-txt: #B45309;
+      --c-dep:      #0ea5e9;
+      --c-rv-go-txt:  #15803D;
+      --c-rv-cond-txt:#B45309;
+      --c-rv-spike-txt:#B91C1C;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
+
+    /* ── Canvas ── */
+    #cy {
+      position: fixed;
+      top: var(--topbar-h); left: 0; right: 0; bottom: 0;
+      overflow: hidden;
+      transition: bottom 0.25s ease;
+    }
+    #cy.drawer-open { bottom: var(--drawer-h); }
+
+    /* ── Card overlay ── */
+    #node-cards { position: absolute; top: 0; left: 0; transform-origin: 0 0; pointer-events: none; z-index: 10; }
+
+    .nc { position: absolute; pointer-events: auto; transform: translate(-50%, -50%); }
+
+    .nc-inner {
+      background: var(--card);
+      border: 0.5px solid var(--border);
+      border-left: 3px solid;
+      border-radius: 8px;
+      padding: 9px 13px 9px 12px;
+      width: 188px; min-height: 70px;
+      cursor: pointer; user-select: none;
+      transition: box-shadow 0.12s, background 0.12s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .nc-inner.nc-done {
+      background: rgba(106, 177, 44, 0.08);
+      border-color: rgba(106, 177, 44, 0.2);
+    }
+    :root[data-theme="light"] .nc-inner.nc-done {
+      background: rgba(22, 163, 74, 0.07);
+      border-color: rgba(22, 163, 74, 0.18);
+    }
+    .nc-inner:hover {
+      border-color: var(--border-soft) !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+    .nc-inner.nc-done:hover {
+      background: rgba(106, 177, 44, 0.13);
+    }
+    :root[data-theme="light"] .nc-inner {
+      box-shadow: 0 2px 8px rgba(15,23,42,0.09);
+    }
+    :root[data-theme="light"] .nc-inner:hover {
+      box-shadow: 0 8px 16px rgba(15,23,42,0.14);
+    }
+
+    .nc-id     { font-size: 9px; color: var(--text-sec); letter-spacing: 0.09em; text-transform: uppercase; margin-bottom: 3px; }
+    .nc-title  { font-size: 12px; font-weight: 600; color: var(--text); line-height: 1.35; margin-bottom: 7px; word-break: break-word; }
+    .nc-footer { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--text-sec); }
+    :root[data-theme="light"] .nc-footer { color: var(--text-sec); }
+    .nc-dot    { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
+
+    /* ── Top bar ── */
+    #topbar {
+      position: fixed; top: 0; left: 0; right: 0; height: var(--topbar-h);
+      background: rgba(var(--bg-rgb), 0.97); border-bottom: 0.5px solid var(--border);
+      display: flex; align-items: center; padding: 0 14px; gap: 5px;
+      z-index: 200; backdrop-filter: blur(8px);
+    }
+    #topbar-title { font-size: 11px; font-weight: 700; color: var(--text); letter-spacing: 0.1em; text-transform: uppercase; margin-right: 4px; white-space: nowrap; flex-shrink: 0; }
+    .tb-div { width: 0.5px; height: 18px; background: rgba(255,255,255,0.09); flex-shrink: 0; margin: 0 5px; }
+    .tb-right { margin-left: auto; display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+
+    .chip { height: 26px; padding: 0 10px; border-radius: 5px; border: 0.5px solid transparent; background: transparent; color: var(--text-muted); font-size: 11px; font-weight: 500; cursor: pointer; white-space: nowrap; transition: all 0.1s; flex-shrink: 0; }
+    .chip:hover { color: var(--text-sec); background: rgba(255,255,255,0.05); }
+    .chip.active { color: var(--text); background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.15); }
+
+    /* ── Skill filter dropdown ── */
+    #skill-filter-wrap { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
+    #skill-filter-label { font-size: 10px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+    #skill-filter {
+      height: 26px; padding: 0 26px 0 10px;
+      border-radius: 5px; border: 0.5px solid rgba(255,255,255,0.12);
+      background-color: rgba(255,255,255,0.05);
+      color: var(--text); font-size: 11px; font-weight: 500;
+      cursor: pointer; outline: none; appearance: none; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238892a4' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 8px center;
+      transition: all 0.1s; min-width: 160px; max-width: 220px;
+    }
+    #skill-filter:hover { background-color: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
+    #skill-filter:focus { border-color: rgba(55,138,221,0.5); }
+    #skill-filter option { background: var(--card); color: var(--text); }
+    #skill-filter-count { font-size: 10px; color: var(--c-dep); font-weight: 600; white-space: nowrap; }
+
+
+    .zbtn { width: 28px; height: 28px; border-radius: 5px; border: 0.5px solid rgba(255,255,255,0.1); background: transparent; color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.1s; }
+    .zbtn:hover { background: rgba(255,255,255,0.06); color: var(--text-sec); }
+
+    /* ── Bottom Drawer ── */
+    #drawer {
+      position: fixed; bottom: calc(-1 * var(--drawer-h)); left: 0; right: 0;
+      height: var(--drawer-h);
+      background: var(--card2);
+      border-top: 0.5px solid var(--border);
+      z-index: 150;
+      transition: bottom 0.25s ease;
+      display: flex; flex-direction: column;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+    }
+    :root[data-theme="light"] #drawer {
+      box-shadow: 0 -4px 16px rgba(15,23,42,0.12);
+    }
+    #drawer.open { bottom: 0; }
+
+    /* Drawer header */
+    #drawer-header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 20px 10px;
+      border-bottom: 0.5px solid rgba(255,255,255,0.06);
+      flex-shrink: 0;
+    }
+    .dh-id    { font-size: 9px; color: var(--text-muted); letter-spacing: 0.09em; text-transform: uppercase; margin-bottom: 2px; }
+    .dh-title { font-size: 14px; font-weight: 700; color: var(--text); line-height: 1.25; }
+    #dh-title-wrap { flex: 1; min-width: 0; }
+    #dh-badges { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+    #drawer-close { margin-left: auto; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; line-height: 1; padding: 4px; flex-shrink: 0; }
+    #drawer-close:hover { color: var(--text-sec); }
+
+    /* Drawer body — 3 columns */
+    #drawer-body {
+      display: flex; flex: 1; overflow: hidden;
+    }
+
+    /* Column 1: Metadata */
+    #drawer-meta {
+      width: 200px; flex-shrink: 0;
+      padding: 14px 18px;
+      border-right: 0.5px solid rgba(255,255,255,0.06);
+      overflow-y: auto;
+    }
+    .dm-row { margin-bottom: 11px; }
+    .dm-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; font-weight: 600; margin-bottom: 3px; }
+    .dm-value { font-size: 12px; color: var(--text); font-weight: 500; }
+    .dm-value-sm { font-size: 11px; color: var(--text-sec); font-style: italic; line-height: 1.4; }
+
+    /* Column 2: User Story */
+    #drawer-story {
+      flex: 1; min-width: 0;
+      padding: 14px 18px;
+      border-right: 0.5px solid rgba(255,255,255,0.06);
+      overflow-y: auto;
+    }
+    .dc-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; font-weight: 600; margin-bottom: 8px; }
+    #d-user-story { font-size: 12px; color: var(--text-sec); line-height: 1.65; }
+    #d-user-story em { color: var(--text); font-style: normal; font-weight: 500; }
+
+    /* Column 3: Dependencies */
+    #drawer-deps {
+      width: 240px; flex-shrink: 0;
+      padding: 14px 18px;
+      display: flex; gap: 16px; overflow-y: auto;
+    }
+    .dd-col { flex: 1; min-width: 0; }
+    .dep-list { list-style: none; margin-top: 6px; }
+    .dep-list li { font-size: 11px; color: var(--text-sec); padding: 4px 0; border-bottom: 0.5px solid rgba(255,255,255,0.04); }
+    .dep-list li:last-child { border-bottom: none; }
+    .dep-list li .dep-id { color: var(--c-dep); font-weight: 600; }
+    .dep-list li.empty { color: var(--text-muted); font-style: italic; }
+    .dep-link { background: none; border: none; cursor: pointer; padding: 0; text-align: left; width: 100%; color: inherit; }
+    .dep-link:hover .dep-id { color: color-mix(in srgb, var(--c-dep) 70%, white); text-decoration: underline; }
+
+    /* Badges */
+    .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 5px; font-size: 11px; font-weight: 600; }
+    .bdot  { display: inline-block; width: 5px; height: 5px; border-radius: 50%; }
+
+    .s-DFT { background: color-mix(in srgb, var(--c-dft)     15%, transparent); color: var(--c-dft-txt); }
+    .s-INT { background: color-mix(in srgb, var(--c-int)     15%, transparent); color: var(--c-int-txt); }
+    .s-RES { background: color-mix(in srgb, var(--c-res)     15%, transparent); color: var(--c-res-txt); }
+    .s-PLA { background: color-mix(in srgb, var(--c-pla)     15%, transparent); color: var(--c-pla-txt); }
+    .s-BUI { background: color-mix(in srgb, var(--c-bui)     15%, transparent); color: var(--c-bui-txt); }
+    .s-VAL { background: color-mix(in srgb, var(--c-val)     15%, transparent); color: var(--c-val-txt); }
+    .s-REV { background: color-mix(in srgb, var(--c-rev)     15%, transparent); color: var(--c-rev-txt); }
+    .s-DON { background: color-mix(in srgb, var(--c-don)     15%, transparent); color: var(--c-don-txt); }
+
+.rv-GO         { background: color-mix(in srgb, var(--c-rv-go)    15%, transparent); color: var(--c-rv-go-txt); }
+    .rv-CONDITIONS { background: color-mix(in srgb, var(--c-rv-cond)  15%, transparent); color: var(--c-rv-cond-txt); }
+    .rv-SPIKE      { background: color-mix(in srgb, var(--c-rv-spike) 15%, transparent); color: var(--c-rv-spike-txt); }
+    .rv-NONE       { background: color-mix(in srgb, var(--c-dft)      10%, transparent); color: var(--text-muted); }
+
+    /* Activity Timeline */
+    #d-activity { margin-top: 16px; padding-top: 16px; border-top: 0.5px solid rgba(255,255,255,0.08); }
+    .activity-timeline { display: flex; flex-direction: column; gap: 10px; max-height: 180px; overflow-y: auto; }
+    .activity-entry {
+      display: flex; flex-direction: column; gap: 3px;
+      padding: 8px 10px; border-radius: 5px;
+      background: rgba(255,255,255,0.03); border: 0.5px solid rgba(255,255,255,0.06);
+      font-size: 10px;
+    }
+    .activity-command { color: var(--text); font-weight: 600; }
+    .activity-desc { color: var(--text-sec); font-size: 9.5px; }
+    .activity-meta { display: flex; gap: 8px; margin-top: 4px; font-size: 9px; }
+    .activity-time { color: var(--text-muted); }
+    .activity-result {
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 2px 6px; border-radius: 3px; font-weight: 600;
+      width: fit-content;
+    }
+    .activity-result.PASS    { background: color-mix(in srgb, var(--c-rv-go)    20%, transparent); color: var(--c-rv-go-txt); }
+    .activity-result.FAIL    { background: color-mix(in srgb, var(--c-blocked)  20%, transparent); color: var(--c-blocked-txt); }
+    .activity-result.PENDING { background: color-mix(in srgb, var(--c-crit)     20%, transparent); color: var(--c-crit-txt); }
+    .activity-entry:hover { background: rgba(255,255,255,0.06); }
+    .activity-toggle { background: none; border: none; color: var(--text-sec); cursor: pointer; font-size: 9px; padding: 0; margin-top: 8px; text-decoration: underline; }
+    .activity-toggle:hover { color: var(--text); }
+
+    /* Tooltip */
+    #tip { position: fixed; pointer-events: none; display: none; background: var(--card); border: 0.5px solid var(--border); border-radius: 6px; padding: 6px 11px; font-size: 11px; color: var(--text); z-index: 400; box-shadow: 0 4px 16px rgba(0,0,0,0.5); }
+    #tip-id { color: var(--c-dep); font-weight: 700; margin-right: 4px; }
+  </style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div id="topbar">
+  <span id="topbar-title">DEPENDENCIES</span>
+  <div class="tb-div"></div>
+  <div id="epic-filters" style="display:flex;gap:4px;align-items:center;">
+    <button class="chip active" data-epic="all">All epics</button>
+  </div>
+  <div class="tb-div"></div>
+  <div id="skill-filter-wrap">
+    <span id="skill-filter-label">Last skill</span>
+    <select id="skill-filter">
+      <option value="all">All stories</option>
+    </select>
+    <span id="skill-filter-count"></span>
+  </div>
+  <div class="tb-right">
+    <button class="zbtn" id="theme-toggle" title="Toggle light/dark mode">&#9681;</button>
+    <button class="zbtn" id="zin">+</button>
+    <button class="zbtn" id="zout">&#8722;</button>
+    <button class="zbtn" id="zfit" style="font-size:9px;letter-spacing:-0.02em">fit</button>
+  </div>
+</div>
+
+<!-- Graph canvas -->
+<div id="cy"></div>
+
+
+<!-- Bottom drawer -->
+<div id="drawer">
+  <div id="drawer-header">
+    <div id="dh-title-wrap">
+      <div class="dh-id" id="d-id"></div>
+      <div class="dh-title" id="d-title"></div>
+    </div>
+    <div id="dh-badges">
+      <span id="d-status"></span>
+    </div>
+    <button id="drawer-close">&#x2715;</button>
+  </div>
+
+  <div id="drawer-body">
+    <!-- Column 1: metadata -->
+    <div id="drawer-meta">
+      <div class="dm-row">
+        <div class="dm-label">Wave</div>
+        <div class="dm-value" id="d-wave">&#8212;</div>
+      </div>
+      <div class="dm-row" id="d-activity">
+        <div class="dm-label">Activity Timeline</div>
+        <div class="activity-timeline" id="d-activity-list"></div>
+        <button class="activity-toggle" id="d-activity-toggle" style="display:none;">Show full history →</button>
+      </div>
+    </div>
+
+    <!-- Column 2: user story -->
+    <div id="drawer-story">
+      <div class="dc-label">User Story</div>
+      <div id="d-user-story"></div>
+    </div>
+
+    <!-- Column 3: dependencies -->
+    <div id="drawer-deps">
+      <div class="dd-col">
+        <div class="dc-label">Needs first</div>
+        <ul class="dep-list" id="d-depends"></ul>
+      </div>
+      <div class="dd-col">
+        <div class="dc-label">Blocks</div>
+        <ul class="dep-list" id="d-blocks"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tooltip -->
+<div id="tip"><span id="tip-id"></span><span id="tip-title"></span></div>
+
+<script>
+  cytoscape.use(cytoscapeDagre);
+
+  // ── Static maps ────────────────────────────────────────────────────────────
+
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const STATUS_COLOR = { DFT: css('--c-dft'), INT: css('--c-int'), RES: css('--c-res'), PLA: css('--c-pla'), BUI: css('--c-bui'), VAL: css('--c-val'), REV: css('--c-rev'), DON: css('--c-don') };
+  const STATUS_LABEL = { DFT: 'Draft', INT: 'Intake', RES: 'Research', PLA: 'Planning', BUI: 'Build', VAL: 'Validation', REV: 'Review', DON: 'Done' };
+
+  // ── Data inlined by generate_graph_data.py ─────────────────────────────────
+
+  const NODES = [
+    /* GRAPH_NODES */
+  ];
+
+  const EDGES = [
+    /* GRAPH_EDGES */
+  ];
+
+  const META = /* GRAPH_META */ null;
+
+  // ── Computed: blocked nodes (have unfinished predecessors) ─────────────────
+
+  function computeBlocked() {
+    const done = new Set(NODES.filter(n => n.data.statusCode === 'DON').map(n => n.data.id));
+    const pm = {};
+    EDGES.forEach(e => { if (!pm[e.data.target]) pm[e.data.target] = []; pm[e.data.target].push(e.data.source); });
+    const bl = new Set();
+    NODES.forEach(n => {
+      const sc = n.data.statusCode;
+      if (sc === 'DON' || sc === 'BUI' || sc === 'VAL' || sc === 'REV') return;
+      if ((pm[n.data.id] || []).some(p => !done.has(p))) bl.add(n.data.id);
+    });
+    return bl;
+  }
+  const BLOCKED = computeBlocked();
+
+  // ── State ──────────────────────────────────────────────────────────────────
+
+  let activeNode  = null;
+  let drawerOpen  = false;
+  let activeWave  = 'all';
+  let activeSkill = 'all';
+
+  const DRAWER_H  = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--drawer-h'));
+
+  // ── Cytoscape ──────────────────────────────────────────────────────────────
+
+  const cy = cytoscape({
+    container: document.getElementById('cy'),
+    elements: [...NODES, ...EDGES],
+    style: [
+      { selector: 'node', style: { shape: 'round-rectangle', width: 190, height: 72, 'background-opacity': 0, 'border-width': 0, label: '' }},
+      { selector: 'edge', style: {
+          'curve-style': 'bezier', 'target-arrow-shape': 'triangle',
+          'line-color':         function(e) { return e.data('label') === 'H' ? css('--c-hard') : css('--c-edge'); },
+          'target-arrow-color': function(e) { return e.data('label') === 'H' ? css('--c-hard') : css('--c-edge'); },
+          'width':              function(e) { return e.data('label') === 'H' ? 2 : 1.5; },
+          'line-opacity': 0.45
+      }},
+      { selector: 'edge.dep-edge',     style: { 'line-color': css('--c-dep'),     'target-arrow-color': css('--c-dep'),     'line-opacity': 1, width: 2.5 }},
+      { selector: 'edge.blocked-edge', style: { 'line-color': css('--c-blocked'), 'target-arrow-color': css('--c-blocked'), 'line-opacity': 1, width: 2.5 }},
+      { selector: 'edge.dimmed',       style: { 'line-opacity': 0.04 }},
+    ],
+    layout: { name: 'preset' }
+  });
+
+  cy.layout({ name: 'dagre', rankDir: 'LR', padding: 80, nodeSep: 70, rankSep: 180, edgeSep: 40, ranker: 'network-simplex', align: 'DR' }).run();
+  cy.fit(undefined, 80);
+  window.addEventListener('resize', () => { cy.resize(); cy.fit(undefined, 80); });
+
+  // ── Card overlay ───────────────────────────────────────────────────────────
+
+  const cyEl  = document.getElementById('cy');
+  const cards = document.createElement('div');
+  cards.id = 'node-cards'; cyEl.appendChild(cards);
+
+  function cardColor(d) { return BLOCKED.has(d.id) ? css('--c-blocked') : STATUS_COLOR[d.statusCode] || css('--c-dft'); }
+  function cardLabel(d) { return BLOCKED.has(d.id) ? 'Blocked' : STATUS_LABEL[d.statusCode] || 'Unknown'; }
+
+  cy.nodes().forEach(node => {
+    const d = node.data();
+    const isBlocked = BLOCKED.has(d.id);
+    const color = cardColor(d);
+    const lastCmd = (d.activityLog && d.activityLog.length > 0) ? d.activityLog[0].command : null;
+    const border = isBlocked ? color : 'transparent';
+    const dotColor = isBlocked ? color : css('--c-dft');
+    const isDone = d.statusCode === 'DON' && !isBlocked;
+    const pos = node.position();
+    const div = document.createElement('div');
+    div.className = 'nc'; div.dataset.id = d.id;
+    div.style.left = pos.x + 'px'; div.style.top = pos.y + 'px';
+    div.innerHTML = `<div class="nc-inner${isDone ? ' nc-done' : ''}" style="border-left-color:${border}">
+      <div class="nc-id">${d.id}</div>
+      <div class="nc-title">${d.title || ''}</div>
+      <div class="nc-footer"><span class="nc-dot" style="background:${dotColor}"></span><span>${lastCmd || '—'}</span></div>
+    </div>`;
+    div.addEventListener('mousedown', (evt) => evt.stopPropagation());
+    div.addEventListener('mouseup',   (evt) => evt.stopPropagation());
+    div.addEventListener('click',     (evt) => { evt.stopPropagation(); const n = cy.$('#' + d.id); if (n.length) selectNode(n); });
+    cards.appendChild(div);
+  });
+
+  function syncViewport() { const p = cy.pan(), z = cy.zoom(); cards.style.transform = `translate(${p.x}px,${p.y}px) scale(${z})`; }
+  cy.on('viewport', syncViewport); syncViewport();
+
+  function getCard(id) { return cards.querySelector(`.nc[data-id="${CSS.escape(id)}"]`); }
+
+  function syncCardStyles() {
+    cy.nodes().forEach(node => {
+      const card = getCard(node.id()); if (!card) return;
+      const inner = card.querySelector('.nc-inner');
+      if (node.style('display') === 'none') { card.style.visibility = 'hidden'; return; }
+      card.style.visibility = 'visible';
+      if      (node.hasClass('dimmed'))             { card.style.opacity = '0.07'; inner.style.boxShadow = ''; }
+      else if (node.hasClass('dep-of-selected'))    { card.style.opacity = '1';    inner.style.boxShadow = '0 0 0 1.5px #378ADD'; }
+      else if (node.hasClass('blocked-by-selected')){ card.style.opacity = '1';    inner.style.boxShadow = '0 0 0 1.5px #E24B4A'; }
+      else if (node.hasClass('selected'))           { card.style.opacity = '1';    inner.style.boxShadow = '0 0 0 2px rgba(255,255,255,0.35)'; }
+      else                                          { card.style.opacity = '1';    inner.style.boxShadow = ''; }
+    });
+  }
+
+  if (META && META.project) document.getElementById('topbar-title').textContent = META.project.toUpperCase() + ' — DEPENDENCIES';
+
+  // ── Epic chips (dynamic) ───────────────────────────────────────────────────
+
+  const epicsPresent = [...new Set(NODES.map(n => n.data.epic).filter(e => e != null))].sort();
+  const epicContainer = document.getElementById('epic-filters');
+  epicsPresent.forEach(e => {
+    const btn = document.createElement('button');
+    btn.className = 'chip'; btn.dataset.epic = e; btn.textContent = e;
+    epicContainer.appendChild(btn);
+  });
+
+  let activeEpic = 'all';
+
+  // ── Skill dropdown (dynamic) ───────────────────────────────────────────────
+
+  const skillSelect = document.getElementById('skill-filter');
+  const skillCount  = document.getElementById('skill-filter-count');
+
+  // Collect all distinct commands that appear as the most-recent activity entry
+  const skillsPresent = [...new Set(
+    NODES
+      .map(n => (n.data.activityLog && n.data.activityLog.length > 0) ? n.data.activityLog[0].command : null)
+      .filter(Boolean)
+  )].sort();
+
+  skillsPresent.forEach(cmd => {
+    const opt = document.createElement('option');
+    opt.value = cmd; opt.textContent = '/' + cmd;
+    skillSelect.appendChild(opt);
+  });
+
+  function updateSkillCount() {
+    if (activeSkill === 'all') { skillCount.textContent = ''; return; }
+    const matching = NODES.filter(n => {
+      const log = n.data.activityLog;
+      return log && log.length > 0 && log[0].command === activeSkill;
+    }).length;
+    skillCount.textContent = matching + ' ' + (matching === 1 ? 'story' : 'stories');
+  }
+
+  // ── Filters ────────────────────────────────────────────────────────────────
+
+  function applyFilters() {
+    cy.batch(() => {
+      cy.nodes().forEach(n => {
+        const d = n.data(); let show = true;
+        if (activeEpic !== 'all') show = show && (d.epic === activeEpic);
+        if (activeSkill !== 'all') {
+          const lastCmd = (d.activityLog && d.activityLog.length > 0) ? d.activityLog[0].command : null;
+          show = show && (lastCmd === activeSkill);
+        }
+        n.style('display', show ? 'element' : 'none');
+      });
+      cy.edges().forEach(e => {
+        const sh = cy.$('#' + e.data('source')).style('display') === 'none';
+        const th = cy.$('#' + e.data('target')).style('display') === 'none';
+        e.style('display', (sh || th) ? 'none' : 'element');
+      });
+    });
+    syncCardStyles();
+    updateSkillCount();
+  }
+
+  epicContainer.addEventListener('click', e => {
+    const chip = e.target.closest('.chip'); if (!chip) return;
+    epicContainer.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active'); activeEpic = chip.dataset.epic; applyFilters();
+  });
+
+  skillSelect.addEventListener('change', () => {
+    activeSkill = skillSelect.value;
+    applyFilters();
+  });
+
+  // ── Graph reset / selection ────────────────────────────────────────────────
+
+  function resetGraph() {
+    cy.elements().removeClass('dimmed dep-of-selected blocked-by-selected selected dep-edge blocked-edge');
+    activeNode = null;
+  }
+
+  function selectNode(node) {
+    if (node.style('display') === 'none') { resetGraph(); closeDrawer(); return; }
+    if (activeNode && activeNode.id() === node.id()) { resetGraph(); closeDrawer(); syncCardStyles(); return; }
+    resetGraph();
+    activeNode = node;
+    cy.elements().addClass('dimmed');
+    node.predecessors('node').removeClass('dimmed').addClass('dep-of-selected');
+    node.successors('node').removeClass('dimmed').addClass('blocked-by-selected');
+    node.predecessors('edge').removeClass('dimmed').addClass('dep-edge');
+    node.successors('edge').removeClass('dimmed').addClass('blocked-edge');
+    node.removeClass('dimmed').addClass('selected');
+    syncCardStyles();
+    openDrawer(node);
+  }
+
+  cy.on('tap', 'node', function(evt) { selectNode(evt.target); });
+
+  cy.on('tap', function(evt) {
+    if (evt.target === cy) { resetGraph(); closeDrawer(); syncCardStyles(); }
+  });
+
+  // ── Drawer ─────────────────────────────────────────────────────────────────
+
+  const drawer   = document.getElementById('drawer');
+
+function formatUserStory(text) {
+    if (!text) return '<span style="color:var(--text-muted);font-style:italic">Not specified</span>';
+    // Bold the persona, action, outcome
+    return text
+      .replace(/^(As a\s+)([^,]+)(,)/i, '$1<em>$2</em>$3')
+      .replace(/(I want to\s+)([^,]+)(,|$)/i, '$1<em>$2</em>$3')
+      .replace(/(so that\s+)(.+)/i, '$1<em>$2</em>');
+  }
+
+  function getRelativeTime(date) {
+    const now = new Date();
+    const diffMs = now - date;
+    const diffSec = Math.floor(diffMs / 1000);
+    const diffMin = Math.floor(diffSec / 60);
+    const diffHr = Math.floor(diffMin / 60);
+    const diffDay = Math.floor(diffHr / 24);
+
+    if (diffDay > 0) return `${diffDay}d ago`;
+    if (diffHr > 0) return `${diffHr}h ago`;
+    if (diffMin > 0) return `${diffMin}m ago`;
+    return 'just now';
+  }
+
+  function openDrawer(node) {
+    const d = node.data();
+
+    // Header
+    document.getElementById('d-id').textContent    = d.id;
+    document.getElementById('d-title').textContent  = d.title || '';
+
+    document.getElementById('d-status').innerHTML = '';
+
+    // Meta column
+    const waveEl = document.getElementById('d-wave');
+    waveEl.innerHTML = d.wave != null ? `Wave ${d.wave}` : '&#8212;';
+
+
+    // Activity timeline
+    const activityList = document.getElementById('d-activity-list');
+    const activityToggle = document.getElementById('d-activity-toggle');
+    activityList.innerHTML = '';
+    activityToggle.style.display = 'none';
+
+    if (d.activityLog && d.activityLog.length > 0) {
+      const maxShow = 3;
+      const entries = d.activityLog.slice(0, maxShow);
+      entries.forEach(entry => {
+        const div = document.createElement('div');
+        div.className = 'activity-entry';
+        const time = new Date(entry.timestamp);
+        const relTime = getRelativeTime(time);
+        const resultBadge = entry.result ? `<span class="activity-result ${entry.result}">● ${entry.result}</span>` : '';
+        div.innerHTML = `
+          <div class="activity-command">${entry.command}</div>
+          <div class="activity-desc">"${entry.description}"</div>
+          <div class="activity-meta">
+            <span class="activity-time">${relTime}</span>
+            ${resultBadge}
+          </div>
+        `;
+        activityList.appendChild(div);
+      });
+      if (d.activityLog.length > maxShow) {
+        activityToggle.style.display = 'block';
+        activityToggle.textContent = `Show ${d.activityLog.length - maxShow} more actions →`;
+      }
+    } else {
+      const empty = document.createElement('div');
+      empty.style.cssText = 'color:var(--text-muted);font-style:italic;font-size:10px;';
+      empty.textContent = 'No activity yet';
+      activityList.appendChild(empty);
+    }
+
+    // User story column
+    document.getElementById('d-user-story').innerHTML = formatUserStory(d.userStory);
+
+    // Dependencies column
+    const depEl = document.getElementById('d-depends'); depEl.innerHTML = '';
+    (d.dependsOn || []).forEach(dep => {
+      const li = document.createElement('li');
+      li.innerHTML = `<button class="dep-link" data-id="${dep}"><span class="dep-id">${dep}</span></button>`;
+      depEl.appendChild(li);
+    });
+    if (!d.dependsOn || !d.dependsOn.length) depEl.innerHTML = '<li class="empty">None</li>';
+
+    const blkEl = document.getElementById('d-blocks'); blkEl.innerHTML = '';
+    const directBlocks = (d.blocks || []).filter(blk => cy.edges(`[source="${d.id}"][target="${blk}"]`).length > 0);
+    directBlocks.forEach(blk => {
+      const li = document.createElement('li');
+      li.innerHTML = `<button class="dep-link" data-id="${blk}"><span class="dep-id">${blk}</span></button>`;
+      blkEl.appendChild(li);
+    });
+    if (!directBlocks.length) blkEl.innerHTML = '<li class="empty">None</li>';
+
+    // Open
+    drawer.classList.add('open');
+    cyEl.classList.add('drawer-open');
+    cy.resize();
+    drawerOpen = true;
+
+    // Pan so selected node isn't hidden behind drawer
+    setTimeout(() => {
+      const rp = node.renderedPosition();
+      const visH = cyEl.offsetHeight;
+      if (rp.y + 50 > visH) {
+        cy.panBy({ x: 0, y: -(rp.y + 50 - visH) });
+      }
+    }, 260); // after transition
+  }
+
+  function closeDrawer() {
+    drawer.classList.remove('open');
+    cyEl.classList.remove('drawer-open');
+    cy.resize();
+    drawerOpen = false;
+  }
+
+  document.getElementById('drawer-close').addEventListener('click', () => {
+    resetGraph(); closeDrawer(); syncCardStyles();
+  });
+
+  ['d-depends', 'd-blocks'].forEach(id => {
+    document.getElementById(id).addEventListener('click', e => {
+      const btn = e.target.closest('.dep-link'); if (!btn) return;
+      const n = cy.$('#' + btn.dataset.id); if (n.length) n.emit('tap');
+    });
+  });
+
+  // ── Hover tooltip ──────────────────────────────────────────────────────────
+
+  const tip = document.getElementById('tip');
+  cy.on('mouseover', 'node', evt => {
+    if (evt.target.style('display') === 'none') return;
+    const d = evt.target.data();
+    document.getElementById('tip-id').textContent    = d.id + ':';
+    document.getElementById('tip-title').textContent = d.title || '';
+    tip.style.display = 'block';
+  });
+  cy.on('mousemove', 'node', evt => { tip.style.left = (evt.originalEvent.clientX + 14) + 'px'; tip.style.top = (evt.originalEvent.clientY - 10) + 'px'; });
+  cy.on('mouseout',  'node', () => { tip.style.display = 'none'; });
+
+  // ── Zoom controls ──────────────────────────────────────────────────────────
+
+  document.getElementById('zin').addEventListener('click',  () => cy.zoom(Math.min(3,   cy.zoom() * 1.2)));
+  document.getElementById('zout').addEventListener('click', () => cy.zoom(Math.max(0.2, cy.zoom() / 1.2)));
+  document.getElementById('zfit').addEventListener('click', () => cy.fit(undefined, 80));
+  document.getElementById('cy').addEventListener('wheel', e => {
+    e.preventDefault();
+    cy.zoom(Math.max(0.2, Math.min(3, cy.zoom() * (e.deltaY > 0 ? 0.9 : 1.11))));
+  }, { passive: false });
+
+  // ── Theme toggle ──────────────────────────────────────────────────────────
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('graph-theme', theme);
+  }
+
+  function getPreferredTheme() {
+    const saved = localStorage.getItem('graph-theme');
+    if (saved) return saved;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
+  const themeToggle = document.getElementById('theme-toggle');
+  const currentTheme = getPreferredTheme();
+  setTheme(currentTheme);
+
+  themeToggle.addEventListener('click', () => {
+    const theme = document.documentElement.getAttribute('data-theme');
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  });
+</script>
+</body>
+</html>

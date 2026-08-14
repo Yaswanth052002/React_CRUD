@@ -1,0 +1,52 @@
+{
+  "categories": [
+    {
+      "id": "primary-requirements",
+      "label": "Primary Requirements / Scope Definition",
+      "required": true,
+      "files": []
+    },
+    {
+      "id": "regulatory-compliance",
+      "label": "Regulatory & Compliance",
+      "required": false,
+      "files": []
+    },
+    {
+      "id": "domain-workflows",
+      "label": "Domain Workflows & Industry Standards",
+      "required": false,
+      "files": []
+    },
+    {
+      "id": "user-research",
+      "label": "User Research / Competitive Reference",
+      "required": false,
+      "files": []
+    },
+    {
+      "id": "accessibility",
+      "label": "Accessibility Standards",
+      "required": false,
+      "files": []
+    },
+    {
+      "id": "competitive",
+      "label": "Competitive Landscape",
+      "required": false,
+      "files": []
+    },
+    {
+      "id": "technical-constraints",
+      "label": "Technical Constraints & Architecture",
+      "required": false,
+      "files": []
+    },
+    {
+      "id": "uncategorized",
+      "label": "Uncategorized",
+      "required": false,
+      "files": []
+    }
+  ]
+}

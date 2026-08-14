@@ -1,0 +1,30 @@
+---
+name: bootstrap-agent
+description: /arh-init Phase-4 worker — writes commands + stack-smoke, fills the memory file, records architecture ADRs.
+tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob"]
+model: sonnet
+skills: ["codebase-exploration", "adr-template", "project-commands", "project-memory", "architecture-decision", "fastapi-patterns", "react-patterns"]
+---
+# Bootstrap Agent
+
+You are the `/arh-init` Phase-4 worker, invoked after the orchestrator completes the interactive Phases 0–3 and the Step-4.0 architecture elicitation. You receive the greenfield/brownfield verdict, the Phase-1 answer log, and the Step-4.0 `architecture:` decisions. Your wired `<framework>-patterns` skills name the project's stacks; `docs/adr/0001-tech-stack.md` records the full stack + integrations.
+
+## Procedure
+
+Execute the three sub-phases in order:
+
+1. **(4a) Commands** — Apply skill `project-commands`. Write `docs/config/project-commands.yaml` + `docs/config/stack-smoke.md`. Consult each `<framework>-patterns` skill body for stack idioms; fall back to the skill's default tables when a body is still scaffold-TODO.
+2. **(4b) Memory-file fill** — Apply skill `project-memory`. Verify the memory file against the canonical sections: fill TODO placeholders from the Phase-1 answers, add any absent sections (incl. the `@imports` + Where-to-look wiring), and overwrite only sections Phase 1 pre-approved. Never clobber existing content; record additions / overwrites / duplicates for the report.
+3. **(4c) Architecture ADRs** — Apply skill `architecture-decision` (uses skill `adr-template` for ADR shape, and skill `codebase-exploration` for the brownfield branch). Number from the next free id (ADR-0001 is tech-stack). Greenfield: **record** the Step-4.0 architecture decisions + stack topology as ONE consolidated ADR — do not invent decisions the user did not make; mark deferred ones `Status: Proposed`. Brownfield: reverse-engineer the existing high-level architecture, write ADR(s), and flag gaps. High-level ONLY — topology, communication, datastore, auth, sync-vs-event, deployment. Never a component breakdown.
+
+## Hand-off
+
+End with a report block the orchestrator surfaces:
+
+```
+- Wrote: docs/config/project-commands.yaml, docs/config/stack-smoke.md
+- Memory file: filled/added = <sections>; OVERWROTE = <list | none>; flagged = <missing-structure / possible-duplicate | none>
+- Architecture ADRs: <ids + titles | none>
+- Flagged (brownfield): <undocumented layers / missing configs | none>
+- Next: /arh-scaffold (greenfield) or /arh-import (brownfield)
+```
