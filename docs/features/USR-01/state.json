@@ -1,0 +1,321 @@
+{
+  "story": "validated",
+  "story_priority": "P1",
+  "story_independent_test": true,
+  "research": "complete",
+  "research_verdict": "GO",
+  "rtm_source_sha": "c2ed94df7a9c94c82b97fdf416781cb12af4e42e",
+  "prd": "complete",
+  "design": "n/a",
+  "design_artifact": "docs/features/USR-01/DESIGN.md",
+  "design_provider": "none",
+  "design_iteration": 0,
+  "phase": "security-reviewed",
+  "needs_clarification_count": 0,
+  "review": "PASS",
+  "review_report": "docs/features/USR-01/REVIEW.md",
+  "gate": "APPROVE",
+  "plan": "complete",
+  "plan_validation": "PASS",
+  "plan_validation_rounds": 1,
+  "decisions": [
+    {
+      "decision_id": "D-01",
+      "title": "Dedicated Users.jsx page vs. splitting Dashboard.jsx in place",
+      "alternatives": [
+        "users-jsx-extraction",
+        "dashboard-mode-flag"
+      ],
+      "chosen": "users-jsx-extraction",
+      "rationale": "Dashboard.jsx (375 lines) currently owns both stats-overview rendering and the full search/filter/pagination/CRUD toolkit built by SRF-01. USR-01 needs a purpose-built Users management surface without further overloading Dashboard or forcing every future Dashboard-only change to thread through CRUD state.",
+      "blast_radius": "feature",
+      "reversibility": "mechanical",
+      "adr_ref": null,
+      "created_at": "2026-08-14T20:00:00Z",
+      "created_by": "plan-implementation/plan-authoring"
+    },
+    {
+      "decision_id": "D-02",
+      "title": "Routing mechanism \u2014 extend conditional branch vs. router library",
+      "alternatives": [
+        "extend-conditional-branch",
+        "react-router-dom"
+      ],
+      "chosen": "extend-conditional-branch",
+      "rationale": "App.jsx's activeView state currently remaps the \"users\" sidebar key onto \"dashboard\" (App.jsx:43). The story constraint forbids introducing a routing library for what remains a three-view admin console (dashboard / users / settings).",
+      "blast_radius": "feature",
+      "reversibility": "mechanical",
+      "adr_ref": null,
+      "created_at": "2026-08-14T20:00:00Z",
+      "created_by": "plan-implementation/plan-authoring"
+    },
+    {
+      "decision_id": "D-03",
+      "title": "Inactive-stat source \u2014 client-side derivation vs. backend field",
+      "alternatives": [
+        "client-derived-total-minus-active",
+        "backend-inactive-users-field"
+      ],
+      "chosen": "client-derived-total-minus-active",
+      "rationale": "GET /api/dashboard/stats returns exactly total_users, active_users, admin_users, regular_users with no inactive_users field, and the story's Constraints section explicitly freezes the backend contract (no new field, no schema change) for this story.",
+      "blast_radius": "feature",
+      "reversibility": "mechanical",
+      "adr_ref": null,
+      "created_at": "2026-08-14T20:00:00Z",
+      "created_by": "plan-implementation/plan-authoring"
+    },
+    {
+      "decision_id": "D-04",
+      "title": "Test-relocation strategy for Dashboard.search.test.jsx",
+      "alternatives": [
+        "adapt-in-place-plus-new-users-test-file",
+        "delete-and-replace",
+        "leave-untouched"
+      ],
+      "chosen": "adapt-in-place-plus-new-users-test-file",
+      "rationale": "Dashboard.search.test.jsx asserts search/debounce/aria-label behavior that is being physically relocated into Users.jsx. AC#16 / USR-01-FR-5 forbid both deleting the file and leaving it asserting against behavior no longer present in the trimmed Dashboard.jsx, so the file is adapted in place to cover remaining overview behavior while a new Users.search.test.jsx relocates the original assertions verbatim.",
+      "blast_radius": "feature",
+      "reversibility": "mechanical",
+      "adr_ref": null,
+      "created_at": "2026-08-14T20:00:00Z",
+      "created_by": "plan-implementation/plan-authoring"
+    }
+  ],
+  "impl_tasks": [
+    {
+      "id": "T-01",
+      "status": "done",
+      "completed_at": "2026-08-14T13:10:55Z",
+      "files_touched": [
+        "frontend/src/pages/Users.jsx"
+      ]
+    },
+    {
+      "id": "T-02",
+      "status": "done",
+      "completed_at": "2026-08-14T13:10:55Z",
+      "files_touched": [
+        "frontend/src/pages/Dashboard.jsx"
+      ]
+    },
+    {
+      "id": "T-03",
+      "status": "done",
+      "completed_at": "2026-08-14T13:10:55Z",
+      "files_touched": [
+        "frontend/src/App.jsx"
+      ]
+    },
+    {
+      "id": "T-04",
+      "status": "done",
+      "completed_at": "2026-08-14T13:13:08Z",
+      "files_touched": [
+        "frontend/src/pages/__tests__/Dashboard.search.test.jsx"
+      ]
+    },
+    {
+      "id": "T-05",
+      "status": "done",
+      "completed_at": "2026-08-14T13:13:08Z",
+      "files_touched": [
+        "frontend/src/pages/__tests__/Users.search.test.jsx"
+      ]
+    },
+    {
+      "id": "T-06",
+      "status": "done",
+      "completed_at": "2026-08-14T13:13:08Z",
+      "files_touched": [
+        "frontend/src/pages/__tests__/Users.crud.test.jsx"
+      ]
+    },
+    {
+      "id": "T-07",
+      "status": "done",
+      "completed_at": "2026-08-14T13:13:08Z",
+      "files_touched": [
+        "frontend/src/pages/__tests__/App.routing.test.jsx"
+      ]
+    },
+    {
+      "id": "T-08",
+      "status": "done",
+      "completed_at": "2026-08-14T13:13:08Z",
+      "files_touched": [
+        "README.md"
+      ]
+    }
+  ],
+  "impl_evidence": {
+    "session_ended_at": "2026-08-14T19:00:36Z",
+    "rounds": 2,
+    "checks": {
+      "typecheck": {
+        "status": "N/A",
+        "source": "project-commands.yaml typecheck:",
+        "command": null,
+        "exit_code": null,
+        "evidence_path": null,
+        "flag_id": "AF-01",
+        "ran_at": null
+      },
+      "unit_tests": {
+        "status": "PASS",
+        "source": "project-commands.yaml test_unit:",
+        "command": "cd backend && pytest",
+        "exit_code": 0,
+        "evidence_path": "docs/features/USR-01/evidence/unit-tests.log",
+        "flag_id": null,
+        "ran_at": "2026-08-14T19:00:36Z",
+        "notes": "16/16 passed (backend, pre-existing suite, unmodified by this story). Frontend suite re-run after fix-loop round 2 for USR-01-TC-13 (added regression test to Users.crud.test.jsx for the edit-failure inline-error path), captured separately at evidence/unit-tests-frontend.log: 25/25 passed (npm run test, up from 24 \u2014 new test added, no regressions) \u2014 not the config-mapped unit_tests source, kept as supporting evidence."
+      },
+      "lint": {
+        "status": "N/A",
+        "source": "project-commands.yaml lint:",
+        "command": null,
+        "exit_code": null,
+        "evidence_path": null,
+        "flag_id": "AF-02",
+        "ran_at": null
+      },
+      "runtime": {
+        "status": "PASS",
+        "source": "stack-smoke.md Run:",
+        "command": null,
+        "exit_code": null,
+        "evidence_path": null,
+        "flag_id": null,
+        "ran_at": "2026-08-14T18:44:00Z",
+        "stacks": [
+          {
+            "stack": "fastapi",
+            "status": "PASS",
+            "command": "cd backend && uvicorn app.main:app --port 8021",
+            "exit_code": null,
+            "evidence_path": "docs/features/USR-01/evidence/runtime-fastapi.log",
+            "boot_log_scan": "clean",
+            "check": "GET /api/health -> 200"
+          },
+          {
+            "stack": "react",
+            "status": "PASS",
+            "command": "cd frontend && npm run dev -- --port 5193",
+            "exit_code": null,
+            "evidence_path": "docs/features/USR-01/evidence/runtime-react.log",
+            "boot_log_scan": "clean",
+            "check": "GET / -> 200, boot-only (empty <div id=\"root\"></div> pre-hydration, expected for SPA)",
+            "render_check": "unavailable"
+          }
+        ]
+      },
+      "compile": {
+        "status": "PASS",
+        "source": "project-commands.yaml build:",
+        "command": "cd frontend && npm run build",
+        "exit_code": 0,
+        "evidence_path": "docs/features/USR-01/evidence/compile.log",
+        "flag_id": null,
+        "ran_at": "2026-08-14T18:44:00Z"
+      },
+      "design_check": {
+        "status": "N/A",
+        "source": "project-commands.yaml design_check:",
+        "command": null,
+        "exit_code": null,
+        "evidence_path": null,
+        "flag_id": "AF-03",
+        "ran_at": null
+      }
+    }
+  },
+  "agent_flags": [
+    {
+      "flag_id": "AF-01",
+      "kind": "other",
+      "summary": "typecheck dimension N/A \u2014 no static type checker configured for either stack (pre-existing)",
+      "source": "docs/config/project-commands.yaml",
+      "task_id": null,
+      "raised_at": "2026-08-14T19:15:00Z",
+      "raised_by": "implementation-agent",
+      "status": "defer",
+      "decision": "Flag deferred \u2014 see rationale.",
+      "decided_by": "yaswanth.panthangi@apexon.com",
+      "decided_at": "2026-08-14T20:15:00Z",
+      "rationale": "Adding a type checker (mypy/TS) repo-wide is out of scope for this story",
+      "carry_forward_ref": "AF-01-carry"
+    },
+    {
+      "flag_id": "AF-02",
+      "kind": "other",
+      "summary": "lint dimension N/A \u2014 no eslint/ruff configured for either stack (pre-existing)",
+      "source": "docs/config/project-commands.yaml",
+      "task_id": null,
+      "raised_at": "2026-08-14T19:15:00Z",
+      "raised_by": "implementation-agent",
+      "status": "defer",
+      "decision": "Flag deferred \u2014 see rationale.",
+      "decided_by": "yaswanth.panthangi@apexon.com",
+      "decided_at": "2026-08-14T20:15:00Z",
+      "rationale": "Adding lint tooling (eslint/ruff) repo-wide is out of scope for this story",
+      "carry_forward_ref": "AF-02-carry"
+    },
+    {
+      "flag_id": "AF-03",
+      "kind": "risky-pattern",
+      "summary": "design_check dimension N/A \u2014 no a11y/console/lighthouse tooling exists; integrations.design=none for this UI-touching story (pre-existing)",
+      "source": "docs/config/stack-smoke.md",
+      "task_id": null,
+      "raised_at": "2026-08-14T19:15:00Z",
+      "raised_by": "implementation-agent",
+      "status": "reject",
+      "decision": "Flag rejected as noise \u2014 see rationale.",
+      "decided_by": "yaswanth.panthangi@apexon.com",
+      "decided_at": "2026-08-14T20:15:00Z",
+      "rationale": "integrations.design=none was an explicit /arh-init decision; not a gap for this story to fix",
+      "carry_forward_ref": null
+    }
+  ],
+  "pending_carry_forward": [
+    {
+      "item_id": "AF-01-carry",
+      "kind": "finding",
+      "reason": "Adding a type checker (mypy/TS) repo-wide is out of scope for this story",
+      "owner": "yaswanth.panthangi@apexon.com",
+      "added_at": "2026-08-14T20:15:00Z",
+      "added_by": "human-review/02-apply",
+      "resolved_at": null,
+      "evidence": null
+    },
+    {
+      "item_id": "AF-02-carry",
+      "kind": "finding",
+      "reason": "Adding lint tooling (eslint/ruff) repo-wide is out of scope for this story",
+      "owner": "yaswanth.panthangi@apexon.com",
+      "added_at": "2026-08-14T20:15:00Z",
+      "added_by": "human-review/02-apply",
+      "resolved_at": null,
+      "evidence": null
+    }
+  ],
+  "impl": "complete",
+  "impl_branch": "feature/USR-01",
+  "validation": "passed",
+  "validation_summary": "2026-08-14 P=25/25 in 2 round(s)",
+  "adrs_referenced": [
+    "ADR-1",
+    "ADR-2",
+    "ADR-3",
+    "ADR-4"
+  ],
+  "security": "PASS",
+  "security_findings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "tool_missing": []
+  },
+  "security_report": "docs/features/USR-01/SECURITY-20260814.md",
+  "last_updated": "2026-08-14T21:45:00Z"
+}

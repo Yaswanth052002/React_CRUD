@@ -18,3 +18,5 @@
 | SRF-02 | Filter users by role | intake:raw-input | Story | SRF | Intake | - | docs/stories/SRF-02.md | - |
 | SRF-03 | Filter users by status | intake:raw-input | Story | SRF | Intake | - | docs/stories/SRF-03.md | - |
 | SRF-04 | Combine search with role and status filters | intake:raw-input | Story | SRF | Intake | - | docs/stories/SRF-04.md | - |
+| USR | User Management Page | intake:raw-input | Epic | - | Intake | - | - | - |
+| USR-01 | Dedicated Users Management Page | intake:raw-input | Story | USR | Intake | - | docs/stories/USR-01.md | - |

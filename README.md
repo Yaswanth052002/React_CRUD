@@ -71,7 +71,8 @@ react-python-crud/
 │   ├── src/
 │   │   ├── components/     # Sidebar, Header, StatsCard, UserTable, UserForm, ...
 │   │   ├── pages/
-│   │   │   └── Dashboard.jsx
+│   │   │   ├── Dashboard.jsx
+│   │   │   └── Users.jsx
 │   │   ├── services/
 │   │   │   └── userApi.js  # The ONLY module that calls the backend
 │   │   ├── styles/index.css
@@ -166,6 +167,10 @@ running.
 be unique (a duplicate returns `409 Conflict`).
 
 ## 11. CRUD Usage (from the UI)
+
+CRUD, search, filtering, and pagination all live on the dedicated **Users** page (sidebar →
+"Users"), not on the Dashboard. Dashboard is overview-only — it shows the Total/Active/Admins/
+Regular Users stats cards and no longer fetches the user list.
 
 1. **Create** — click **+ Add User**, fill the form, submit. Validation runs client-side first;
    the server re-validates and rejects duplicate emails.
