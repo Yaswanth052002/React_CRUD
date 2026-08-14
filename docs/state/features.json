@@ -42,5 +42,18 @@
     "rtm_source_sha": "bf8d08637468e343cb0c39377aa7d7af9b360b72",
     "phase": "story-validated",
     "last_updated": "2026-08-14T00:05:00Z"
+  },
+  "USR-01": {
+    "story": "validated",
+    "story_priority": "P1",
+    "research": "complete",
+    "research_verdict": "GO",
+    "prd": "complete",
+    "design": "n/a",
+    "rtm_source_sha": "c2ed94df7a9c94c82b97fdf416781cb12af4e42e",
+    "phase": "plan-implementation",
+    "last_updated": "2026-08-14T20:00:00Z",
+    "gate": "APPROVE",
+    "plan": "complete"
   }
 }

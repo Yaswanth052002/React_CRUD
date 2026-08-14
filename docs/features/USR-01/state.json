@@ -1,0 +1,70 @@
+{
+  "story": "validated",
+  "story_priority": "P1",
+  "story_independent_test": true,
+  "research": "complete",
+  "research_verdict": "GO",
+  "rtm_source_sha": "c2ed94df7a9c94c82b97fdf416781cb12af4e42e",
+  "prd": "complete",
+  "design": "n/a",
+  "design_artifact": "docs/features/USR-01/DESIGN.md",
+  "design_provider": "none",
+  "design_iteration": 0,
+  "phase": "plan-implementation",
+  "needs_clarification_count": 0,
+  "last_updated": "2026-08-14T20:00:00Z",
+  "gate": "APPROVE",
+  "plan": "complete",
+  "plan_validation": "PASS",
+  "plan_validation_rounds": 1,
+  "decisions": [
+    {
+      "decision_id": "D-01",
+      "title": "Dedicated Users.jsx page vs. splitting Dashboard.jsx in place",
+      "alternatives": ["users-jsx-extraction", "dashboard-mode-flag"],
+      "chosen": "users-jsx-extraction",
+      "rationale": "Dashboard.jsx (375 lines) currently owns both stats-overview rendering and the full search/filter/pagination/CRUD toolkit built by SRF-01. USR-01 needs a purpose-built Users management surface without further overloading Dashboard or forcing every future Dashboard-only change to thread through CRUD state.",
+      "blast_radius": "feature",
+      "reversibility": "mechanical",
+      "adr_ref": null,
+      "created_at": "2026-08-14T20:00:00Z",
+      "created_by": "plan-implementation/plan-authoring"
+    },
+    {
+      "decision_id": "D-02",
+      "title": "Routing mechanism — extend conditional branch vs. router library",
+      "alternatives": ["extend-conditional-branch", "react-router-dom"],
+      "chosen": "extend-conditional-branch",
+      "rationale": "App.jsx's activeView state currently remaps the \"users\" sidebar key onto \"dashboard\" (App.jsx:43). The story constraint forbids introducing a routing library for what remains a three-view admin console (dashboard / users / settings).",
+      "blast_radius": "feature",
+      "reversibility": "mechanical",
+      "adr_ref": null,
+      "created_at": "2026-08-14T20:00:00Z",
+      "created_by": "plan-implementation/plan-authoring"
+    },
+    {
+      "decision_id": "D-03",
+      "title": "Inactive-stat source — client-side derivation vs. backend field",
+      "alternatives": ["client-derived-total-minus-active", "backend-inactive-users-field"],
+      "chosen": "client-derived-total-minus-active",
+      "rationale": "GET /api/dashboard/stats returns exactly total_users, active_users, admin_users, regular_users with no inactive_users field, and the story's Constraints section explicitly freezes the backend contract (no new field, no schema change) for this story.",
+      "blast_radius": "feature",
+      "reversibility": "mechanical",
+      "adr_ref": null,
+      "created_at": "2026-08-14T20:00:00Z",
+      "created_by": "plan-implementation/plan-authoring"
+    },
+    {
+      "decision_id": "D-04",
+      "title": "Test-relocation strategy for Dashboard.search.test.jsx",
+      "alternatives": ["adapt-in-place-plus-new-users-test-file", "delete-and-replace", "leave-untouched"],
+      "chosen": "adapt-in-place-plus-new-users-test-file",
+      "rationale": "Dashboard.search.test.jsx asserts search/debounce/aria-label behavior that is being physically relocated into Users.jsx. AC#16 / USR-01-FR-5 forbid both deleting the file and leaving it asserting against behavior no longer present in the trimmed Dashboard.jsx, so the file is adapted in place to cover remaining overview behavior while a new Users.search.test.jsx relocates the original assertions verbatim.",
+      "blast_radius": "feature",
+      "reversibility": "mechanical",
+      "adr_ref": null,
+      "created_at": "2026-08-14T20:00:00Z",
+      "created_by": "plan-implementation/plan-authoring"
+    }
+  ]
+}
