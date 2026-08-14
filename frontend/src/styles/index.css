@@ -465,6 +465,23 @@ select {
   flex-wrap: wrap;
 }
 
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+  flex-wrap: wrap;
+}
+
+.pagination__controls {
+  display: flex;
+  gap: 8px;
+}
+
 .search-input {
   position: relative;
   min-width: 260px;

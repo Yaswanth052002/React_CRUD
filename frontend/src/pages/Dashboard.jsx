@@ -27,6 +27,9 @@ export default function Dashboard({ onMenuClick, onUserCountChange }) {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [page, setPage] = useState(1);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const PAGE_SIZE = 50;
 
   const [modalMode, setModalMode] = useState(null); // 'create' | 'edit' | null
   const [editingUser, setEditingUser] = useState(null);
@@ -55,15 +58,22 @@ export default function Dashboard({ onMenuClick, onUserCountChange }) {
     setLoadingUsers(true);
     setLoadError(null);
     try {
-      const data = await getUsers({ search, role: roleFilter, status: statusFilter });
-      setUsers(data);
-      onUserCountChange?.(data.length);
+      const data = await getUsers({
+        search,
+        role: roleFilter,
+        status: statusFilter,
+        page,
+        pageSize: PAGE_SIZE,
+      });
+      setUsers(data.items);
+      setTotalUsers(data.total);
+      onUserCountChange?.(data.total);
     } catch (err) {
       setLoadError(err.message);
     } finally {
       setLoadingUsers(false);
     }
-  }, [search, roleFilter, statusFilter, onUserCountChange]);
+  }, [search, roleFilter, statusFilter, page, onUserCountChange]);
 
   const loadStats = useCallback(async () => {
     setLoadingStats(true);
@@ -84,7 +94,13 @@ export default function Dashboard({ onMenuClick, onUserCountChange }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Debounced search + immediate filter changes
+  // Search/filter changes reset to page 1 (their effect on `page` triggers the load below).
+  useEffect(() => {
+    setPage(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, roleFilter, statusFilter]);
+
+  // Debounced search + immediate filter/page changes
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
@@ -92,7 +108,7 @@ export default function Dashboard({ onMenuClick, onUserCountChange }) {
     }, search ? 300 : 0);
     return () => clearTimeout(debounceRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, roleFilter, statusFilter]);
+  }, [search, roleFilter, statusFilter, page]);
 
   const refreshAll = async () => {
     await Promise.all([loadUsers(), loadStats()]);
@@ -289,6 +305,33 @@ export default function Dashboard({ onMenuClick, onUserCountChange }) {
             onAddUser={openCreateModal}
             hasActiveFilters={hasActiveFilters}
           />
+
+          {!loadingUsers && totalUsers > 0 && (
+            <div className="pagination" aria-label="Pagination">
+              <span aria-live="polite">
+                Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, totalUsers)} of{" "}
+                {totalUsers}
+              </span>
+              <div className="pagination__controls">
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  aria-label="Previous page"
+                >
+                  Previous
+                </button>
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={page * PAGE_SIZE >= totalUsers}
+                  aria-label="Next page"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

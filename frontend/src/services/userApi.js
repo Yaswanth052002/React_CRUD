@@ -34,12 +34,14 @@ function normalizeError(error) {
   return new Error("Something went wrong. Please try again.");
 }
 
-export async function getUsers({ search, role, status } = {}) {
+export async function getUsers({ search, role, status, page, pageSize } = {}) {
   try {
     const params = {};
     if (search) params.search = search;
     if (role && role !== "All") params.role = role;
     if (status && status !== "All") params.status = status;
+    if (page) params.page = page;
+    if (pageSize) params.page_size = pageSize;
     const res = await client.get("/api/users", { params });
     return res.data;
   } catch (err) {
