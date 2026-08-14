@@ -1,0 +1,124 @@
+{
+  "story_id": "SRF-01",
+  "test_cases": [
+    {
+      "id": "SRF-01-TC-01",
+      "title": "Non-empty search value debounces 300ms before firing request",
+      "type": "unit",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "SRF-01-FR-1",
+      "given": "the admin has focused the dashboard search input and no request has fired yet",
+      "when": "the admin types a non-empty value into the search input",
+      "then": "getUsers({ search, role, status }) is not called until 300ms of fake-timer time has elapsed, then is called exactly once with the typed value",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "SRF-01-TC-02",
+      "title": "Clearing the search input triggers an immediate (0ms) refetch",
+      "type": "unit",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "SRF-01-FR-1",
+      "given": "the admin has a non-empty search value entered and results are filtered",
+      "when": "the admin clears the search input to an empty string",
+      "then": "getUsers is called immediately (0ms delay) with an empty/omitted search param, without waiting for the 300ms debounce",
+      "tags": ["happy-path", "edge-case"]
+    },
+    {
+      "id": "SRF-01-TC-03",
+      "title": "Search matches case-insensitively across name, email, and phone",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "SRF-01-FR-1",
+      "given": "users Alice Example (alice@test.com, phone 5551234567) and Bob Example exist",
+      "when": "GET /api/users?search=ALICE is requested",
+      "then": "the response contains only the user whose name, email, or phone matches 'alice' case-insensitively (Alice), and excludes Bob",
+      "tags": ["happy-path", "regression"]
+    },
+    {
+      "id": "SRF-01-TC-04",
+      "title": "Empty search term returns the full unfiltered, paginated user list",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "SRF-01-FR-1",
+      "given": "multiple users exist and a search filter was previously applied",
+      "when": "the search value becomes empty and GET /api/users is requested with no search param",
+      "then": "the response returns the full unfiltered user list within the existing pagination envelope (default page size 50)",
+      "tags": ["happy-path", "edge-case"]
+    },
+    {
+      "id": "SRF-01-TC-05",
+      "title": "Search term matching no user returns an empty result set, not an error",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Should",
+      "requirement_id": "SRF-01-FR-1",
+      "given": "no user in the system has 'zzz-nomatch' in name, email, or phone",
+      "when": "GET /api/users?search=zzz-nomatch is requested",
+      "then": "the response is 200 OK with an empty results array and total=0, not a 404 or 500",
+      "tags": ["negative", "edge-case"]
+    },
+    {
+      "id": "SRF-01-TC-06",
+      "title": "Backend regression suite passes after test-infrastructure fix",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "SRF-01-FR-1",
+      "given": "the import-shadowing fix in backend/tests/test_users.py:13 is applied",
+      "when": "the full pytest suite is run",
+      "then": "all 15 backend tests pass, including test_search_filters_by_name_email_phone",
+      "tags": ["regression-test-infra-fix"]
+    },
+    {
+      "id": "SRF-01-TC-07",
+      "title": "GET /api/users search response time stays within performance budget",
+      "type": "performance",
+      "automatable": true,
+      "priority": "Should",
+      "requirement_id": "SRF-01-NFR-performance",
+      "given": "GET /api/users?search=<term> is exercised at sustained load",
+      "when": "50 RPS is sustained for 60 seconds against a seeded dataset",
+      "then": "p95 response latency is below 300ms",
+      "tags": ["performance"]
+    },
+    {
+      "id": "SRF-01-TC-08",
+      "title": "Search endpoint requires no authentication (documented current behavior)",
+      "type": "security",
+      "automatable": true,
+      "priority": "Should",
+      "requirement_id": "SRF-01-NFR-security",
+      "given": "no Authorization header or session is provided",
+      "when": "GET /api/users?search=alice is requested",
+      "then": "the request succeeds with 200 OK, confirming the documented open-endpoint behavior has not silently changed",
+      "tags": ["regression"]
+    },
+    {
+      "id": "SRF-01-TC-09",
+      "title": "Search input exposes an accessible label",
+      "type": "e2e",
+      "automatable": true,
+      "priority": "Should",
+      "requirement_id": "SRF-01-NFR-accessibility",
+      "given": "the dashboard is loaded",
+      "when": "the search input element is queried",
+      "then": "it has aria-label=\"Search users\" attribute present",
+      "tags": ["accessibility"]
+    }
+  ],
+  "coverage_audit": {
+    "functional_requirements": [
+      {"id": "SRF-01-FR-1", "covered_by": ["SRF-01-TC-01", "SRF-01-TC-02", "SRF-01-TC-03", "SRF-01-TC-04", "SRF-01-TC-05", "SRF-01-TC-06"]}
+    ],
+    "non_functional_requirements": [
+      {"id": "SRF-01-NFR-performance", "covered_by": ["SRF-01-TC-07"]},
+      {"id": "SRF-01-NFR-security", "covered_by": ["SRF-01-TC-08"]},
+      {"id": "SRF-01-NFR-accessibility", "covered_by": ["SRF-01-TC-09"]}
+    ],
+    "uncovered": []
+  }
+}

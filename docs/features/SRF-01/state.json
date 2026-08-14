@@ -1,0 +1,32 @@
+{
+  "story": "validated",
+  "story_priority": "P1",
+  "story_independent_test": true,
+  "research": "complete",
+  "research_verdict": "GO-WITH-CONDITIONS",
+  "rtm_source_sha": "bf8d08637468e343cb0c39377aa7d7af9b360b72",
+  "prd": "complete",
+  "design": "n/a",
+  "design_artifact": "docs/features/SRF-01/DESIGN.md",
+  "design_provider": "none",
+  "design_iteration": 0,
+  "phase": "plan-implementation",
+  "needs_clarification_count": 0,
+  "gate": "APPROVE",
+  "plan": "complete",
+  "plan_validation": "PASS",
+  "plan_validation_rounds": 1,
+  "pending_carry_forward": [
+    {
+      "item_id": "SRF-01-perf-p95-measurement",
+      "kind": "risk",
+      "reason": "GET /api/users search p95 < 300ms @ 50 RPS budget (SRF-01-TC-07) is unmeasured — no load-testing runner (k6 or equivalent) exists in this repo; accepted per REQUIREMENTS.md § Scope (Out): 'Measuring/tuning the server-side p95 latency budget under real load — tracked as a follow-up profiling task, not blocking this PRD'",
+      "owner": "Full-stack (brownfield backfill — no named owner in source system)",
+      "added_at": "2026-08-14T14:05:00Z",
+      "added_by": "plan-implementation/03-tasks (risk accepted)",
+      "resolved_at": null,
+      "evidence": null
+    }
+  ],
+  "last_updated": "2026-08-14T14:05:00Z"
+}
