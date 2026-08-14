@@ -55,6 +55,8 @@
     "last_updated": "2026-08-14T20:30:00Z",
     "gate": "APPROVE",
     "plan": "complete",
-    "review": "PASS"
+    "review": "PASS",
+    "impl": "complete",
+    "validation": "passed"
   }
 }

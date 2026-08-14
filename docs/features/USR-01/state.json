@@ -14,7 +14,7 @@
   "needs_clarification_count": 0,
   "review": "PASS",
   "review_report": "docs/features/USR-01/REVIEW.md",
-  "last_updated": "2026-08-14T20:15:00Z",
+  "last_updated": "2026-08-14T20:30:00Z",
   "gate": "APPROVE",
   "plan": "complete",
   "plan_validation": "PASS",
@@ -298,5 +298,15 @@
       "resolved_at": null,
       "evidence": null
     }
+  ],
+  "impl": "complete",
+  "impl_branch": "feature/USR-01",
+  "validation": "passed",
+  "validation_summary": "2026-08-14 P=25/25 in 2 round(s)",
+  "adrs_referenced": [
+    "ADR-1",
+    "ADR-2",
+    "ADR-3",
+    "ADR-4"
   ]
 }
