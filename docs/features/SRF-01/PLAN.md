@@ -1,7 +1,13 @@
 # PLAN: SRF-01 — Search users by name, email, or phone
 
-Status: Complete
+Status: Complete (amended 2026-08-14 with SRF-01-FR-2)
 Story: SRF-01 · Priority: P1 · Research verdict: GO-WITH-CONDITIONS (89/100)
+
+> Amendment note (2026-08-14): §§ 1-7 below (original) cover SRF-01-FR-1 only. Following the
+> merge of `feature/USR-01` (dedicated Users page) into this branch, the story was extended
+> in-place with SRF-01-FR-2 (Dashboard "User Overview" layout enhancement) per explicit user
+> request — no new story was created. The amendment is appended as §§ 2a/5a/6a/7a below rather
+> than rewritten inline, to keep the original PRD's plan-validation record intact and auditable.
 
 > Scope note: this is a brownfield backfill PRD. `GET /api/users?search=` (backend) and the
 > debounced search input (`frontend/src/pages/Dashboard.jsx`) are already implemented,
@@ -28,6 +34,18 @@ ADR" / else it isn't ADR-worthy) this decision does not clear the bar for a mini
 `decide` skill invocation follows from this section — there is no mini-ADR to mirror into
 `decisions[]`.
 
+## 1a. Architecture Decisions (SRF-01-FR-2 amendment)
+
+**No mini-ADR required.** Every choice in this amendment is either dictated by an explicit
+user constraint (client-side Inactive derivation, no new API, no new dependency, reuse
+existing components) or a small, obviously-reversible CSS/JSX change with one clear existing
+precedent to follow (the app's established `.badge-inactive` neutral-gray convention for
+"Inactive" state, and the existing `.panel` container pattern already used by `Users.jsx`'s
+toolbar). Per `plan-authoring`'s bar ("if three readers would each pick a different solution,
+write the ADR"), none of these choices clears it — same rationale the original § 1 used to skip
+a mini-ADR for SRF-01-FR-1. Recorded here as plan prose rather than a `decisions[]` state entry,
+per this session's explicit instruction not to hand-edit state files.
+
 ## 2. File and Module Plan
 
 | ID   | Action | Path                                                          | Reason                                                                                      |
@@ -35,11 +53,33 @@ ADR" / else it isn't ADR-worthy) this decision does not clear the bar for a mini
 | F-01 | create | `frontend/src/pages/__tests__/Dashboard.search.test.jsx`        | New Vitest spec for SRF-01-FR-1: 300ms debounce-while-typing + 0ms immediate-clear refetch, plus a static aria-label assertion (TC-09) |
 | F-02 | verify | `backend/tests/test_users.py`                                   | No edits — re-run the existing suite to confirm the already-applied import-shadowing fix (research Risk #1) and pagination coverage (Risk #2, ADR-0003) remain green; traces C-1/C-2 |
 
-No other files are created or modified. `frontend/src/pages/Dashboard.jsx`,
+No other files are created or modified by the original SRF-01-FR-1 scope.
 `frontend/src/services/userApi.js`, `backend/app/api/users.py`,
 `backend/app/services/user_service.py`, and `backend/app/repositories/user_repository.py`
-are frozen per REQUIREMENTS.md § Constraints and are read-only references for the new test
-(F-01), not file-table entries.
+remain frozen per REQUIREMENTS.md § Constraints for FR-1 and are untouched by the FR-2
+amendment below as well.
+
+## 2a. File and Module Plan (SRF-01-FR-2 amendment)
+
+| ID   | Action | Path                                            | Reason                                                                                     |
+|------|--------|--------------------------------------------------|----------------------------------------------------------------------------------------------|
+| F-03 | modify | `frontend/src/pages/Dashboard.jsx`                | Wrap stats cards in a bordered "User Overview" section; add 5th `StatsCard` (Inactive Users) derived client-side |
+| F-04 | modify | `frontend/src/components/StatsCard.jsx`           | Add one additive `neutral` entry to `COLOR_MAP` (existing entries untouched)                |
+| F-05 | modify | `frontend/src/styles/index.css`                   | Change `.stats-grid` base rule to `repeat(auto-fit, minmax(160px, 1fr))`; existing 1100px/640px media queries unchanged |
+| F-06 | modify | `frontend/src/pages/__tests__/Dashboard.search.test.jsx` | Extend the existing file with SRF-01-TC-10..14 (no new test file — reuses the existing `describe` structure) |
+
+### Wiring
+
+F-03/F-04/F-05 are edits to already-registered, already-imported modules (`Dashboard.jsx` is
+already rendered by `App.jsx`; `StatsCard.jsx` is already imported by `Dashboard.jsx` and
+`Users.jsx`; `index.css` is already the app's single global stylesheet, imported once in
+`main.jsx`) — no new entry-registration is needed. F-06 is a leaf test file edit, exempt per
+`plan-validation` § Wiring, same exception SRF-01-FR-1's F-01 used.
+
+**Shared-class risk**: F-05's `.stats-grid` change affects `Users.jsx`'s existing 4-card usage
+too (same class, different consumer). T-04 below explicitly re-verifies `Users.jsx`'s stats
+grid still renders correctly after the change — this is a disclosed, tested blast-radius
+expansion, not a silent side effect.
 
 ### Wiring
 
@@ -94,6 +134,18 @@ Both tasks are `[P]`: disjoint files (F-01 vs F-02), no predecessors, no shared 
 state (one touches only a new frontend test file, the other only runs — does not edit — an
 existing backend test file).
 
+## 5a. Task Breakdown (SRF-01-FR-2 amendment)
+
+| #    | Title                                                          | Complexity | [P] | Predecessors | Files | Notes                                                                 |
+|------|-----------------------------------------------------------------|------------|-----|--------------|-------|------------------------------------------------------------------------|
+| T-03 | Add "User Overview" panel + Inactive-stat derivation to `Dashboard.jsx`; extend `StatsCard.jsx` COLOR_MAP with `neutral` | S | [P] | — | F-03, F-04 | ACs: story AC #4. Implements SRF-01-FR-2 items 1, 2, 4. Inline comment documents the `total - active` assumption per REQUIREMENTS.md. |
+| T-04 | Adjust `.stats-grid` base rule to `auto-fit, minmax(160px,1fr)`  | S          | [P] | —             | F-05  | Implements FR-2 item 5. Must visually verify `Users.jsx`'s existing 4-card grid still renders correctly (shared class) |
+| T-05 | Add SRF-01-TC-10..14 to `Dashboard.search.test.jsx`              | M          | —   | T-03, T-04    | F-06  | Covers FR-2 items 1-4. Mocks `getDashboardStats` per existing `react-patterns` service-boundary convention |
+| T-06 | Re-run full frontend + backend suites — regression gate          | S          | —   | T-05          | —     | Closes SRF-01-TC-14. Verifies no regression to `Users.jsx` CRUD/search/filter/pagination or backend behavior |
+
+T-03 and T-04 are `[P]` (disjoint files: `Dashboard.jsx`/`StatsCard.jsx` vs `index.css`). T-05
+depends on both (it tests the combined result). T-06 is the final regression gate.
+
 ## 6. Carry-Forward Risks and Conditions
 
 Risks from `docs/research/SRF-01.md` § Risk register. Risks #1 and #2 were HIGH and are
@@ -137,6 +189,15 @@ item is written to `pending_carry_forward[]` (see state write below) and require
 | C-2  | Add pagination to `GET /api/users`                                                                             | T-02 (already implemented via ADR-0003 prior to this PRD; T-02's full-suite re-run re-verifies pagination tests stay green) |
 | C-3  | Add a frontend unit test for the search-input debounce logic (`Dashboard.jsx`)                                 | T-01 |
 
+### Carry-forward (SRF-01-FR-2 amendment)
+
+No new HIGH/MED risks introduced. One disclosed, deferred item (consistent with the original
+plan's TC-07 pattern, not a silently dropped gap):
+
+| Item | Severity | Rationale |
+|------|----------|-----------|
+| SRF-01-TC-15 (responsive reflow, real-browser) | LOW | jsdom cannot evaluate CSS layout/media queries; visual verification of the 5-card responsive reflow is deferred to manual/real-browser check, same disclosed-deferral pattern as SRF-01-TC-07's performance measurement. Not written to `pending_carry_forward[]` by this document — that state write is the implementation-agent's responsibility at `/arh-implement` time, per this session's instruction not to hand-edit state files. |
+
 ### Cross-Feature Dependency Notes
 
 SRF-02 (role filter), SRF-03 (status filter), and SRF-04 (combined filters) all extend the
@@ -159,6 +220,14 @@ them beyond the already-frozen contract.
 | Integration (existing, re-verified) | `backend/tests/test_users.py` (T-02)                                | SRF-01-TC-06              | Regression check that the already-applied import-shadowing fix (`test_users.py:13`) holds; confirmed by T-02 (15/15 pass) |
 | Performance                   | manual / deferred (no task in this PLAN)                            | SRF-01-TC-07              | Execution deferred — reason: no load-testing runner configured in this repo (`project-commands.yaml` `test_e2e: n/a`, no `test_performance` entry) and REQUIREMENTS.md § Scope explicitly lists p95 measurement as **Out** ("tracked as a follow-up profiling task, not blocking this PRD"). Carried forward via `pending_carry_forward[]`, requires `--accept-pending` at commit-PR time |
 | Security                      | manual checklist                                                    | SRF-01-TC-08              | Endpoint is intentionally unauthenticated in the current build per REQUIREMENTS.md § Non-functional requirements (documented known gap, not in scope for this story); covered in `/arh-security-review` |
+
+### 7a. Test Strategy (SRF-01-FR-2 amendment)
+
+| Layer                        | Test path                                                        | TCs covered              | Notes                                                                                                  |
+|-------------------------------|--------------------------------------------------------------------|---------------------------|-----------------------------------------------------------------------------------------------------------|
+| Unit                          | `frontend/src/pages/__tests__/Dashboard.search.test.jsx` (T-05)     | SRF-01-TC-10, TC-11, TC-12, TC-13 | Extends the existing file's `describe` block; mocks `getDashboardStats` per existing convention |
+| Integration (regression)      | full `npm run test` + `pytest` (T-06)                               | SRF-01-TC-14              | Confirms no regression to `Users.jsx` or backend after the Dashboard change |
+| Manual / deferred             | real-browser viewport check (no task in this PLAN)                  | SRF-01-TC-15              | Deferred — no CSS-layout-evaluating runner exists in this repo; disclosed via `pending_carry_forward[]` at implementation time, same pattern as TC-07 |
 
 ### Coverage gates
 
@@ -196,3 +265,12 @@ executed" anti-pattern the `plan-authoring` skill warns about.
 | Round | Verdict | Failing dimensions | Action                                                             |
 |-------|---------|---------------------|----------------------------------------------------------------------|
 | 1     | PASS    | —                   | Runner-setup carries one disclosed, PRD-approved exception (TC-07 performance); all other dimensions clean. Proceeding to hand-off. |
+
+### Plan validation (SRF-01-FR-2 amendment, 2026-08-14)
+
+- Wiring: PASS (F-03/F-04/F-05 edit already-registered modules; F-06 is a leaf test-file exception, same rubric exception as F-01)
+- Docs: PASS (no new runnable surface, HTTP route, env var, service, or port — REQUIREMENTS.md § Documentation requirements confirms no README update needed)
+- Runner-setup: PASS-with-documented-exception (SRF-01-TC-15 responsive-reflow check has no CSS-layout-evaluating runner in this repo; same disclosed pattern as the original plan's TC-07)
+- Cross-section: PASS (every amendment file-table row (F-03..F-06) is referenced by a task's Files column (T-03..T-06); every new TC in `docs/test-cases/SRF-01.json` appears in § 7a, none silently omitted)
+- Config drift: PASS (no new runtime dependency, service, or port — no `docs/config/project-commands.yaml` or `docs/config/stack-smoke.md` edit needed)
+- Rounds: 1

@@ -3,6 +3,8 @@ const COLOR_MAP = {
   success: { fg: "#0a8a52", bg: "var(--success-soft)" },
   violet: { fg: "#6425d1", bg: "var(--violet-soft)" },
   warning: { fg: "#b3650a", bg: "var(--warning-soft)" },
+  // Matches the app's existing .badge-inactive convention (neutral gray, not --danger red).
+  neutral: { fg: "var(--ink-muted)", bg: "#eef0f3" },
 };
 
 export default function StatsCard({ label, value, total, icon, color = "accent", loading }) {

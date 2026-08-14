@@ -52,65 +52,92 @@ export default function Dashboard({ onMenuClick, onUserCountChange }) {
           <p className="page__desc">Manage user accounts, roles, and access status.</p>
         </div>
 
-        <div className="stats-grid">
-          <StatsCard
-            label="Total Users"
-            value={stats?.total_users ?? 0}
-            total={stats?.total_users}
-            loading={loadingStats}
-            color="accent"
-            icon={
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                <circle cx="9" cy="8" r="3.2" stroke="currentColor" strokeWidth="1.7" />
-                <path d="M3.5 20c0-3.6 2.5-6 5.5-6s5.5 2.4 5.5 6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-                <circle cx="17" cy="8" r="2.6" stroke="currentColor" strokeWidth="1.7" />
-                <path d="M15.5 14.2c2.7.2 4.9 2.5 4.9 5.8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-              </svg>
-            }
-          />
-          <StatsCard
-            label="Active Users"
-            value={stats?.active_users ?? 0}
-            total={stats?.total_users}
-            loading={loadingStats}
-            color="success"
-            icon={
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                <path d="M5 12l5 5L19 7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            }
-          />
-          <StatsCard
-            label="Admins"
-            value={stats?.admin_users ?? 0}
-            total={stats?.total_users}
-            loading={loadingStats}
-            color="violet"
-            icon={
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M12 3l2.6 2.7 3.7-.6.9 3.6 3.4 1.5-1.5 3.4.6 3.7-3.7.6L15.3 21 12 18.7 8.7 21l-2.7-3.1-3.7-.6.6-3.7L1.4 10 4.8 8.5l.9-3.6 3.7.6L12 3Z"
-                  stroke="currentColor"
-                  strokeWidth="1.4"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            }
-          />
-          <StatsCard
-            label="Regular Users"
-            value={stats?.regular_users ?? 0}
-            total={stats?.total_users}
-            loading={loadingStats}
-            color="warning"
-            icon={
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.7" />
-                <path d="M5 20c0-4 3-6.5 7-6.5s7 2.5 7 6.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-              </svg>
-            }
-          />
-        </div>
+        <section className="panel" aria-labelledby="user-overview-heading">
+          <div className="panel__header">
+            <div className="panel__eyebrow">Summary</div>
+            <h2 className="panel__title" id="user-overview-heading">
+              User Overview
+            </h2>
+          </div>
+          <div className="panel__body">
+            <div className="stats-grid" style={{ marginBottom: 0 }}>
+              <StatsCard
+                label="Total Users"
+                value={stats?.total_users ?? 0}
+                total={stats?.total_users}
+                loading={loadingStats}
+                color="accent"
+                icon={
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                    <circle cx="9" cy="8" r="3.2" stroke="currentColor" strokeWidth="1.7" />
+                    <path d="M3.5 20c0-3.6 2.5-6 5.5-6s5.5 2.4 5.5 6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+                    <circle cx="17" cy="8" r="2.6" stroke="currentColor" strokeWidth="1.7" />
+                    <path d="M15.5 14.2c2.7.2 4.9 2.5 4.9 5.8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+                  </svg>
+                }
+              />
+              <StatsCard
+                label="Active Users"
+                value={stats?.active_users ?? 0}
+                total={stats?.total_users}
+                loading={loadingStats}
+                color="success"
+                icon={
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                    <path d="M5 12l5 5L19 7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                }
+              />
+              <StatsCard
+                label="Inactive Users"
+                // Client-side derivation, per REQUIREMENTS.md SRF-01-FR-2: holds only while
+                // Active/Inactive remain the sole two status values.
+                value={
+                  stats ? Math.max(0, (stats.total_users ?? 0) - (stats.active_users ?? 0)) : 0
+                }
+                total={stats?.total_users}
+                loading={loadingStats}
+                color="neutral"
+                icon={
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.7" />
+                    <path d="M8.5 12h7" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+                  </svg>
+                }
+              />
+              <StatsCard
+                label="Admins"
+                value={stats?.admin_users ?? 0}
+                total={stats?.total_users}
+                loading={loadingStats}
+                color="violet"
+                icon={
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M12 3l2.6 2.7 3.7-.6.9 3.6 3.4 1.5-1.5 3.4.6 3.7-3.7.6L15.3 21 12 18.7 8.7 21l-2.7-3.1-3.7-.6.6-3.7L1.4 10 4.8 8.5l.9-3.6 3.7.6L12 3Z"
+                      stroke="currentColor"
+                      strokeWidth="1.4"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                }
+              />
+              <StatsCard
+                label="Regular Users"
+                value={stats?.regular_users ?? 0}
+                total={stats?.total_users}
+                loading={loadingStats}
+                color="warning"
+                icon={
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.7" />
+                    <path d="M5 20c0-4 3-6.5 7-6.5s7 2.5 7 6.5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+                  </svg>
+                }
+              />
+            </div>
+          </div>
+        </section>
       </div>
 
       <Notification toasts={toasts} onDismiss={dismissToast} />

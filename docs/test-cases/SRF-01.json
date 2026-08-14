@@ -230,16 +230,105 @@
         "runner": "vitest",
         "rerun_count": 0
       }
+    },
+    {
+      "id": "SRF-01-TC-10",
+      "title": "Inactive Users stat is derived as total_users - active_users",
+      "type": "unit",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "SRF-01-FR-2",
+      "given": "getDashboardStats resolves with total_users=8, active_users=5",
+      "when": "the User Overview section renders",
+      "then": "the Inactive Users card displays 3 (8 - 5), computed client-side with no additional API call",
+      "tags": ["happy-path"],
+      "last_run": null
+    },
+    {
+      "id": "SRF-01-TC-11",
+      "title": "User Overview section renders all five stat cards",
+      "type": "unit",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "SRF-01-FR-2",
+      "given": "the dashboard-stats request resolves",
+      "when": "the User Overview section renders",
+      "then": "five StatsCard instances are present with labels Total Users, Active Users, Inactive Users, Admins, and Regular Users, each showing the correct value",
+      "tags": ["happy-path"],
+      "last_run": null
+    },
+    {
+      "id": "SRF-01-TC-12",
+      "title": "User Overview section is wrapped in a bordered panel container, not a bare grid",
+      "type": "unit",
+      "automatable": true,
+      "priority": "Should",
+      "requirement_id": "SRF-01-FR-2",
+      "given": "the dashboard is rendered",
+      "when": "the DOM is queried",
+      "then": "the stats grid is contained within a titled section/panel element (not floating directly in .page with no visual boundary)",
+      "tags": ["happy-path"],
+      "last_run": null
+    },
+    {
+      "id": "SRF-01-TC-13",
+      "title": "Dashboard introduces no new service calls",
+      "type": "unit",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "SRF-01-FR-2",
+      "given": "the dashboard renders and stats resolve",
+      "when": "the mocked userApi module is inspected",
+      "then": "getDashboardStats is called exactly once and getUsers/getUser/createUser/updateUser/deleteUser are never called from Dashboard.jsx",
+      "tags": ["negative", "regression"],
+      "last_run": null
+    },
+    {
+      "id": "SRF-01-TC-14",
+      "title": "Existing Users.jsx and backend suites remain green after the Dashboard change",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "SRF-01-FR-2",
+      "given": "SRF-01-FR-2 is implemented",
+      "when": "the full frontend suite (npm run test) and backend suite (pytest) are run",
+      "then": "all existing tests continue to pass — no regression to Users.jsx CRUD/search/filter/pagination or backend behavior",
+      "tags": ["regression"],
+      "last_run": null
+    },
+    {
+      "id": "SRF-01-TC-15",
+      "title": "User Overview section reflows responsively at existing breakpoints",
+      "type": "e2e",
+      "automatable": false,
+      "priority": "Should",
+      "requirement_id": "SRF-01-NFR-accessibility",
+      "given": "the dashboard is viewed in a real browser",
+      "when": "the viewport is narrowed past 1100px and 640px",
+      "then": "the five-card grid reflows per the existing .stats-grid responsive rules with no overlap or clipping",
+      "tags": ["accessibility", "manual"],
+      "last_run": {
+        "started_at": null,
+        "duration_ms": null,
+        "status": "DEFERRED",
+        "verdict": null,
+        "attempts": [],
+        "failure_reason": "jsdom does not evaluate CSS layout/media queries; visual reflow requires manual/real-browser verification, same disclosed-deferral pattern as SRF-01-TC-07",
+        "artefact": null,
+        "runner": "manual",
+        "rerun_count": 0
+      }
     }
   ],
   "coverage_audit": {
     "functional_requirements": [
-      {"id": "SRF-01-FR-1", "covered_by": ["SRF-01-TC-01", "SRF-01-TC-02", "SRF-01-TC-03", "SRF-01-TC-04", "SRF-01-TC-05", "SRF-01-TC-06"]}
+      {"id": "SRF-01-FR-1", "covered_by": ["SRF-01-TC-01", "SRF-01-TC-02", "SRF-01-TC-03", "SRF-01-TC-04", "SRF-01-TC-05", "SRF-01-TC-06"]},
+      {"id": "SRF-01-FR-2", "covered_by": ["SRF-01-TC-10", "SRF-01-TC-11", "SRF-01-TC-12", "SRF-01-TC-13", "SRF-01-TC-14"]}
     ],
     "non_functional_requirements": [
       {"id": "SRF-01-NFR-performance", "covered_by": ["SRF-01-TC-07"]},
       {"id": "SRF-01-NFR-security", "covered_by": ["SRF-01-TC-08"]},
-      {"id": "SRF-01-NFR-accessibility", "covered_by": ["SRF-01-TC-09"]}
+      {"id": "SRF-01-NFR-accessibility", "covered_by": ["SRF-01-TC-09", "SRF-01-TC-15"]}
     ],
     "uncovered": []
   }

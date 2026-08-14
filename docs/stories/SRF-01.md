@@ -12,6 +12,10 @@
 > criteria below document verified current behavior (with file:line citations), not new-build
 > aspirational behavior.
 
+> Extension note (2026-08-14): AC #4 below is new-build scope, added after `feature/USR-01`
+> (dedicated Users management page) was merged into this branch. It is not a brownfield backfill
+> like ACs #1-#3 — see `docs/features/SRF-01/REQUIREMENTS.md` § SRF-01-FR-2.
+
 ## User story
 
 As an admin using the dashboard, I want to search users by name, email, or phone so that I can
@@ -32,6 +36,13 @@ quickly locate a specific user record without scrolling the full table.
 3. Given the search input is cleared, when the value becomes empty, then the debounce delay is
    0ms (immediate refetch, `frontend/src/pages/Dashboard.jsx:92`) and the full unfiltered user
    list is returned (verified by `backend/tests/test_users.py:154-158`, `test_search_filters_by_name_email_phone`).
+4. Given the dashboard is loaded, when the dashboard-stats request resolves, then a bordered
+   "User Overview" section renders five compact summary cards — Total, Active, Inactive, Admin,
+   and Regular Users — reusing the existing `StatsCard` component; Inactive is computed
+   client-side as `total_users - active_users` (no backend/API change); the section reflows
+   responsively at the existing `.stats-grid` breakpoints (1100px, 640px); and all existing
+   Users-page CRUD/search/filter/pagination behavior (`frontend/src/pages/Users.jsx`) is
+   unaffected.
 
 ## Non-functional requirements
 
@@ -43,8 +54,9 @@ quickly locate a specific user record without scrolling the full table.
   scope, this story documents current behavior only — the endpoint is intentionally open in the
   present build, and adding auth is out of scope for this story (tracked as a known gap, not a
   blocking requirement here).
-- Accessibility: search input has `aria-label="Search users"` (`frontend/src/pages/Dashboard.jsx:250`); no other WCAG-specific behavior (e.g. live-region announcement of result count) is implemented.
+- Accessibility: search input has `aria-label="Search users"` (`frontend/src/pages/Dashboard.jsx:250`); no other WCAG-specific behavior (e.g. live-region announcement of result count) is implemented. Per `.claude/rules/accessibility-baseline.md`: the new "User Overview" section (AC #4) uses a semantic `<section>` with an accessible heading; stat cards remain non-interactive, introducing no new focusable elements.
 - Observability: no logging/metrics are emitted around search requests or query latency in the current code.
+- Performance (AC #4): no new network request — the Inactive-Users value is a pure client-side arithmetic derivation from the existing `getDashboardStats()` response already fetched by `Dashboard.jsx`.
 
 ## Dependencies
 
@@ -75,6 +87,17 @@ quickly locate a specific user record without scrolling the full table.
 - 2026-08-14 Auth scope: endpoint intentionally left open in current build; adding
   authentication is out of scope for this story and tracked as a known gap — resolved via best
   judgment given brownfield backfill scope (document current behavior, not new-build behavior).
+- 2026-08-14 Extension (AC #4): story amended post-merge (feature/USR-01 → feature/SRF-01) to
+  add a Dashboard "User Overview" layout enhancement, per explicit user request. No new story
+  was created; the existing SRF-01 id is reused per user instruction. Inactive-Users color
+  reuses the existing `.badge-inactive` neutral-gray convention (`var(--ink-muted)` / `#eef0f3`)
+  rather than the `--danger` token, consistent with the app's existing semantic color language.
+  No mini-ADR was written for this extension — every implementation choice is either dictated by
+  explicit constraints (client-side derivation, no new API, no new dependency) or a small,
+  reversible CSS/JSX change with a single obvious precedent to follow (same bar `plan-authoring`
+  used to skip a mini-ADR for the original SRF-01-FR-1). Approved via direct user confirmation
+  in-session (functionally equivalent to the Product Gate `AskUserQuestion` ceremony used for
+  the original PRD).
 
 ## Validation log
 

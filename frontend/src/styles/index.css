@@ -380,7 +380,7 @@ select {
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 16px;
   margin-bottom: 24px;
 }
@@ -446,6 +446,29 @@ select {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
+}
+
+.panel__header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.panel__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.panel__title {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.panel__body {
+  padding: 20px;
 }
 
 .toolbar {
