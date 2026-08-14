@@ -10,11 +10,10 @@
   "design_artifact": "docs/features/USR-01/DESIGN.md",
   "design_provider": "none",
   "design_iteration": 0,
-  "phase": "review",
+  "phase": "security-reviewed",
   "needs_clarification_count": 0,
   "review": "PASS",
   "review_report": "docs/features/USR-01/REVIEW.md",
-  "last_updated": "2026-08-14T20:30:00Z",
   "gate": "APPROVE",
   "plan": "complete",
   "plan_validation": "PASS",
@@ -308,5 +307,15 @@
     "ADR-2",
     "ADR-3",
     "ADR-4"
-  ]
+  ],
+  "security": "PASS",
+  "security_findings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "tool_missing": []
+  },
+  "security_report": "docs/features/USR-01/SECURITY-20260814.md",
+  "last_updated": "2026-08-14T21:45:00Z"
 }

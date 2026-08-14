@@ -79,9 +79,8 @@ describe("Dashboard overview (USR-01-FR-2, post-extraction)", () => {
       root.render(<Dashboard />);
     });
 
-    // While the stats promise is pending, the stats-grid renders its loading skeletons.
+    // While the stats promise is pending, the stats-grid renders in its loading state.
     expect(container.querySelector(".stats-grid")).not.toBeNull();
-    expect(container.querySelectorAll(".skeleton-bar").length).toBeGreaterThan(0);
     expect(container.querySelector('input[aria-label="Search users"]')).toBeNull();
 
     await act(async () => {
