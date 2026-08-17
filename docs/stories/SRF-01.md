@@ -16,6 +16,11 @@
 > (dedicated Users management page) was merged into this branch. It is not a brownfield backfill
 > like ACs #1-#3 — see `docs/features/SRF-01/REQUIREMENTS.md` § SRF-01-FR-2.
 
+> Extension note (2026-08-17): AC #5 below is a second new-build layout refinement, extending the
+> `SRF-01-FR-2` "User Overview" panel with a compact overview restructure (status/role breakdown
+> panels + a Recent Users preview). Same in-place-amendment pattern as AC #4 — no new story was
+> created. See `docs/features/SRF-01/REQUIREMENTS.md` § SRF-01-FR-3.
+
 ## User story
 
 As an admin using the dashboard, I want to search users by name, email, or phone so that I can
@@ -43,6 +48,15 @@ quickly locate a specific user record without scrolling the full table.
    responsively at the existing `.stats-grid` breakpoints (1100px, 640px); and all existing
    Users-page CRUD/search/filter/pagination behavior (`frontend/src/pages/Users.jsx`) is
    unaffected.
+5. Given the dashboard-stats request resolves, when the admin views the Dashboard below the
+   "User Overview" section, then two side-by-side panels render — "User Status" (Active vs.
+   Inactive, each with a proportional horizontal bar and count) and "Users by Role" (Admin vs.
+   Regular, same treatment) — which stack vertically on narrow viewports; below them, a
+   full-width "Recent Users" section shows a compact table (Name, Email, Role, Status, Created)
+   of the most-recently-created users (a small fixed subset, derived client-side from the
+   existing `getUsers()` response already used elsewhere in the app — no new backend endpoint or
+   field), plus a "View All Users →" link that navigates to the existing Users page; no existing
+   CRUD/search/filter/pagination/API behavior is changed.
 
 ## Non-functional requirements
 
@@ -73,6 +87,8 @@ quickly locate a specific user record without scrolling the full table.
   `frontend/src/pages/Dashboard.jsx` — gap, not covered by `npm run test` today.
 - Manual: verify search box returns matching rows for partial, case-mixed input against name,
   email, and phone fields.
+- Unit (AC #5): `frontend/src/pages/__tests__/Dashboard.search.test.jsx` — status/role breakdown
+  panels, Recent Users subset/columns, and "View All Users →" navigation (SRF-01-TC-16..21).
 
 ## Clarifications
 
@@ -98,6 +114,15 @@ quickly locate a specific user record without scrolling the full table.
   used to skip a mini-ADR for the original SRF-01-FR-1). Approved via direct user confirmation
   in-session (functionally equivalent to the Product Gate `AskUserQuestion` ceremony used for
   the original PRD).
+- 2026-08-17 Extension (AC #5): story amended in-place a second time (still `feature/SRF-01`) to
+  add a compact-overview restructure — "User Status" and "Users by Role" breakdown panels plus a
+  "Recent Users" preview — per explicit user request. No new story was created. "Recent Users"
+  data is derived client-side by sorting the existing `getUsers({ page: 1, pageSize: 50 })`
+  response (the already-frozen default page, per `docs/adr/0003-users-list-pagination.md`) on
+  `created_at` descending and taking the top 5, rather than adding a backend sort/limit
+  parameter — resolved via best judgment as the smallest change consistent with the "no new
+  backend API unless absolutely required" constraint; flagged in `PLAN.md` § 1b as the one
+  judgment call in this amendment. Approved via direct user confirmation in-session.
 
 ## Validation log
 

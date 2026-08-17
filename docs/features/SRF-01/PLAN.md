@@ -1,6 +1,6 @@
 # PLAN: SRF-01 — Search users by name, email, or phone
 
-Status: Complete (amended 2026-08-14 with SRF-01-FR-2)
+Status: Complete (amended 2026-08-14 with SRF-01-FR-2; amended 2026-08-17 with SRF-01-FR-3)
 Story: SRF-01 · Priority: P1 · Research verdict: GO-WITH-CONDITIONS (89/100)
 
 > Amendment note (2026-08-14): §§ 1-7 below (original) cover SRF-01-FR-1 only. Following the
@@ -8,6 +8,11 @@ Story: SRF-01 · Priority: P1 · Research verdict: GO-WITH-CONDITIONS (89/100)
 > in-place with SRF-01-FR-2 (Dashboard "User Overview" layout enhancement) per explicit user
 > request — no new story was created. The amendment is appended as §§ 2a/5a/6a/7a below rather
 > than rewritten inline, to keep the original PRD's plan-validation record intact and auditable.
+
+> Amendment note (2026-08-17): the story was extended in-place a second time with SRF-01-FR-3
+> (Dashboard compact-overview restructure: status/role breakdown panels + Recent Users preview)
+> per explicit user request — still no new story. Appended as §§ 1b/2b/5b/6b/7b below, same
+> append-don't-rewrite convention as the FR-2 amendment.
 
 > Scope note: this is a brownfield backfill PRD. `GET /api/users?search=` (backend) and the
 > debounced search input (`frontend/src/pages/Dashboard.jsx`) are already implemented,
@@ -45,6 +50,29 @@ toolbar). Per `plan-authoring`'s bar ("if three readers would each pick a differ
 write the ADR"), none of these choices clears it — same rationale the original § 1 used to skip
 a mini-ADR for SRF-01-FR-1. Recorded here as plan prose rather than a `decisions[]` state entry,
 per this session's explicit instruction not to hand-edit state files.
+
+## 1b. Architecture Decisions (SRF-01-FR-3 amendment)
+
+**No mini-ADR required, but one judgment call is flagged for traceability.** Most of this
+amendment is the same class of small, reversible, precedent-following change as FR-2 (reusing
+`.panel`, `StatsCard`'s bar-fill percentage math, and `UserTable`'s table markup/`formatDate`
+convention). The one non-trivial decision:
+
+- **"Recent Users" source**: rather than adding a backend sort/limit parameter (e.g.
+  `GET /api/users?sort=created_at_desc&limit=5`), `Dashboard.jsx` calls the existing
+  `getUsers({ page: 1, pageSize: 50 })` — the already-frozen default page — and derives the top 5
+  by sorting the returned page client-side on `created_at` descending. Rationale: REQUIREMENTS.md
+  § Scope (Out) explicitly excludes a new backend endpoint/param "unless absolutely required,"
+  and a client-side sort of an already-fetched, already-small (page_size ≤ 100) result set is not
+  a performance concern at this app's scale. A competent reviewer could alternatively choose to
+  add a backend `limit`/`sort` param — so unlike the rest of this amendment, this one choice
+  plausibly clears the "three readers, three answers" bar. It is recorded here as plan prose
+  (not a `decisions[]` state entry, per this session's explicit instruction not to hand-edit state
+  files) precisely so it isn't silently buried among the lower-judgment CSS/JSX changes.
+- **`onNavigate` wiring**: `Dashboard.jsx` gains an `onNavigate` prop and `App.jsx` passes
+  `onNavigate={() => setActiveView("users")}` — this mirrors the existing prop `Sidebar.jsx`
+  already receives from the same `App.jsx` call site, so it is not treated as a separate
+  judgment call.
 
 ## 2. File and Module Plan
 
@@ -89,6 +117,29 @@ fixture, README"). It is discovered automatically by Vitest's default glob
 `frontend/src/services/userApi.test.js`) — no entry-registration edit is required. F-02 is a
 verification action on an existing, already-wired test file; nothing new needs registering.
 
+## 2b. File and Module Plan (SRF-01-FR-3 amendment)
+
+| ID   | Action | Path                                                          | Reason                                                                                     |
+|------|--------|------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
+| F-07 | modify | `frontend/src/pages/Dashboard.jsx`                                | Add "User Status" / "Users by Role" breakdown panels, "Recent Users" table + "View All Users →" link; accept new `onNavigate` prop |
+| F-08 | create | `frontend/src/components/StatBreakdownPanel.jsx`                  | Small reusable presentational component for a labeled 2-row proportional-bar breakdown (used by both "User Status" and "Users by Role") — extracted rather than duplicated inline, per `reusability-baseline` ("three similar lines" — here two near-identical inline blocks would otherwise exist) |
+| F-09 | create | `frontend/src/components/RecentUsersTable.jsx`                    | Compact table (Name/Email/Role/Status/Created) reusing `UserTable.jsx`'s `formatDate` convention and `.data-table`/`.table-scroll` classes; no per-row actions |
+| F-10 | modify | `frontend/src/styles/index.css`                                   | Add a `.dashboard-breakdown-row` two-column grid rule (stacks to one column ≤1100px, matching existing `.stats-grid` breakpoints) for the side-by-side panels; no change to existing `.stats-grid`, `.panel`, `.stat-card__bar*`, or `.data-table` rules |
+| F-11 | modify | `frontend/src/App.jsx`                                            | Pass `onNavigate={() => setActiveView("users")}` to `<Dashboard />` (mirrors the existing prop already passed to `<Sidebar />`) |
+| F-12 | modify | `frontend/src/pages/__tests__/Dashboard.search.test.jsx`          | Extend the existing file with SRF-01-TC-16..21 (no new test file, same convention as F-06) |
+
+### Wiring
+
+F-07/F-10/F-11 are edits to already-registered, already-imported modules (same reasoning as F-03/F-05
+above). F-08 and F-09 are new leaf presentational components consumed only by `Dashboard.jsx`
+(F-07) — the import is added in the same F-07 edit that introduces their usage, satisfying
+`plan-validation` § Wiring (new module + its call site land together, not orphaned). F-12 is a
+leaf test file edit, exempt per the same rubric exception as F-01/F-06.
+
+**Shared-class risk**: none. F-10's `.dashboard-breakdown-row` is a new class, not a change to
+the existing `.stats-grid`/`.panel` rules `Users.jsx` also relies on — no re-verification of
+`Users.jsx`'s rendering is required for this amendment (unlike F-05's FR-2 change).
+
 ## 3. Module Hierarchy
 
 No new production module is introduced. The single new node is a test module whose subject
@@ -109,6 +160,28 @@ frontend/src/pages/__tests__/
     - public:  none — this is a leaf test module, not consumed by other code
 ```
 
+### 3a. Module Hierarchy (SRF-01-FR-3 amendment)
+
+Two new leaf presentational components, both consumed only by `Dashboard.jsx`:
+
+```
+frontend/src/components/
+├── StatBreakdownPanel.jsx
+│   - input:   { title, rows: [{ label, value, color }], total } props
+│   - output:  a `.panel`-style section with N rows, each a label + proportional
+│              bar (`width: ${value/total*100}%`) + count — same math as `StatsCard`
+│   - subject: none (pure presentational, no side effects)
+│   - public:  props above; consumed by Dashboard.jsx (F-07) for both "User Status"
+│              and "Users by Role" (two instances, different `rows`)
+└── RecentUsersTable.jsx
+    - input:   { users, onViewAll } props (users = pre-sorted/sliced top-5 array)
+    - output:  compact `.data-table` (Name/Email/Role/Status/Created) + a
+               "View All Users →" control that calls `onViewAll`
+    - subject: none (pure presentational; sorting/slicing happens in Dashboard.jsx,
+               not in this component, so it stays a dumb renderer)
+    - public:  props above; consumed by Dashboard.jsx (F-07)
+```
+
 ## 4. State and Data Management
 
 No new persistent state, no new client-side state, and no new cache. This story adds test
@@ -122,6 +195,17 @@ coverage only:
   The new test observes this existing state machine; it does not add to it.
 - **Cache**: none exists today (no client-side cache layer per `react-patterns`); none is
   added.
+
+### 4a. State and Data Management (SRF-01-FR-3 amendment)
+
+- **Backend state**: unchanged — no new query, param, or field.
+- **Frontend state**: `Dashboard.jsx` adds one existing-pattern `useState`/derived-value pair:
+  a `users` list from a new (Dashboard-local) call to `getUsers({ page: 1, pageSize: 50 })`, and
+  a derived `recentUsers` value (`[...users].sort(...).slice(0, 5)`) computed inline — same
+  "plain `useState`, no global store" convention as the rest of this file (`react-patterns`
+  § State management). No new persisted or shared state.
+- **Cache**: none added — the `getUsers()` call is fetched once on mount alongside the existing
+  `getDashboardStats()` call, not on every render.
 
 ## 5. Task Breakdown
 
@@ -145,6 +229,19 @@ existing backend test file).
 
 T-03 and T-04 are `[P]` (disjoint files: `Dashboard.jsx`/`StatsCard.jsx` vs `index.css`). T-05
 depends on both (it tests the combined result). T-06 is the final regression gate.
+
+## 5b. Task Breakdown (SRF-01-FR-3 amendment)
+
+| #    | Title                                                          | Complexity | [P] | Predecessors | Files       | Notes                                                                 |
+|------|-----------------------------------------------------------------|------------|-----|--------------|-------------|--------------------------------------------------------------------------|
+| T-07 | Author `StatBreakdownPanel.jsx` and `RecentUsersTable.jsx`       | M          | [P] | —            | F-08, F-09  | Pure presentational leaf components, no service calls. Implements SRF-01-FR-3 items 1 and 3-4 (rendering only) |
+| T-08 | Wire "User Status" / "Users by Role" panels + Recent Users + `onNavigate` into `Dashboard.jsx`; wire `App.jsx` | M | — | T-07 | F-07, F-11 | Implements FR-3 items 1, 3, 5. Adds the single new `getUsers({ page: 1, pageSize: 50 })` call and the `created_at`-descending client-side sort/slice, with an inline comment documenting the assumption |
+| T-09 | Add `.dashboard-breakdown-row` responsive grid rule to `index.css` | S | [P] | — | F-10 | Implements FR-3 item 2. Reuses the existing 1100px/640px breakpoint values — no new breakpoint constants |
+| T-10 | Add SRF-01-TC-16..21 to `Dashboard.search.test.jsx`; re-run full frontend + backend suites | M | — | T-08, T-09 | F-12 | Covers all FR-3 items. Mocks `getUsers`/`getDashboardStats` per existing `react-patterns` service-boundary convention. Closes SRF-01-TC-21 (regression gate: no change to `Users.jsx` or backend behavior) |
+
+T-07 and T-09 are `[P]` (disjoint files, no shared state). T-08 depends on T-07 (consumes the new
+components). T-10 depends on both T-08 and T-09 (tests the combined result) and is the final
+regression gate for this amendment.
 
 ## 6. Carry-Forward Risks and Conditions
 
@@ -198,6 +295,14 @@ plan's TC-07 pattern, not a silently dropped gap):
 |------|----------|-----------|
 | SRF-01-TC-15 (responsive reflow, real-browser) | LOW | jsdom cannot evaluate CSS layout/media queries; visual verification of the 5-card responsive reflow is deferred to manual/real-browser check, same disclosed-deferral pattern as SRF-01-TC-07's performance measurement. Not written to `pending_carry_forward[]` by this document — that state write is the implementation-agent's responsibility at `/arh-implement` time, per this session's instruction not to hand-edit state files. |
 
+### Carry-forward (SRF-01-FR-3 amendment)
+
+No new HIGH/MED risks introduced. One disclosed, deferred item, same pattern as TC-15 above:
+
+| Item | Severity | Rationale |
+|------|----------|-----------|
+| SRF-01-TC-19 (side-by-side → stacked responsive reflow, real-browser) | LOW | jsdom cannot evaluate CSS layout/media queries; visual verification that the two breakdown panels stack to one column ≤1100px is deferred to manual/real-browser check. Not written to `pending_carry_forward[]` by this document — that state write is the implementation-agent's responsibility at `/arh-implement` time, per this session's instruction not to hand-edit state files. |
+
 ### Cross-Feature Dependency Notes
 
 SRF-02 (role filter), SRF-03 (status filter), and SRF-04 (combined filters) all extend the
@@ -228,6 +333,14 @@ them beyond the already-frozen contract.
 | Unit                          | `frontend/src/pages/__tests__/Dashboard.search.test.jsx` (T-05)     | SRF-01-TC-10, TC-11, TC-12, TC-13 | Extends the existing file's `describe` block; mocks `getDashboardStats` per existing convention |
 | Integration (regression)      | full `npm run test` + `pytest` (T-06)                               | SRF-01-TC-14              | Confirms no regression to `Users.jsx` or backend after the Dashboard change |
 | Manual / deferred             | real-browser viewport check (no task in this PLAN)                  | SRF-01-TC-15              | Deferred — no CSS-layout-evaluating runner exists in this repo; disclosed via `pending_carry_forward[]` at implementation time, same pattern as TC-07 |
+
+### 7b. Test Strategy (SRF-01-FR-3 amendment)
+
+| Layer                        | Test path                                                        | TCs covered              | Notes                                                                                                  |
+|-------------------------------|--------------------------------------------------------------------|---------------------------|-----------------------------------------------------------------------------------------------------------|
+| Unit                          | `frontend/src/pages/__tests__/Dashboard.search.test.jsx` (T-10)     | SRF-01-TC-16, TC-17, TC-18, TC-20 | Extends the existing file's `describe` block; mocks `getUsers`/`getDashboardStats` per existing convention |
+| Manual / deferred             | real-browser viewport check (no task in this PLAN)                  | SRF-01-TC-19              | Deferred — no CSS-layout-evaluating runner exists in this repo; disclosed via `pending_carry_forward[]` at implementation time, same pattern as TC-07/TC-15 |
+| Integration (regression)      | full `npm run test` + `pytest` (T-10)                               | SRF-01-TC-21              | Confirms no regression to `Users.jsx` or backend after the Dashboard restructure |
 
 ### Coverage gates
 
@@ -273,4 +386,20 @@ executed" anti-pattern the `plan-authoring` skill warns about.
 - Runner-setup: PASS-with-documented-exception (SRF-01-TC-15 responsive-reflow check has no CSS-layout-evaluating runner in this repo; same disclosed pattern as the original plan's TC-07)
 - Cross-section: PASS (every amendment file-table row (F-03..F-06) is referenced by a task's Files column (T-03..T-06); every new TC in `docs/test-cases/SRF-01.json` appears in § 7a, none silently omitted)
 - Config drift: PASS (no new runtime dependency, service, or port — no `docs/config/project-commands.yaml` or `docs/config/stack-smoke.md` edit needed)
+- Rounds: 1
+
+### Plan validation (SRF-01-FR-3 amendment, 2026-08-17)
+
+- Wiring: PASS (F-07/F-10/F-11 edit already-registered modules; F-08/F-09 are new modules whose
+  only call site lands in the same F-07 task, not orphaned; F-12 is a leaf test-file exception,
+  same rubric exception as F-01/F-06)
+- Docs: PASS (no new runnable surface, HTTP route, env var, service, or port — REQUIREMENTS.md
+  § Documentation requirements confirms no README structural update needed)
+- Runner-setup: PASS-with-documented-exception (SRF-01-TC-19 side-by-side→stacked responsive
+  check has no CSS-layout-evaluating runner in this repo; same disclosed pattern as TC-07/TC-15)
+- Cross-section: PASS (every amendment file-table row (F-07..F-12) is referenced by a task's
+  Files column (T-07..T-10); every new TC in `docs/test-cases/SRF-01.json` appears in § 7b, none
+  silently omitted)
+- Config drift: PASS (no new runtime dependency, service, or port — no
+  `docs/config/project-commands.yaml` or `docs/config/stack-smoke.md` edit needed)
 - Rounds: 1

@@ -53,7 +53,11 @@ export default function App() {
         ) : activeView === "users" ? (
           <Users onMenuClick={() => setSidebarOpen(true)} onUserCountChange={setUserCount} />
         ) : (
-          <Dashboard onMenuClick={() => setSidebarOpen(true)} onUserCountChange={setUserCount} />
+          <Dashboard
+            onMenuClick={() => setSidebarOpen(true)}
+            onUserCountChange={setUserCount}
+            onNavigate={setActiveView}
+          />
         )}
       </div>
     </div>

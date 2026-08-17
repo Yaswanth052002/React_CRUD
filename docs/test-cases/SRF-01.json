@@ -318,17 +318,106 @@
         "runner": "manual",
         "rerun_count": 0
       }
+    },
+    {
+      "id": "SRF-01-TC-16",
+      "title": "User Status panel renders Active/Inactive counts with proportional bars",
+      "type": "unit",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "SRF-01-FR-3",
+      "given": "getDashboardStats resolves with total_users=8, active_users=5",
+      "when": "the 'User Status' panel renders",
+      "then": "it shows Active=5 and Inactive=3 with each row's bar width proportional to its share of total_users, computed with no additional API call",
+      "tags": ["happy-path"],
+      "last_run": null
+    },
+    {
+      "id": "SRF-01-TC-17",
+      "title": "Users by Role panel renders Admin/Regular counts with proportional bars",
+      "type": "unit",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "SRF-01-FR-3",
+      "given": "getDashboardStats resolves with total_users=8, admin_users=2, regular_users=6",
+      "when": "the 'Users by Role' panel renders",
+      "then": "it shows Admins=2 and Regular Users=6 with each row's bar width proportional to its share of total_users",
+      "tags": ["happy-path"],
+      "last_run": null
+    },
+    {
+      "id": "SRF-01-TC-18",
+      "title": "Recent Users table shows the 5 most-recently-created users with correct columns",
+      "type": "unit",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "SRF-01-FR-3",
+      "given": "getUsers({ page: 1, pageSize: 50 }) resolves with 8 users with distinct created_at timestamps",
+      "when": "the 'Recent Users' section renders",
+      "then": "exactly 5 rows are shown, ordered newest-first by created_at, with columns Name, Email, Role, Status, Created — derived client-side with no new backend endpoint or parameter",
+      "tags": ["happy-path"],
+      "last_run": null
+    },
+    {
+      "id": "SRF-01-TC-19",
+      "title": "User Status and Users by Role panels stack vertically at existing responsive breakpoints",
+      "type": "e2e",
+      "automatable": false,
+      "priority": "Should",
+      "requirement_id": "SRF-01-NFR-accessibility",
+      "given": "the dashboard is viewed in a real browser",
+      "when": "the viewport is narrowed past the existing 1100px breakpoint",
+      "then": "the two side-by-side breakdown panels stack into a single column with no overlap or clipping",
+      "tags": ["accessibility", "manual"],
+      "last_run": {
+        "started_at": null,
+        "duration_ms": null,
+        "status": "DEFERRED",
+        "verdict": null,
+        "attempts": [],
+        "failure_reason": "jsdom does not evaluate CSS layout/media queries; visual reflow requires manual/real-browser verification, same disclosed-deferral pattern as SRF-01-TC-07/TC-15",
+        "artefact": null,
+        "runner": "manual",
+        "rerun_count": 0
+      }
+    },
+    {
+      "id": "SRF-01-TC-20",
+      "title": "'View All Users →' navigates to the Users page",
+      "type": "unit",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "SRF-01-FR-3",
+      "given": "the Recent Users section is rendered with an onNavigate prop supplied",
+      "when": "the admin activates the 'View All Users →' control",
+      "then": "onNavigate is called with 'users', matching the value App.jsx uses to switch activeView to the Users page",
+      "tags": ["happy-path"],
+      "last_run": null
+    },
+    {
+      "id": "SRF-01-TC-21",
+      "title": "Existing Users.jsx and backend suites remain green after the Dashboard restructure",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "SRF-01-FR-3",
+      "given": "SRF-01-FR-3 is implemented",
+      "when": "the full frontend suite (npm run test) and backend suite (pytest) are run",
+      "then": "all existing tests continue to pass — no regression to Users.jsx CRUD/search/filter/pagination or backend behavior, and no new backend endpoint/param was added",
+      "tags": ["regression"],
+      "last_run": null
     }
   ],
   "coverage_audit": {
     "functional_requirements": [
       {"id": "SRF-01-FR-1", "covered_by": ["SRF-01-TC-01", "SRF-01-TC-02", "SRF-01-TC-03", "SRF-01-TC-04", "SRF-01-TC-05", "SRF-01-TC-06"]},
-      {"id": "SRF-01-FR-2", "covered_by": ["SRF-01-TC-10", "SRF-01-TC-11", "SRF-01-TC-12", "SRF-01-TC-13", "SRF-01-TC-14"]}
+      {"id": "SRF-01-FR-2", "covered_by": ["SRF-01-TC-10", "SRF-01-TC-11", "SRF-01-TC-12", "SRF-01-TC-13", "SRF-01-TC-14"]},
+      {"id": "SRF-01-FR-3", "covered_by": ["SRF-01-TC-16", "SRF-01-TC-17", "SRF-01-TC-18", "SRF-01-TC-20", "SRF-01-TC-21"]}
     ],
     "non_functional_requirements": [
       {"id": "SRF-01-NFR-performance", "covered_by": ["SRF-01-TC-07"]},
       {"id": "SRF-01-NFR-security", "covered_by": ["SRF-01-TC-08"]},
-      {"id": "SRF-01-NFR-accessibility", "covered_by": ["SRF-01-TC-09", "SRF-01-TC-15"]}
+      {"id": "SRF-01-NFR-accessibility", "covered_by": ["SRF-01-TC-09", "SRF-01-TC-15", "SRF-01-TC-19"]}
     ],
     "uncovered": []
   }

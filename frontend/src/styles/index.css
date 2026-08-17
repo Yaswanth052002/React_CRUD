@@ -437,6 +437,38 @@ select {
   transition: width 0.4s ease;
 }
 
+.dashboard-breakdown-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.breakdown-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.breakdown-row__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.breakdown-row__label {
+  font-size: 13px;
+  color: var(--ink-muted);
+  font-weight: 500;
+}
+
+.breakdown-row__value {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+}
+
 /* ==========================================================================
    Panel / toolbar / table
    ========================================================================== */
@@ -1212,6 +1244,10 @@ table.data-table {
 @media (max-width: 1100px) {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dashboard-breakdown-row {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -23,6 +23,15 @@ describe("Dashboard overview (USR-01-FR-2, post-extraction)", () => {
   let container;
   let root;
 
+  const SAMPLE_USERS = [
+    { id: 1, name: "Alice Example", email: "alice@test.com", phone: "5551234567", role: "Admin", status: "Active", created_at: "2026-08-10T00:00:00Z" },
+    { id: 2, name: "Bob Example", email: "bob@test.com", phone: "5551234568", role: "User", status: "Active", created_at: "2026-08-11T00:00:00Z" },
+    { id: 3, name: "Carol Example", email: "carol@test.com", phone: "5551234569", role: "User", status: "Inactive", created_at: "2026-08-12T00:00:00Z" },
+    { id: 4, name: "Dana Example", email: "dana@test.com", phone: "5551234570", role: "User", status: "Active", created_at: "2026-08-13T00:00:00Z" },
+    { id: 5, name: "Eve Example", email: "eve@test.com", phone: "5551234571", role: "User", status: "Active", created_at: "2026-08-14T00:00:00Z" },
+    { id: 6, name: "Frank Example", email: "frank@test.com", phone: "5551234572", role: "User", status: "Active", created_at: "2026-08-15T00:00:00Z" },
+  ];
+
   beforeEach(() => {
     userApi.getDashboardStats.mockResolvedValue({
       total_users: 8,
@@ -30,6 +39,7 @@ describe("Dashboard overview (USR-01-FR-2, post-extraction)", () => {
       admin_users: 2,
       regular_users: 6,
     });
+    userApi.getUsers.mockResolvedValue({ items: SAMPLE_USERS, total: SAMPLE_USERS.length, page: 1, page_size: 50 });
     container = document.createElement("div");
     document.body.appendChild(container);
   });
@@ -60,8 +70,10 @@ describe("Dashboard overview (USR-01-FR-2, post-extraction)", () => {
     expect(gridText).toContain("Admins");
     expect(gridText).toContain("Regular Users");
     expect(userApi.getDashboardStats).toHaveBeenCalledTimes(1);
-    // Dashboard no longer fetches the user list at all (search/filter/CRUD moved to Users.jsx).
-    expect(userApi.getUsers).not.toHaveBeenCalled();
+    // As of SRF-01-FR-3, Dashboard also fetches the users page once (read-only) to derive the
+    // "Recent Users" preview — search/filter/CRUD still live exclusively on Users.jsx.
+    expect(userApi.getUsers).toHaveBeenCalledTimes(1);
+    expect(userApi.getUsers).toHaveBeenCalledWith({ page: 1, pageSize: 50 });
   });
 
   // TC-22: loadingStats skeleton state is shown before stats resolve, and there is
@@ -128,15 +140,95 @@ describe("Dashboard overview (USR-01-FR-2, post-extraction)", () => {
     expect(section.querySelector(".stats-grid")).not.toBeNull();
   });
 
-  // SRF-01-TC-13: Dashboard introduces no new service calls beyond getDashboardStats.
-  it("SRF-01-TC-13: calls getDashboardStats exactly once and no user-list/CRUD functions", async () => {
+  // SRF-01-TC-13: Dashboard introduces no CRUD/mutation service calls.
+  it("SRF-01-TC-13: calls getDashboardStats and getUsers exactly once each, and no CRUD functions", async () => {
     await renderDashboard();
 
     expect(userApi.getDashboardStats).toHaveBeenCalledTimes(1);
-    expect(userApi.getUsers).not.toHaveBeenCalled();
+    // As of SRF-01-FR-3, Dashboard calls getUsers once (read-only, for the Recent Users
+    // preview) but never a per-record getUser or any mutation function.
+    expect(userApi.getUsers).toHaveBeenCalledTimes(1);
     expect(userApi.getUser).not.toHaveBeenCalled();
     expect(userApi.createUser).not.toHaveBeenCalled();
     expect(userApi.updateUser).not.toHaveBeenCalled();
     expect(userApi.deleteUser).not.toHaveBeenCalled();
   });
+
+  // SRF-01-TC-16: User Status panel renders Active/Inactive counts with proportional bars.
+  it("SRF-01-TC-16: renders the User Status breakdown panel with Active/Inactive counts and bar widths", async () => {
+    await renderDashboard();
+
+    const section = container.querySelector('section[aria-labelledby="breakdown-user-status"]');
+    expect(section).not.toBeNull();
+    const rows = Array.from(section.querySelectorAll(".breakdown-row"));
+    const byLabel = (label) => rows.find((r) => r.textContent.includes(label));
+
+    const active = byLabel("Active");
+    expect(active.querySelector(".breakdown-row__value").textContent).toBe("5");
+    expect(active.querySelector(".stat-card__bar-fill").style.width).toBe("63%"); // round(5/8*100)
+
+    const inactive = byLabel("Inactive");
+    expect(inactive.querySelector(".breakdown-row__value").textContent).toBe("3");
+    expect(inactive.querySelector(".stat-card__bar-fill").style.width).toBe("38%"); // round(3/8*100)
+  });
+
+  // SRF-01-TC-17: Users by Role panel renders Admin/Regular counts with proportional bars.
+  it("SRF-01-TC-17: renders the Users by Role breakdown panel with Admin/Regular counts and bar widths", async () => {
+    await renderDashboard();
+
+    const section = container.querySelector('section[aria-labelledby="breakdown-users-by-role"]');
+    expect(section).not.toBeNull();
+    const rows = Array.from(section.querySelectorAll(".breakdown-row"));
+    const byLabel = (label) => rows.find((r) => r.textContent.includes(label));
+
+    expect(byLabel("Admins").querySelector(".breakdown-row__value").textContent).toBe("2");
+    expect(byLabel("Regular Users").querySelector(".breakdown-row__value").textContent).toBe("6");
+  });
+
+  // SRF-01-TC-18: Recent Users table shows the 5 most-recently-created users, newest first.
+  it("SRF-01-TC-18: shows the 5 most-recently-created users in the Recent Users table", async () => {
+    await renderDashboard();
+
+    const section = container.querySelector('section[aria-labelledby="recent-users-heading"]');
+    expect(section).not.toBeNull();
+
+    const headerText = section.querySelector("thead").textContent;
+    expect(headerText).toContain("Name");
+    expect(headerText).toContain("Email");
+    expect(headerText).toContain("Role");
+    expect(headerText).toContain("Status");
+    expect(headerText).toContain("Created");
+
+    const rows = Array.from(section.querySelectorAll("tbody tr"));
+    expect(rows).toHaveLength(5);
+    // SAMPLE_USERS has 6 users; newest-first by created_at excludes the oldest (Alice, id 1).
+    expect(rows[0].textContent).toContain("Frank Example");
+    expect(rows.some((r) => r.textContent.includes("Alice Example"))).toBe(false);
+  });
+
+  // SRF-01-TC-20: "View All Users →" calls onNavigate("users").
+  it('SRF-01-TC-20: calls onNavigate("users") when "View All Users" is activated', async () => {
+    const onNavigate = vi.fn();
+    root = createRoot(container);
+    await act(async () => {
+      root.render(<Dashboard onNavigate={onNavigate} />);
+    });
+
+    const button = Array.from(container.querySelectorAll("button")).find((b) =>
+      b.textContent.includes("View All Users")
+    );
+    expect(button).not.toBeUndefined();
+
+    await act(async () => {
+      button.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(onNavigate).toHaveBeenCalledWith("users");
+  });
+
+  // SRF-01-TC-21 (regression): existing behavior is unaffected — see backend/tests/test_users.py
+  // and frontend/src/pages/__tests__/Users search/filter/CRUD coverage for the Users.jsx side of
+  // this regression guard; this Dashboard suite itself is the frontend regression evidence that
+  // Dashboard.jsx's pre-existing getDashboardStats-driven stats cards still render unchanged
+  // (see TC-11/TC-12/TC-21 above) alongside the new getUsers-driven Recent Users section.
 });

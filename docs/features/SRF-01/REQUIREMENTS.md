@@ -64,6 +64,11 @@ protected by an automated regression test rather than manual verification alone.
 - In (SRF-01-FR-2, added 2026-08-14 post feature/USR-01 merge): a compact "User Overview"
   section on the (now overview-only, post-USR-01) `Dashboard.jsx`, showing Total/Active/
   Inactive/Admin/Regular Users stat cards, with Inactive derived client-side.
+- In (SRF-01-FR-3, added 2026-08-17): restructure `Dashboard.jsx` below "User Overview" into two
+  side-by-side breakdown panels ("User Status", "Users by Role") with proportional bars, plus a
+  full-width "Recent Users" preview table and a "View All Users →" link to the Users page — all
+  reusing existing API responses and design tokens, closing the reported excess-whitespace gap
+  below the stats grid.
 - Out: Changing search semantics (fuzzy matching, relevance ranking, field weighting) — tracked
   as a future enhancement (SRF-05 per research risk #4).
 - Out: Adding authentication/authorization to `GET /api/users` — tracked as a known gap, not
@@ -76,6 +81,16 @@ protected by an automated regression test rather than manual verification alone.
   the existing `GET /api/dashboard/stats` response with no new fields.
 - Out (SRF-01-FR-2): charting/graphing libraries, new npm dependencies, or a new backend field
   for inactive-user count — Inactive is a pure client-side derivation.
+- Out (SRF-01-FR-3): any change to `frontend/src/pages/Users.jsx`, `frontend/src/services/userApi.js`,
+  or any backend file — this restructure is Dashboard-only, purely presentational, and reuses the
+  existing `getDashboardStats()` and `getUsers()` responses with no new fields, params, or routes.
+- Out (SRF-01-FR-3): charting/graphing libraries or any new npm dependency — proportional bars
+  reuse the existing `.stat-card__bar-fill`-style width-percentage pattern already in
+  `StatsCard.jsx`; the Recent Users table reuses `UserTable.jsx`'s existing `.data-table` markup
+  and `formatDate` convention.
+- Out (SRF-01-FR-3): a backend sort/limit parameter for "recent" users — the top-5-by-`created_at`
+  subset is derived client-side from the existing `getUsers({ page: 1, pageSize: 50 })` response
+  (see FR-3 item 3 below).
 
 ## Functional requirements
 
@@ -114,6 +129,38 @@ values in `frontend/src/pages/Dashboard.jsx:90-92` are changed without correspon
    used by `Users.jsx`'s existing 4-card grid — verified to still render correctly (task T-04).
 6. No change to `Users.jsx`, `userApi.js`, or any backend file.
 
+**SRF-01-FR-3** — Dashboard compact-overview restructure *(new AC #5, added 2026-08-17; extends `Dashboard.jsx` below the SRF-01-FR-2 "User Overview" section)*
+
+1. Below "User Overview", render two side-by-side panels on desktop, each a `.panel`-style
+   container matching the existing "User Overview" treatment:
+   - **"User Status"**: Active vs. Inactive, each row showing a label, count, and a proportional
+     horizontal bar (`width: ${pct}%` of the larger of the two, or of `total_users` — same
+     percentage math already used by `StatsCard`'s `stat-card__bar-fill`).
+   - **"Users by Role"**: Admin vs. Regular, same row/bar/count treatment.
+   Both panels source their counts from the single existing `getDashboardStats()` response
+   already fetched by `Dashboard.jsx` — no new network call.
+2. The two panels sit in a two-column responsive row that stacks to a single column on narrow
+   viewports, reusing the app's existing breakpoint values (1100px, 640px — same values already
+   used by `.stats-grid`) rather than introducing new breakpoint constants.
+3. Below the two panels, a full-width "Recent Users" section renders a compact table (columns:
+   Name, Email, Role, Status, Created) showing the 5 most-recently-created users. Data is sourced
+   by calling the existing `getUsers({ page: 1, pageSize: 50 })` (the already-frozen default page
+   per `docs/adr/0003-users-list-pagination.md`) once, then deriving the top 5 client-side by
+   sorting on `created_at` descending — no new backend endpoint, sort parameter, or field. A code
+   comment documents this assumption (holds for any dataset size, since it derives from the
+   already-returned page rather than a separate "latest" query), mirroring the FR-2 Inactive-count
+   derivation's documentation style.
+4. The Recent Users table reuses `UserTable.jsx`'s existing `formatDate` convention and
+   `.data-table`/`.table-scroll` CSS classes (compact variant — fewer columns, no per-row actions)
+   rather than introducing a new table component or styling approach.
+5. A "View All Users →" link/button at the end of the Recent Users section navigates to the
+   existing Users page. `Dashboard.jsx` gains an `onNavigate` prop (same shape as the prop
+   `Sidebar.jsx` already receives from `App.jsx`), and `App.jsx` passes
+   `onNavigate={() => setActiveView("users")}` when rendering `Dashboard` — the one wiring change
+   outside `Dashboard.jsx`/`StatsCard.jsx`/`index.css` this amendment requires.
+6. No new npm dependency (no charting/graphing library). No change to `Users.jsx`, `userApi.js`,
+   or any backend file. No change to pagination behavior or defaults.
+
 ## Non-functional requirements
 
 - Performance: Per `.claude/rules/performance-baseline.md`: pagination is already in place
@@ -135,6 +182,16 @@ values in `frontend/src/pages/Dashboard.jsx:90-92` are changed without correspon
   current behavior only).
 - Performance (SRF-01-FR-2): no new network request — Inactive-Users is a pure client-side
   arithmetic derivation from the already-fetched `getDashboardStats()` response.
+- Performance (SRF-01-FR-3): one existing `getUsers({ page: 1, pageSize: 50 })` call, already
+  the frozen default page size — no new endpoint, no additional round trip beyond what
+  `Dashboard.jsx` already needs for the Recent Users subset.
+- Accessibility (SRF-01-FR-3): Per `.claude/rules/accessibility-baseline.md`: "User Status" and
+  "Users by Role" use semantic `<section>`s with accessible headings, same pattern as "User
+  Overview"; the Recent Users table uses semantic `<table>`/`<thead>`/`<th scope="col">` markup
+  (matching `UserTable.jsx`'s existing convention); "View All Users →" is a real, keyboard-
+  reachable, focus-visible control (not a non-semantic `<div onClick>`).
+- Security (SRF-01-FR-3): no new surface — reuses the same unauthenticated `getUsers()`/
+  `getDashboardStats()` calls already covered by this story's NFR-security statement above.
 
 ## Visual spec
 
@@ -155,6 +212,11 @@ Not applicable — `integrations.design = none`. Backend / API / data feature.
   or API impact. Backout plan: revert the `Dashboard.jsx` / `StatsCard.jsx` / `index.css` diff;
   no data migration or contract change to unwind. Success signal: full frontend suite (25+ tests
   including new SRF-01-TC-10..14) and backend suite (16 tests) both green.
+- **SRF-01-FR-3 addendum**: bang-bang, no feature flag — a pure UI/layout change with no backend
+  or API impact. Backout plan: revert the `Dashboard.jsx` / `App.jsx` diff (and any new
+  presentational sub-component files); no data migration or contract change to unwind. Success
+  signal: full frontend suite (including new SRF-01-TC-16..21) and backend suite both green, with
+  no change to backend test count (no backend files touched).
 
 ## Documentation requirements
 
@@ -169,6 +231,11 @@ Not applicable — `integrations.design = none`. Backend / API / data feature.
 - **SRF-01-FR-2 addendum**: `README.md` §4 (Project Structure) already lists `Dashboard.jsx`;
   no path changes, so no README update is required. No new API surface to document in `/docs`
   (Swagger UI unaffected — no backend change).
+- **SRF-01-FR-3 addendum**: `README.md` §4 (Project Structure) already lists `Dashboard.jsx` and
+  `App.jsx`; if new presentational sub-component files are added under
+  `frontend/src/components/`, they follow the existing naming/location convention already
+  documented there, so no README structural update is required. No new API surface to document
+  (no backend change).
 
 ## Open questions
 
@@ -189,6 +256,17 @@ Decisions logged in `docs/stories/SRF-01.md` § Decision log.
   SRF-01-FR-2 (Dashboard "User Overview" enhancement)
   - Reviewed proposed FR-2 text, new story AC #4, 6 new test cases (SRF-01-TC-10..15), and
     PLAN.md task additions (T-03..T-06) presented in-session before any file was written
+  - No design review required (`integrations.design = none`)
+  - No new `[NEEDS CLARIFICATION]` markers introduced; Open Questions unchanged (none)
+  - No-placeholder check ✓
+  - Decision collected via direct user confirmation in-session (functionally equivalent to the
+    Product Gate `AskUserQuestion` ceremony — this is a same-story amendment, not a fresh PRD
+    cycle through `/arh-plan-requirements`)
+
+- **2026-08-17** — yaswanth.panthangi@apexon.com (PO, single-approver mode): **APPROVE** —
+  SRF-01-FR-3 (Dashboard compact-overview restructure)
+  - Reviewed proposed FR-3 text, new story AC #5, 6 new test cases (SRF-01-TC-16..21), and
+    PLAN.md task additions (T-07..T-10) presented in-session before any file was written
   - No design review required (`integrations.design = none`)
   - No new `[NEEDS CLARIFICATION]` markers introduced; Open Questions unchanged (none)
   - No-placeholder check ✓

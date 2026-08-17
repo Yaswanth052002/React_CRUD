@@ -1,14 +1,21 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Header from "../components/Header.jsx";
 import StatsCard from "../components/StatsCard.jsx";
+import StatBreakdownPanel from "../components/StatBreakdownPanel.jsx";
+import RecentUsersTable from "../components/RecentUsersTable.jsx";
 import Notification from "../components/Notification.jsx";
-import { getDashboardStats } from "../services/userApi.js";
+import { getDashboardStats, getUsers } from "../services/userApi.js";
+
+const RECENT_USERS_LIMIT = 5;
 
 let toastId = 0;
 
-export default function Dashboard({ onMenuClick, onUserCountChange }) {
+export default function Dashboard({ onMenuClick, onUserCountChange, onNavigate }) {
   const [stats, setStats] = useState(null);
   const [loadingStats, setLoadingStats] = useState(true);
+
+  const [users, setUsers] = useState([]);
+  const [loadingUsers, setLoadingUsers] = useState(true);
 
   const [toasts, setToasts] = useState([]);
 
@@ -36,11 +43,37 @@ export default function Dashboard({ onMenuClick, onUserCountChange }) {
     }
   }, [pushToast, onUserCountChange]);
 
+  const loadRecentUsers = useCallback(async () => {
+    setLoadingUsers(true);
+    try {
+      const data = await getUsers({ page: 1, pageSize: 50 });
+      setUsers(data.items);
+    } catch (err) {
+      // Recent Users is supplementary — surface via toast rather than blocking the page.
+      pushToast("error", "Could not load recent users: " + err.message);
+    } finally {
+      setLoadingUsers(false);
+    }
+  }, [pushToast]);
+
   // Initial load
   useEffect(() => {
     loadStats();
+    loadRecentUsers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // "Recent Users" is derived client-side from the existing getUsers() page (no separate
+  // "latest" endpoint/param) by sorting on created_at descending and taking the top N. This
+  // holds for any dataset size since it re-derives from the already-fetched page each time,
+  // rather than depending on a fixed insertion order.
+  const recentUsers = useMemo(
+    () =>
+      [...users]
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+        .slice(0, RECENT_USERS_LIMIT),
+    [users]
+  );
 
   return (
     <>
@@ -138,6 +171,33 @@ export default function Dashboard({ onMenuClick, onUserCountChange }) {
             </div>
           </div>
         </section>
+
+        <div className="dashboard-breakdown-row">
+          <StatBreakdownPanel
+            title="User Status"
+            total={stats?.total_users ?? 0}
+            rows={[
+              { label: "Active", value: stats?.active_users ?? 0, color: "#0a8a52" },
+              {
+                label: "Inactive",
+                value: stats ? Math.max(0, (stats.total_users ?? 0) - (stats.active_users ?? 0)) : 0,
+                color: "var(--ink-muted)",
+              },
+            ]}
+          />
+          <StatBreakdownPanel
+            title="Users by Role"
+            total={stats?.total_users ?? 0}
+            rows={[
+              { label: "Admins", value: stats?.admin_users ?? 0, color: "#6425d1" },
+              { label: "Regular Users", value: stats?.regular_users ?? 0, color: "#b3650a" },
+            ]}
+          />
+        </div>
+
+        {!loadingUsers && (
+          <RecentUsersTable users={recentUsers} onViewAll={() => onNavigate?.("users")} />
+        )}
       </div>
 
       <Notification toasts={toasts} onDismiss={dismissToast} />
