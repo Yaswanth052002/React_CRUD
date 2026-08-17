@@ -1,0 +1,32 @@
+{
+  "story": "validated",
+  "story_priority": "P2",
+  "story_independent_test": false,
+  "needs_clarification_count": 0,
+  "research": "complete",
+  "research_verdict": "GO-WITH-CONDITIONS",
+  "rtm_source_sha": "5a019873bdc1df059c68aa5c582baf9511ca7414",
+  "prd": "complete",
+  "design": "n/a",
+  "design_artifact": "docs/features/AUTH-08/DESIGN.md",
+  "design_provider": "none",
+  "design_iteration": 0,
+  "phase": "plan-implementation",
+  "gate": "APPROVE",
+  "last_updated": "2026-08-17T23:10:00Z",
+  "plan": "complete",
+  "plan_validation": "PASS",
+  "plan_validation_rounds": 1,
+  "pending_carry_forward": [
+    {
+      "item_id": "R-08-jwt-signing-not-yet-implemented",
+      "kind": "risk",
+      "reason": "No backend code in AUTH-02/AUTH-03/AUTH-04's written PLANs reads JWT_SECRET_KEY to sign or verify a JWT; AUTH-02's AuthService.login issues a stub token. AUTH-08 documents/passes through the env var per its own scope but does not implement signing (out of scope). Accepted via PLAN.md \u00a7 6 risk R-08.",
+      "owner": "Backend lead",
+      "added_at": "2026-08-17T23:10:00Z",
+      "added_by": "plan-implementation/03-tasks (risk accepted)",
+      "resolved_at": "2026-08-17T23:45:00Z",
+      "evidence": "docs/features/AUTH-02/PLAN.md ADR-5 (D-05): AUTH-02 amended to implement real JWT signing via PyJWT/HS256 reading JWT_SECRET_KEY in AuthService.login, replacing the stub token. AUTH-08's env var is now consumed by real signing code, closing the gap."
+    }
+  ]
+}

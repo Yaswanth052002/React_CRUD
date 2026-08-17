@@ -1,0 +1,125 @@
+{
+  "story_id": "AUTH-01",
+  "test_cases": [
+    {
+      "id": "AUTH-01-TC-01",
+      "title": "Login form renders email, password, and submit button with existing form classes",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-01-FR-2",
+      "given": "an unauthenticated visitor mounts LoginScreen",
+      "when": "the component renders",
+      "then": "a form with an email input (type=email), a password input (type=password), and a 'Log in' button styled with form-group/form-label/form-input/btn btn-primary classes is visible",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-01-TC-02",
+      "title": "Submitting valid credentials shows loading state and calls onLoginSuccess with token",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-01-FR-1",
+      "given": "a mocked userAuthService.login resolves with a token after a delay",
+      "when": "the visitor fills valid email/password and clicks Log in",
+      "then": "the submit button is disabled and shows the .spinner element immediately, then re-enables on resolution, userApi.setAuthToken is called with the token, and props.onLoginSuccess is called with that token afterward",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-01-TC-03",
+      "title": "Submit button loading state clears immediately on auth call rejection (no minimum spinner duration)",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-01-FR-1",
+      "given": "a mocked userAuthService.login rejects",
+      "when": "the visitor submits valid-looking credentials",
+      "then": "the submit button re-enables the instant the rejection is caught, with no artificial delay",
+      "tags": ["edge-case"]
+    },
+    {
+      "id": "AUTH-01-TC-04",
+      "title": "Rejected mocked auth call shows single generic non-leaking error message",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-01-FR-1",
+      "given": "a mocked userAuthService.login rejects (simulating invalid credentials or a network error)",
+      "when": "the rejection is caught",
+      "then": "the screen displays exactly 'Invalid email or password. Please try again.' in a .form-server-error element, with no distinction between invalid-email and invalid-password causes and no raw exception/stack trace rendered",
+      "tags": ["negative"]
+    },
+    {
+      "id": "AUTH-01-TC-05",
+      "title": "Login form reflows without horizontal scroll at 320px viewport width",
+      "type": "e2e",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-01-FR-2",
+      "given": "the login screen is rendered",
+      "when": "the viewport is resized to 320px width",
+      "then": "the form remains fully usable with no horizontal scrolling, consistent with existing .stats-grid responsive breakpoints",
+      "tags": ["edge-case"]
+    },
+    {
+      "id": "AUTH-01-TC-06",
+      "title": "Empty email and password fields block submit with field-level errors and no auth call",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-01-FR-2",
+      "given": "the visitor leaves both email and password fields empty",
+      "when": "the visitor clicks Log in",
+      "then": "submit is blocked, a .form-error message appears under each offending field, and userAuthService.login is never called",
+      "tags": ["negative"]
+    },
+    {
+      "id": "AUTH-01-TC-07",
+      "title": "Password value never appears in DOM, console, or error message after a failed submit",
+      "type": "security",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-01-NFR-security",
+      "given": "a visitor submits a password and the mocked auth call rejects",
+      "when": "the rejection is handled and the generic error is rendered",
+      "then": "no console.log/console.error call and no DOM node (including the error message) contains the submitted password value",
+      "tags": ["negative"]
+    },
+    {
+      "id": "AUTH-01-TC-08",
+      "title": "Email and password inputs have associated labels, aria-required, and error region uses aria-live=assertive",
+      "type": "e2e",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-01-NFR-accessibility",
+      "given": "the login screen is rendered",
+      "when": "the DOM is inspected via axe-core / Playwright",
+      "then": "each input has a <label> linked via htmlFor/id and aria-required=true, the .form-server-error container has aria-live=assertive, the submit button has a visible :focus-visible outline, and the button's bounding box is >= 44x44px",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-01-TC-09",
+      "title": "Loading state (disabled button + spinner) appears within one render frame of click",
+      "type": "performance",
+      "automatable": true,
+      "priority": "Should",
+      "requirement_id": "AUTH-01-NFR-performance",
+      "given": "a mocked userAuthService.login with an artificial delay",
+      "when": "the visitor clicks Log in",
+      "then": "the button's disabled attribute and .spinner element are present in the DOM within 16ms of the click event (budget: <16ms to loading-state paint)",
+      "tags": ["happy-path"]
+    }
+  ],
+  "coverage_audit": {
+    "functional_requirements": [
+      {"id": "AUTH-01-FR-1", "covered_by": ["AUTH-01-TC-02", "AUTH-01-TC-03", "AUTH-01-TC-04"]},
+      {"id": "AUTH-01-FR-2", "covered_by": ["AUTH-01-TC-01", "AUTH-01-TC-05", "AUTH-01-TC-06"]}
+    ],
+    "non_functional_requirements": [
+      {"id": "AUTH-01-NFR-security", "covered_by": ["AUTH-01-TC-07"]},
+      {"id": "AUTH-01-NFR-accessibility", "covered_by": ["AUTH-01-TC-08"]},
+      {"id": "AUTH-01-NFR-performance", "covered_by": ["AUTH-01-TC-09"]}
+    ],
+    "uncovered": []
+  }
+}

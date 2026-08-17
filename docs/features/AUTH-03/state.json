@@ -1,0 +1,46 @@
+{
+  "story": "validated",
+  "story_priority": "P1",
+  "story_independent_test": true,
+  "needs_clarification_count": 0,
+  "research": "complete",
+  "research_verdict": "GO-WITH-CONDITIONS",
+  "rtm_source_sha": "5a019873bdc1df059c68aa5c582baf9511ca7414",
+  "prd": "complete",
+  "design": "n/a",
+  "design_artifact": "docs/features/AUTH-03/DESIGN.md",
+  "design_provider": "none",
+  "design_iteration": 0,
+  "phase": "plan-implementation",
+  "gate": "APPROVE",
+  "plan": "complete",
+  "plan_validation": "PASS",
+  "plan_validation_rounds": 1,
+  "decisions": [
+    {
+      "decision_id": "D-01",
+      "title": "Bcrypt via passlib[bcrypt] (work factor 12), ratifying the story/research decision",
+      "alternatives": ["argon2-cffi", "raw-bcrypt-package"],
+      "chosen": "passlib-bcrypt-rounds-12",
+      "rationale": "The story's Decision log already chose passlib[bcrypt] over argon2/scrypt and fixed the work factor at 12, and research scored this GO-WITH-CONDITIONS with a latency-benchmark condition to confirm the budget holds at that work factor. This mini-ADR ratifies that decision at the implementation-planning level: AuthService.hash_password and verify_credentials use CryptContext(schemes=[\"bcrypt\"], bcrypt__rounds=12), replacing AUTH-02's stdlib pbkdf2_hmac placeholder in place, with CryptContext.verify's typed UnknownHashError giving a clean, testable path for the documented placeholder-hash cutover.",
+      "blast_radius": "service",
+      "reversibility": "mechanical",
+      "adr_ref": null,
+      "created_at": "2026-08-17T19:15:00Z",
+      "created_by": "plan-implementation/plan-authoring"
+    }
+  ],
+  "pending_carry_forward": [
+    {
+      "item_id": "R-01-auth-02-sequencing",
+      "kind": "risk",
+      "reason": "AUTH-03 depends on AUTH-02's D-04 columns and AuthService skeleton (T-01/T-03) landing first; no task in AUTH-03's PLAN can force an upstream story to ship — accepted via the PLAN's explicit Sequencing note and AUTH-02's own ADR-4 documenting the handoff",
+      "owner": "Backend lead",
+      "added_at": "2026-08-17T19:15:00Z",
+      "added_by": "plan-implementation/03-tasks (risk accepted)",
+      "resolved_at": null,
+      "evidence": null
+    }
+  ],
+  "last_updated": "2026-08-17T19:15:00Z"
+}

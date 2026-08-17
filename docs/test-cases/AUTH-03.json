@@ -1,0 +1,162 @@
+{
+  "story_id": "AUTH-03",
+  "test_cases": [
+    {
+      "id": "AUTH-03-TC-01",
+      "title": "Create user persists bcrypt hash, never plaintext",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-03-FR-1",
+      "given": "a valid create-user payload including a plaintext password",
+      "when": "POST /api/users is submitted",
+      "then": "the persisted password_hash column value is a bcrypt hash (identifiable bcrypt prefix), distinct from the submitted plaintext, and is never equal to the plaintext value",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-03-TC-02",
+      "title": "Hash is unique per call due to bcrypt salting",
+      "type": "unit",
+      "automatable": false,
+      "priority": "Should",
+      "requirement_id": "AUTH-03-FR-1",
+      "given": "the same plaintext password hashed twice via AuthService.hash_password",
+      "when": "the two resulting hash values are compared",
+      "then": "they are not equal, confirming per-call random salting",
+      "tags": ["edge-case"]
+    },
+    {
+      "id": "AUTH-03-TC-03",
+      "title": "Verify succeeds for correct password",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-03-FR-2",
+      "given": "a user record created with a known password",
+      "when": "AuthService.verify_credentials is called with the correct email and plaintext password",
+      "then": "it returns true",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-03-TC-04",
+      "title": "Verify fails for incorrect password without leaking distinction",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-03-FR-2",
+      "given": "a user record created with a known password",
+      "when": "AuthService.verify_credentials is called with the correct email and an incorrect plaintext password",
+      "then": "it returns false and no exception, log line, or response body reveals the submitted plaintext or distinguishes the failure reason",
+      "tags": ["negative"]
+    },
+    {
+      "id": "AUTH-03-TC-05",
+      "title": "Hash/verify failures logged at WARN with user id only",
+      "type": "security",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-03-NFR-security",
+      "given": "a bcrypt/passlib exception is raised during hash or verify (simulated via a forced library error)",
+      "when": "the service layer catches the exception",
+      "then": "a WARN-level log entry is emitted containing the user id only, no plaintext or hash material appears in the log, and the API layer receives a generic readable error rather than a raw stack trace",
+      "tags": ["negative"]
+    },
+    {
+      "id": "AUTH-03-TC-06",
+      "title": "GET /api/users list response omits password fields",
+      "type": "contract",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-03-FR-3",
+      "given": "at least one user exists in the system",
+      "when": "GET /api/users is called",
+      "then": "the raw JSON response body contains no 'password' or 'password_hash' key for any returned user object",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-03-TC-07",
+      "title": "GET /api/users/{id} response omits password fields",
+      "type": "contract",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-03-FR-3",
+      "given": "an existing user id",
+      "when": "GET /api/users/{id} is called",
+      "then": "the raw JSON response body contains no 'password' or 'password_hash' key",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-03-TC-08",
+      "title": "POST and PUT /api/users responses omit password fields",
+      "type": "contract",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-03-FR-3",
+      "given": "a valid create payload and a valid update payload for an existing user",
+      "when": "POST /api/users then PUT /api/users/{id} are called",
+      "then": "neither response body contains a 'password' or 'password_hash' key",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-03-TC-09",
+      "title": "Create user without password is rejected, no default invented",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-03-FR-4",
+      "given": "a create-user payload that omits the password field entirely",
+      "when": "POST /api/users is submitted",
+      "then": "the request is rejected with a 422 validation error and no user record is persisted with an invented default password",
+      "tags": ["negative"]
+    },
+    {
+      "id": "AUTH-03-TC-10",
+      "title": "Create user with empty-string password is rejected",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-03-FR-4",
+      "given": "a create-user payload with password set to an empty string",
+      "when": "POST /api/users is submitted",
+      "then": "the request is rejected with a 422 validation error",
+      "tags": ["edge-case", "negative"]
+    },
+    {
+      "id": "AUTH-03-TC-11",
+      "title": "Bcrypt hashing latency stays within p95 budget",
+      "type": "performance",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-03-NFR-performance",
+      "given": "100 distinct plaintext passwords hashed sequentially with work factor 12 under single-request, non-concurrent load",
+      "when": "hash latency for each call is measured",
+      "then": "p95 latency is <= 300ms; if exceeded, work factor is reduced to 11 and re-benchmarked per the documented tuning procedure",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-03-TC-12",
+      "title": "Placeholder-hashed rows fail verification after bcrypt cutover",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Should",
+      "requirement_id": "AUTH-03-FR-2",
+      "given": "a user row persisted with AUTH-02's pbkdf2_hmac placeholder hash format",
+      "when": "AuthService.verify_credentials is called against that row with the correct original plaintext",
+      "then": "verification fails (returns false) without raising an unhandled exception, confirming the documented expected incompatibility",
+      "tags": ["edge-case", "regression-compat"]
+    }
+  ],
+  "coverage_audit": {
+    "functional_requirements": [
+      {"id": "AUTH-03-FR-1", "covered_by": ["AUTH-03-TC-01", "AUTH-03-TC-02"]},
+      {"id": "AUTH-03-FR-2", "covered_by": ["AUTH-03-TC-03", "AUTH-03-TC-04", "AUTH-03-TC-12"]},
+      {"id": "AUTH-03-FR-3", "covered_by": ["AUTH-03-TC-06", "AUTH-03-TC-07", "AUTH-03-TC-08"]},
+      {"id": "AUTH-03-FR-4", "covered_by": ["AUTH-03-TC-09", "AUTH-03-TC-10"]}
+    ],
+    "non_functional_requirements": [
+      {"id": "AUTH-03-NFR-performance", "covered_by": ["AUTH-03-TC-11"]},
+      {"id": "AUTH-03-NFR-security", "covered_by": ["AUTH-03-TC-05"]}
+    ],
+    "uncovered": []
+  }
+}

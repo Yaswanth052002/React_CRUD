@@ -1,0 +1,177 @@
+{
+  "story_id": "AUTH-02",
+  "test_cases": [
+    {
+      "id": "AUTH-02-TC-01",
+      "title": "Valid credential login returns success response with no row duplication",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-02-FR-1",
+      "given": "a fixture user with a valid password_hash and must_reset_password=false",
+      "when": "the user POSTs the correct email/password to /api/auth/login",
+      "then": "the response is 200 with a LoginResponse body containing token, and the users table row count is unchanged (no insert, no duplicate)",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-02-TC-02",
+      "title": "Login response never exposes password_hash or must_reset_password",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-02-FR-1",
+      "given": "a fixture user with a valid credential",
+      "when": "login succeeds",
+      "then": "the response body contains only the LoginResponse fields (token) and never includes password_hash or must_reset_password",
+      "tags": ["happy-path", "security"]
+    },
+    {
+      "id": "AUTH-02-TC-03",
+      "title": "Login with non-existent email returns generic 401",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-02-FR-2",
+      "given": "an email with no matching user record in the fixture set",
+      "when": "the client POSTs that email with any password to /api/auth/login",
+      "then": "the response is 401 with body \"Invalid email or password.\"",
+      "tags": ["negative", "edge-case"]
+    },
+    {
+      "id": "AUTH-02-TC-04",
+      "title": "Login with wrong password returns byte-for-byte identical response to unknown-email case",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-02-FR-2",
+      "given": "a fixture user with a valid credential and the wrong password supplied",
+      "when": "the client POSTs the valid email with an incorrect password to /api/auth/login",
+      "then": "the response status and body are byte-for-byte identical to AUTH-02-TC-03's response, with no field-specific validation error distinguishing the two cases",
+      "tags": ["negative", "edge-case"]
+    },
+    {
+      "id": "AUTH-02-TC-05",
+      "title": "Login rejected for user with must_reset_password=true using the same generic error",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-02-FR-3",
+      "given": "a fixture user whose must_reset_password flag is true",
+      "when": "the user attempts to log in with any password",
+      "then": "the response is byte-for-byte identical to the generic 401 in AUTH-02-TC-03/04, and no authentication succeeds",
+      "tags": ["negative", "edge-case"]
+    },
+    {
+      "id": "AUTH-02-TC-06",
+      "title": "Startup migration provisions every credential-less row with a random unusable hash",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-02-FR-4",
+      "given": "a fixture set of rows, some with password_hash set and some with password_hash null",
+      "when": "provision_existing_users_with_random_password is invoked directly",
+      "then": "every previously-null row now has a non-null password_hash (unique per row, never a fixed string) and must_reset_password=true, while previously-hashed rows are untouched",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-02-TC-07",
+      "title": "Re-running the provisioning migration is a no-op for already-provisioned rows",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-02-FR-4",
+      "given": "a users table where the migration has already run once",
+      "when": "provision_existing_users_with_random_password is invoked a second time",
+      "then": "no rows are updated (password_hash values and must_reset_password flags are unchanged from the first run)",
+      "tags": ["edge-case", "regression"]
+    },
+    {
+      "id": "AUTH-02-TC-08",
+      "title": "Provisioning script sets a real password and clears must_reset_password",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-02-FR-5",
+      "given": "a fixture user with must_reset_password=true and an operator-supplied plaintext password",
+      "when": "set_user_initial_password is invoked with the user's email and the plaintext password",
+      "then": "the user's password_hash changes to a value that verifies against the supplied password via verify_credentials, must_reset_password becomes false, and the user can subsequently log in per AUTH-02-TC-01",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-02-TC-09",
+      "title": "Provisioning script never logs or persists the plaintext password",
+      "type": "security",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-02-FR-5",
+      "given": "an operator invokes the set_initial_password script with a plaintext password via captured stdin",
+      "when": "the script completes successfully or fails (user not found)",
+      "then": "the plaintext password never appears in captured logs, stdout/stderr, or any persisted field other than as the input to the hash function, and the script exits 0 on success / 1 on failure",
+      "tags": ["security", "negative"]
+    },
+    {
+      "id": "AUTH-02-TC-10",
+      "title": "Login rate limiter returns 429 after 3 failed attempts per email within 60 minutes",
+      "type": "security",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-02-FR-6",
+      "given": "3 failed login attempts have already been made for the same email within the last 60 minutes",
+      "when": "a 4th login attempt is made for that email within the same rolling window",
+      "then": "the response is 429 with a Retry-After header, regardless of whether the 4th attempt's credentials would otherwise be valid",
+      "tags": ["edge-case", "security"]
+    },
+    {
+      "id": "AUTH-02-TC-11",
+      "title": "Auth logic is isolated in AuthService, not added to UserService",
+      "type": "contract",
+      "automatable": true,
+      "priority": "Should",
+      "requirement_id": "AUTH-02-FR-7",
+      "given": "the backend/app/services module tree after implementation",
+      "when": "app.services.auth_service and app.services.user_service are imported and introspected",
+      "then": "login, provision_existing_users_with_random_password, and set_user_initial_password exist only on AuthService, and UserService exposes no auth-related methods",
+      "tags": ["regression"]
+    },
+    {
+      "id": "AUTH-02-TC-12",
+      "title": "Login endpoint meets p95 latency budget under sustained load",
+      "type": "performance",
+      "automatable": true,
+      "priority": "Should",
+      "requirement_id": "AUTH-02-NFR-performance",
+      "given": "the login endpoint under a sustained load of 50 RPS for 60 seconds",
+      "when": "requests are issued against /api/auth/login with a mix of valid and invalid credentials",
+      "then": "p95 response latency is under 400ms for the full 60-second window",
+      "tags": ["performance"]
+    },
+    {
+      "id": "AUTH-02-TC-13",
+      "title": "Failed and successful login attempts are logged with opaque keys only, never plaintext email or password",
+      "type": "security",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-02-NFR-security",
+      "given": "a mix of successful and failed login attempts, including one for a non-existent email",
+      "when": "logs are captured for the duration of the test",
+      "then": "no log line contains a plaintext email address or password; all authentication log entries reference only user_id or a hashed email",
+      "tags": ["security", "negative"]
+    }
+  ],
+  "coverage_audit": {
+    "functional_requirements": [
+      {"id": "AUTH-02-FR-1", "covered_by": ["AUTH-02-TC-01", "AUTH-02-TC-02"]},
+      {"id": "AUTH-02-FR-2", "covered_by": ["AUTH-02-TC-03", "AUTH-02-TC-04"]},
+      {"id": "AUTH-02-FR-3", "covered_by": ["AUTH-02-TC-05"]},
+      {"id": "AUTH-02-FR-4", "covered_by": ["AUTH-02-TC-06", "AUTH-02-TC-07"]},
+      {"id": "AUTH-02-FR-5", "covered_by": ["AUTH-02-TC-08", "AUTH-02-TC-09"]},
+      {"id": "AUTH-02-FR-6", "covered_by": ["AUTH-02-TC-10"]},
+      {"id": "AUTH-02-FR-7", "covered_by": ["AUTH-02-TC-11"]}
+    ],
+    "non_functional_requirements": [
+      {"id": "AUTH-02-NFR-performance", "covered_by": ["AUTH-02-TC-12"]},
+      {"id": "AUTH-02-NFR-security", "covered_by": ["AUTH-02-TC-09", "AUTH-02-TC-10", "AUTH-02-TC-13"]}
+    ],
+    "uncovered": []
+  }
+}

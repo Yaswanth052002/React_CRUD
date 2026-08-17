@@ -1,0 +1,58 @@
+{
+  "story": "validated",
+  "story_priority": "P1",
+  "story_independent_test": true,
+  "needs_clarification_count": 0,
+  "research": "complete",
+  "research_verdict": "GO-WITH-CONDITIONS",
+  "rtm_source_sha": "5a019873bdc1df059c68aa5c582baf9511ca7414",
+  "prd": "complete",
+  "design": "n/a",
+  "design_artifact": "docs/features/AUTH-04/DESIGN.md",
+  "design_provider": "none",
+  "design_iteration": 0,
+  "phase": "plan-implementation",
+  "gate": "APPROVE",
+  "plan": "complete",
+  "plan_validation": "PASS",
+  "plan_validation_rounds": 1,
+  "decisions": [
+    {
+      "decision_id": "D-01",
+      "title": "Axios interceptor pair + plain-boolean auth state (ratifies story/research decision)",
+      "alternatives": ["null-loading-auth-state", "event-bus-signal"],
+      "chosen": "interceptor-pair-plain-boolean-state",
+      "rationale": "App.jsx has no auth concept and no router; userApi.js is the sole HTTP layer per project convention. The story's Decision log locks the mechanism (JWT bearer token in localStorage, axios interceptor, 60-minute TTL) and research condition C-9 locks isAuthenticated as a plain useState boolean (never null/loading) with a separate sessionExpiredMessage string state. This ADR ratifies those decisions as the PLAN's implementation contract.",
+      "blast_radius": "feature",
+      "reversibility": "mechanical",
+      "adr_ref": null,
+      "created_at": "2026-08-17T22:45:00Z",
+      "created_by": "plan-implementation/plan-authoring"
+    },
+    {
+      "decision_id": "D-02",
+      "title": "jwt-decode library for client-side expiry check (per condition C-8)",
+      "alternatives": ["jwt-decode-npm-package", "manual-base64url-parse"],
+      "chosen": "jwt-decode-npm-package",
+      "rationale": "The client must extract a JWT's exp claim to decide isAuthenticated on mount without a network round-trip, and must never throw on a malformed token. Reinventing a well-tested, widely-used, maintained micro-library adds maintenance surface (base64url padding, unicode payload handling) for zero benefit over a 2KB dependency with no transitive deps.",
+      "blast_radius": "feature",
+      "reversibility": "mechanical",
+      "adr_ref": null,
+      "created_at": "2026-08-17T22:45:00Z",
+      "created_by": "plan-implementation/plan-authoring"
+    },
+    {
+      "decision_id": "D-03",
+      "title": "AUTH-04 is the authoritative implementer of userApi.js's auth-token surface, superseding AUTH-01 PLAN.md's F-06 forward-reference",
+      "alternatives": ["auth-01-owns-final-shape", "duplicate-independent-implementations"],
+      "chosen": "auth-04-authoritative-supersedes-auth-01-f06",
+      "rationale": "AUTH-01 PLAN.md's F-06 adds only an in-memory client.defaults.headers setAuthToken variant, explicitly deferring localStorage persistence to AUTH-04. AUTH-04's REQUIREMENTS.md FR-2 defines the full, localStorage-backed auth-token API surface with a different setAuthToken implementation. AUTH-01 has not been implemented yet (no impl field in its state.json), but the plan must make explicit which story owns the final shape of setAuthToken regardless of implementation order, to avoid a silent conflicting duplicate at merge time.",
+      "blast_radius": "system",
+      "reversibility": "mechanical",
+      "adr_ref": null,
+      "created_at": "2026-08-17T22:45:00Z",
+      "created_by": "plan-implementation/plan-authoring"
+    }
+  ],
+  "last_updated": "2026-08-17T22:45:00Z"
+}

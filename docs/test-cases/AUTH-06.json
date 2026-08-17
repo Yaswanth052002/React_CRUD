@@ -1,0 +1,163 @@
+{
+  "story_id": "AUTH-06",
+  "test_cases": [
+    {
+      "id": "AUTH-06-TC-01",
+      "title": "getCurrentUser() returns name and email on success",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-06-FR-1",
+      "given": "an authenticated session with a valid stored token",
+      "when": "getCurrentUser() is called",
+      "then": "it issues a single GET /api/auth/me request and resolves to exactly {name, email}",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-06-TC-02",
+      "title": "getCurrentUser() throws a normalizeError-wrapped error on failure",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-06-FR-1",
+      "given": "the GET /api/auth/me request fails (network error or non-2xx)",
+      "when": "getCurrentUser() is called",
+      "then": "it throws an error normalized via the same normalizeError pattern used by other userApi.js functions, never a raw stack trace",
+      "tags": ["negative"]
+    },
+    {
+      "id": "AUTH-06-TC-03",
+      "title": "getCurrentUser() response never includes role, id, or avatar fields",
+      "type": "contract",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-06-FR-1",
+      "given": "a successful GET /api/auth/me response",
+      "when": "Settings.jsx consumes the result",
+      "then": "only name and email are read/rendered; role, id, and any other field are never accessed",
+      "tags": ["edge-case"]
+    },
+    {
+      "id": "AUTH-06-TC-04",
+      "title": "Logout button calls userApi.logout() then props.onLogout() in order",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-06-FR-2",
+      "given": "the Settings page is rendered for an authenticated user",
+      "when": "the Logout button is clicked",
+      "then": "userApi.logout() is called first, followed by props.onLogout(), with no additional network request",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-06-TC-05",
+      "title": "Settings.jsx performs no navigation or redirect itself on logout",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Should",
+      "requirement_id": "AUTH-06-FR-2",
+      "given": "the Logout button has been clicked",
+      "when": "userApi.logout() and props.onLogout() resolve",
+      "then": "Settings.jsx issues no router/navigation call itself; the Login transition happens only because onLogout flips isAuthenticated in App.jsx",
+      "tags": ["edge-case"]
+    },
+    {
+      "id": "AUTH-06-TC-06",
+      "title": "Settings.jsx does not accept or branch on an isAuthenticated prop",
+      "type": "contract",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-06-FR-3",
+      "given": "the Settings component's prop interface",
+      "when": "Settings.jsx is rendered with no isAuthenticated prop supplied",
+      "then": "the component renders identically to being supplied one, proving no such prop is read or required",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-06-TC-07",
+      "title": "Loading spinner renders next to fields while getCurrentUser() is pending",
+      "type": "e2e",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-06-FR-4",
+      "given": "Settings.jsx has just mounted and the current-user fetch is in flight",
+      "when": "the page renders before the fetch resolves",
+      "then": "a spinner (reusing the existing .spinner class) is visible next to the name/email fields, not a full-page skeleton",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-06-TC-08",
+      "title": "Inline persistent error banner renders on fetch failure",
+      "type": "e2e",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-06-FR-4",
+      "given": "the current-user fetch rejects",
+      "when": "Settings.jsx re-renders after the rejection",
+      "then": "a readable inline banner replaces the fields (not a toast, not a raw stack trace) and remains visible without auto-dismissing",
+      "tags": ["negative"]
+    },
+    {
+      "id": "AUTH-06-TC-09",
+      "title": "Current-user fetch is issued exactly once on mount with no retry or polling",
+      "type": "performance",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-06-NFR-performance",
+      "given": "Settings.jsx mounts once",
+      "when": "the component lifecycle runs to completion without re-mounting",
+      "then": "getCurrentUser() is called exactly once (empty-dependency useEffect), with no automatic retry loop and no polling, completing within the inherited 10s userApi.js timeout",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-06-TC-10",
+      "title": "Current-user identity is derived server-side, never from a client-supplied id",
+      "type": "security",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-06-NFR-security",
+      "given": "an authenticated request to GET /api/auth/me with a valid Bearer token",
+      "when": "the request is sent",
+      "then": "no user_id or identity parameter is included in the request; the returned identity matches the token's subject exclusively",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-06-TC-11",
+      "title": "No PII is written to logs or error messages on fetch success or failure",
+      "type": "security",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-06-NFR-security",
+      "given": "either a successful or a failed getCurrentUser() call",
+      "when": "the result or error is handled by Settings.jsx",
+      "then": "no name, email, or other PII appears in any console/application log output or in the displayed error message",
+      "tags": ["negative"]
+    },
+    {
+      "id": "AUTH-06-TC-12",
+      "title": "Name/email fields use the details-item labelling pattern",
+      "type": "e2e",
+      "automatable": true,
+      "priority": "Should",
+      "requirement_id": "AUTH-06-NFR-accessibility",
+      "given": "the current-user fetch has resolved successfully",
+      "when": "the Settings page renders the name/email fields",
+      "then": "each field uses the details-item / details-item__label / details-item__value classes consistent with UserDetails.jsx, ensuring consistent labelling structure",
+      "tags": ["happy-path"]
+    }
+  ],
+  "coverage_audit": {
+    "functional_requirements": [
+      {"id": "AUTH-06-FR-1", "covered_by": ["AUTH-06-TC-01", "AUTH-06-TC-02", "AUTH-06-TC-03"]},
+      {"id": "AUTH-06-FR-2", "covered_by": ["AUTH-06-TC-04", "AUTH-06-TC-05"]},
+      {"id": "AUTH-06-FR-3", "covered_by": ["AUTH-06-TC-06"]},
+      {"id": "AUTH-06-FR-4", "covered_by": ["AUTH-06-TC-07", "AUTH-06-TC-08"]}
+    ],
+    "non_functional_requirements": [
+      {"id": "AUTH-06-NFR-performance", "covered_by": ["AUTH-06-TC-09"]},
+      {"id": "AUTH-06-NFR-security", "covered_by": ["AUTH-06-TC-10", "AUTH-06-TC-11"]},
+      {"id": "AUTH-06-NFR-accessibility", "covered_by": ["AUTH-06-TC-12"]}
+    ],
+    "uncovered": []
+  }
+}

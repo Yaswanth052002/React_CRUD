@@ -1,0 +1,20 @@
+{
+  "story": "validated",
+  "story_priority": "P1",
+  "story_independent_test": true,
+  "needs_clarification_count": 0,
+  "research": "complete",
+  "research_verdict": "GO-WITH-CONDITIONS",
+  "rtm_source_sha": "5a019873bdc1df059c68aa5c582baf9511ca7414",
+  "prd": "complete",
+  "design": "n/a",
+  "design_artifact": "docs/features/AUTH-05/DESIGN.md",
+  "design_provider": "none",
+  "design_iteration": 0,
+  "phase": "plan-implementation",
+  "gate": "APPROVE",
+  "plan": "complete",
+  "plan_validation": "PASS",
+  "plan_validation_rounds": 1,
+  "last_updated": "2026-08-17T23:10:00Z"
+}

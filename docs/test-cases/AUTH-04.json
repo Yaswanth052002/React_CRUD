@@ -1,0 +1,200 @@
+{
+  "story_id": "AUTH-04",
+  "test_cases": [
+    {
+      "id": "AUTH-04-TC-01",
+      "title": "Valid unexpired token restores session across refresh without showing Login",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-04-FR-3",
+      "given": "a valid, unexpired token is present in localStorage before App.jsx mounts",
+      "when": "App.jsx mounts (simulating a browser refresh)",
+      "then": "isAuthenticated is initialized to true, Login is not rendered, and the previously active view re-renders",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-04-TC-02",
+      "title": "No stored token renders Login and issues zero protected data-fetch calls",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-04-FR-3",
+      "given": "no token exists in localStorage (first visit or previously cleared)",
+      "when": "App.jsx mounts",
+      "then": "isAuthenticated is initialized to false, Login is rendered within 100ms of mount, and no GET /api/dashboard/stats or GET /api/users request is issued",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-04-TC-03",
+      "title": "Expired stored token clears storage and redirects to Login with session-expired message",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-04-FR-1",
+      "given": "a token is present in localStorage but its exp claim is in the past",
+      "when": "App.jsx mounts and performs the jwt-decode expiry check",
+      "then": "the token is cleared, isAuthenticated is set to false, and sessionExpiredMessage is set to 'Your session has expired. Please log in again.'",
+      "tags": ["edge-case"]
+    },
+    {
+      "id": "AUTH-04-TC-04",
+      "title": "401 on a mid-session API call clears token and redirects to Login (same as expiry)",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-04-FR-4",
+      "given": "the Admin is authenticated on the Users view and calls updateUser, which the backend rejects with 401",
+      "when": "the response interceptor observes the 401",
+      "then": "clearAuthToken is called, the registered unauthorized handler fires, isAuthenticated becomes false, and sessionExpiredMessage is set (not a generic/opaque error toast)",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-04-TC-05",
+      "title": "Malformed/unparseable token is treated as no token, not a crash",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-04-FR-1",
+      "given": "localStorage holds a string that is not a valid JWT",
+      "when": "App.jsx mounts and jwt-decode throws while parsing it",
+      "then": "isAuthenticated is set to false with no uncaught exception and no stack trace surfaced to the user",
+      "tags": ["negative", "edge-case"]
+    },
+    {
+      "id": "AUTH-04-TC-06",
+      "title": "localStorage.getItem throwing is treated as no token",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-04-FR-2",
+      "given": "localStorage.getItem is mocked to throw (e.g. storage disabled)",
+      "when": "getStoredToken() is called during App.jsx mount",
+      "then": "getStoredToken returns null (throw is not propagated) and isAuthenticated is set to false",
+      "tags": ["negative"]
+    },
+    {
+      "id": "AUTH-04-TC-07",
+      "title": "localStorage.setItem throwing surfaces a readable error, not a raw stack trace",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Should",
+      "requirement_id": "AUTH-04-FR-2",
+      "given": "localStorage.setItem is mocked to throw (e.g. quota exceeded)",
+      "when": "setAuthToken(token) is called after a successful login",
+      "then": "the error is caught and a readable, non-stack-trace error condition is surfaced rather than an uncaught exception",
+      "tags": ["negative"]
+    },
+    {
+      "id": "AUTH-04-TC-08",
+      "title": "Request interceptor attaches Authorization header only when a token is present",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-04-FR-2",
+      "given": "a token is stored via setAuthToken",
+      "when": "any userApi.js HTTP call is made (e.g. getUsers)",
+      "then": "the outgoing request carries an Authorization: Bearer <token> header; when no token is stored, no Authorization header is attached",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-04-TC-09",
+      "title": "Unauthorized handler does not fire twice when two in-flight requests both 401 after token already cleared",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-04-FR-4",
+      "given": "two protected requests are in-flight and both receive 401; the first response clears the token",
+      "when": "the second 401 response arrives after the token is already null",
+      "then": "the registered unauthorized handler is invoked exactly once, not twice (no duplicate redirect/message reset)",
+      "tags": ["edge-case", "regression-guard"]
+    },
+    {
+      "id": "AUTH-04-TC-10",
+      "title": "sessionExpiredMessage is threaded to LoginScreen as sessionExpiredMessage prop, never as authError",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-04-FR-3",
+      "given": "a 401 or expiry event has set sessionExpiredMessage to a non-null string in App.jsx",
+      "when": "App.jsx renders LoginScreen",
+      "then": "LoginScreen receives a sessionExpiredMessage prop with that value and receives no authError prop",
+      "tags": ["happy-path", "contract"]
+    },
+    {
+      "id": "AUTH-04-TC-11",
+      "title": "Auth-state check on mount completes within the 100ms budget",
+      "type": "performance",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-04-NFR-performance",
+      "given": "a valid token is present in localStorage",
+      "when": "App.jsx mounts 100 times in a benchmark loop, measuring time from mount to isAuthenticated being set",
+      "then": "p95 latency is < 100ms across the 100 iterations",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-04-TC-12",
+      "title": "No password or password hash is ever written to localStorage or any client-persistent storage",
+      "type": "security",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-04-NFR-security",
+      "given": "a successful login has occurred and setAuthToken has been called",
+      "when": "localStorage contents are inspected after login",
+      "then": "only the opaque JWT is present under the auth-token key; no password, password hash, or other credential material is present anywhere in localStorage",
+      "tags": ["security"]
+    },
+    {
+      "id": "AUTH-04-TC-13",
+      "title": "Session-expiry event is logged with no PII on 401 or on-mount expiry detection",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Should",
+      "requirement_id": "AUTH-04-NFR-observability",
+      "given": "a 401 response is received or an expired token is detected on mount",
+      "when": "the session-expiry handling path runs",
+      "then": "a client-side auth_session_expired event is logged with no token value, no email, and no other PII in its payload",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-04-TC-14",
+      "title": "sessionExpiredMessage renders in an aria-live region on the Login screen after redirect",
+      "type": "e2e",
+      "automatable": true,
+      "priority": "Should",
+      "requirement_id": "AUTH-04-NFR-accessibility",
+      "given": "sessionExpiredMessage is set to a non-null string and LoginScreen is rendered",
+      "when": "an axe-core / DOM scan inspects the rendered Login screen",
+      "then": "the message text appears inside an aria-live region reachable by assistive technology",
+      "tags": ["accessibility"]
+    },
+    {
+      "id": "AUTH-04-TC-15",
+      "title": "Login token extraction matches AUTH-02's { token: string } response shape",
+      "type": "contract",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-04-FR-2",
+      "given": "userApi.login(email, password) is mocked to resolve with { token: '<jwt>' }",
+      "when": "the login success handler processes the resolved value",
+      "then": "setAuthToken is called with exactly the token string field, with no other shape assumed",
+      "tags": ["contract"]
+    }
+  ],
+  "coverage_audit": {
+    "functional_requirements": [
+      {"id": "AUTH-04-FR-1", "covered_by": ["AUTH-04-TC-03", "AUTH-04-TC-05"]},
+      {"id": "AUTH-04-FR-2", "covered_by": ["AUTH-04-TC-06", "AUTH-04-TC-07", "AUTH-04-TC-08", "AUTH-04-TC-15"]},
+      {"id": "AUTH-04-FR-3", "covered_by": ["AUTH-04-TC-01", "AUTH-04-TC-02", "AUTH-04-TC-10"]},
+      {"id": "AUTH-04-FR-4", "covered_by": ["AUTH-04-TC-04", "AUTH-04-TC-09"]}
+    ],
+    "non_functional_requirements": [
+      {"id": "AUTH-04-NFR-performance", "covered_by": ["AUTH-04-TC-11"]},
+      {"id": "AUTH-04-NFR-security", "covered_by": ["AUTH-04-TC-12"]},
+      {"id": "AUTH-04-NFR-accessibility", "covered_by": ["AUTH-04-TC-14"]},
+      {"id": "AUTH-04-NFR-observability", "covered_by": ["AUTH-04-TC-13"]}
+    ],
+    "uncovered": []
+  }
+}

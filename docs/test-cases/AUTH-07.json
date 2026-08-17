@@ -1,0 +1,151 @@
+{
+  "story_id": "AUTH-07",
+  "test_cases": [
+    {
+      "id": "AUTH-07-TC-01",
+      "title": "Logout clears token, header, and redirects to Login",
+      "type": "e2e",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-07-FR-2",
+      "given": "user is authenticated and on the Settings screen",
+      "when": "user clicks the Logout button",
+      "then": "userApi.logout() is called, then props.onLogout() fires, isAuthenticated becomes false, and the Login screen renders",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-07-TC-02",
+      "title": "logout() removes auth_token from localStorage and clears axios Authorization default",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-07-FR-1",
+      "given": "a valid JWT is present under localStorage key auth_token and axios default Authorization header is set",
+      "when": "logout() is called",
+      "then": "clearAuthToken() is called exactly once, localStorage.getItem('auth_token') returns null, and axios.defaults.headers.common.Authorization is unset",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-07-TC-03",
+      "title": "logout() performs no HTTP call",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-07-FR-1",
+      "given": "an authenticated session with a network request spy installed",
+      "when": "logout() is called",
+      "then": "zero HTTP requests are made and logout() returns undefined synchronously",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-07-TC-04",
+      "title": "Post-logout direct navigation to a protected route redirects to Login without exposing data",
+      "type": "e2e",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-07-FR-2",
+      "given": "user has just logged out",
+      "when": "user navigates directly to a protected route URL or presses browser back",
+      "then": "the app rejects the attempt, no protected data renders, and the user is redirected to the Login screen",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-07-TC-05",
+      "title": "No leftover auth artifacts remain in browser storage after logout",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-07-FR-1",
+      "given": "user was authenticated with token and any session artifacts present",
+      "when": "logout() completes",
+      "then": "localStorage, sessionStorage, and cookies contain no auth token, session id, or cookie related to the prior session",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-07-TC-06",
+      "title": "Logout observability event logs timestamp only, no user id or token",
+      "type": "security",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-07-FR-3",
+      "given": "a console.log spy is installed",
+      "when": "logout() is called",
+      "then": "console.log is called with 'auth:logout' and a payload containing exactly { timestamp } — no user id, email, or token value present",
+      "tags": ["happy-path", "security"]
+    },
+    {
+      "id": "AUTH-07-TC-07",
+      "title": "Double-invocation of logout() is idempotent and error-free",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-07-FR-4",
+      "given": "user is authenticated",
+      "when": "logout() is called twice in rapid succession",
+      "then": "no error is thrown, auth state ends cleared, and only harmless duplicate callback invocations occur",
+      "tags": ["edge-case"]
+    },
+    {
+      "id": "AUTH-07-TC-08",
+      "title": "logout() tolerates localStorage.removeItem throwing",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-07-FR-4",
+      "given": "localStorage.removeItem is mocked to throw",
+      "when": "logout() is called",
+      "then": "logout() completes without propagating the exception, the observability event still logs, and the auth-state callback path remains available",
+      "tags": ["edge-case", "negative"]
+    },
+    {
+      "id": "AUTH-07-TC-09",
+      "title": "In-flight API request during logout resolves via 401 through the same unauthorized handler",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Should",
+      "requirement_id": "AUTH-07-FR-2",
+      "given": "an API request is in flight (mocked 500ms delay) when logout() is called",
+      "when": "logout() clears the token immediately and the in-flight request later arrives at the backend without a valid Authorization header",
+      "then": "the backend returns 401, the registered unauthorized handler fires, isAuthenticated is (still) false, and no delay is introduced to the logout redirect",
+      "tags": ["edge-case"]
+    },
+    {
+      "id": "AUTH-07-TC-10",
+      "title": "logout() p95 latency is under 10ms",
+      "type": "performance",
+      "automatable": true,
+      "priority": "Should",
+      "requirement_id": "AUTH-07-NFR-performance",
+      "given": "logout() is invoked in a loop of 100+ iterations with a fresh token set before each call",
+      "when": "latency of each call is measured",
+      "then": "p95 latency is < 10ms",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-07-TC-11",
+      "title": "Logout control is keyboard-operable and focus moves to Login's primary field after redirect",
+      "type": "e2e",
+      "automatable": true,
+      "priority": "Should",
+      "requirement_id": "AUTH-07-NFR-accessibility",
+      "given": "user is authenticated on the Settings screen using keyboard only",
+      "when": "user tabs to the Logout control and activates it with Enter/Space",
+      "then": "logout proceeds and after the redirect, focus is moved to the Login screen's primary input field",
+      "tags": ["happy-path", "accessibility"]
+    }
+  ],
+  "coverage_audit": {
+    "functional_requirements": [
+      {"id": "AUTH-07-FR-1", "covered_by": ["AUTH-07-TC-02", "AUTH-07-TC-03", "AUTH-07-TC-05"]},
+      {"id": "AUTH-07-FR-2", "covered_by": ["AUTH-07-TC-01", "AUTH-07-TC-04", "AUTH-07-TC-09"]},
+      {"id": "AUTH-07-FR-3", "covered_by": ["AUTH-07-TC-06"]},
+      {"id": "AUTH-07-FR-4", "covered_by": ["AUTH-07-TC-07", "AUTH-07-TC-08"]}
+    ],
+    "non_functional_requirements": [
+      {"id": "AUTH-07-NFR-performance", "covered_by": ["AUTH-07-TC-10"]},
+      {"id": "AUTH-07-NFR-security", "covered_by": ["AUTH-07-TC-06"]},
+      {"id": "AUTH-07-NFR-accessibility", "covered_by": ["AUTH-07-TC-11"]}
+    ],
+    "uncovered": []
+  }
+}

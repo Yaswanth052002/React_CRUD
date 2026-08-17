@@ -1,0 +1,150 @@
+{
+  "story_id": "AUTH-05",
+  "test_cases": [
+    {
+      "id": "AUTH-05-TC-01",
+      "title": "Unauthenticated visitor sees Login-only view, no Sidebar/Header mounted",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-05-FR-1",
+      "given": "isAuthenticated is stubbed false and App.jsx renders",
+      "when": "the component tree is queried",
+      "then": "LoginScreen is present, and Sidebar/Header/activeView protected view are absent from the DOM (not just CSS-hidden)",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-05-TC-02",
+      "title": "activeView cannot be set to a protected view while unauthenticated",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-05-FR-1",
+      "given": "isAuthenticated is stubbed false",
+      "when": "no Sidebar nav control is exposed to the user",
+      "then": "there is no rendered control capable of setting activeView to dashboard, users, or settings",
+      "tags": ["edge-case", "security"]
+    },
+    {
+      "id": "AUTH-05-TC-03",
+      "title": "Authenticated user sees Sidebar with exactly three working nav entries",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-05-FR-1",
+      "given": "isAuthenticated is stubbed true and App.jsx renders",
+      "when": "the Sidebar is queried",
+      "then": "Sidebar renders exactly the three NAV_ITEMS (Dashboard, Users, Settings), each clickable and switching activeView as today",
+      "tags": ["happy-path", "regression"]
+    },
+    {
+      "id": "AUTH-05-TC-04",
+      "title": "Successful login transitions directly to Dashboard without reload",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-05-FR-2",
+      "given": "isAuthenticated is false and LoginScreen is mounted",
+      "when": "onLoginSuccess(token) fires after a valid credential submit",
+      "then": "isAuthenticated becomes true, activeView becomes dashboard, and Sidebar/Header/Dashboard render without a page reload",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-05-TC-05",
+      "title": "Post-login activeView resets to dashboard even if a prior session left it on users",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-05-FR-2",
+      "given": "a prior session had activeView set to users before logout",
+      "when": "the user logs in again via onLoginSuccess(token)",
+      "then": "activeView is dashboard, not the preserved users value",
+      "tags": ["edge-case", "regression"]
+    },
+    {
+      "id": "AUTH-05-TC-06",
+      "title": "Auth state becoming invalid falls back to Login-only, unmounting the stale protected view",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-05-FR-1",
+      "given": "isAuthenticated is true and Users view is mounted",
+      "when": "isAuthenticated flips to false (token expired/cleared)",
+      "then": "Sidebar/Header/Users view unmount and LoginScreen renders, with no stale protected view left mounted",
+      "tags": ["edge-case", "security"]
+    },
+    {
+      "id": "AUTH-05-TC-07",
+      "title": "sessionExpiredMessage is threaded through to LoginScreen unchanged on session expiry",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-05-FR-3",
+      "given": "AUTH-04 sets sessionExpiredMessage to a non-null string on a 401/expiry event",
+      "when": "App.jsx re-renders with isAuthenticated=false",
+      "then": "LoginScreen receives that exact sessionExpiredMessage string as its sessionExpiredMessage prop, with no transformation or local default substituted",
+      "tags": ["happy-path"]
+    },
+    {
+      "id": "AUTH-05-TC-08",
+      "title": "No authError prop is ever passed to LoginScreen",
+      "type": "contract",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-05-FR-3",
+      "given": "App.jsx renders LoginScreen in any auth state",
+      "when": "the props passed to LoginScreen are inspected",
+      "then": "no authError prop is present; only onLoginSuccess and sessionExpiredMessage are passed",
+      "tags": ["negative", "contract"]
+    },
+    {
+      "id": "AUTH-05-TC-09",
+      "title": "Auth-gate branch adds no additional network round trip on login/logout toggle",
+      "type": "performance",
+      "automatable": true,
+      "priority": "Should",
+      "requirement_id": "AUTH-05-NFR-performance",
+      "given": "isAuthenticated toggles between false and true within a mounted App.jsx",
+      "when": "network calls are captured for the duration of the toggle and re-render",
+      "then": "no additional network request is issued by AUTH-05's own render logic beyond AUTH-04's existing auth-state check, and the branch resolves within the same paint (no added spinner state)",
+      "tags": ["performance"]
+    },
+    {
+      "id": "AUTH-05-TC-10",
+      "title": "Protected components do not mount (not merely CSS-hide) when unauthenticated",
+      "type": "security",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-05-NFR-security",
+      "given": "isAuthenticated is false",
+      "when": "the rendered DOM and any data-fetching calls from Dashboard/Users/Settings are inspected",
+      "then": "no protected view component is present in the DOM and no data-fetching call to a protected endpoint fires",
+      "tags": ["security", "negative"]
+    },
+    {
+      "id": "AUTH-05-TC-11",
+      "title": "Sidebar nav-item buttons remain keyboard-reachable with visible focus when authenticated",
+      "type": "e2e",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-05-NFR-accessibility",
+      "given": "isAuthenticated is true and Sidebar is rendered",
+      "when": "Tab is pressed repeatedly through the nav-item buttons",
+      "then": "each nav-item button receives focus in order and shows a visible focus-visible outline",
+      "tags": ["happy-path", "accessibility"]
+    }
+  ],
+  "coverage_audit": {
+    "functional_requirements": [
+      {"id": "AUTH-05-FR-1", "covered_by": ["AUTH-05-TC-01", "AUTH-05-TC-02", "AUTH-05-TC-03", "AUTH-05-TC-06"]},
+      {"id": "AUTH-05-FR-2", "covered_by": ["AUTH-05-TC-04", "AUTH-05-TC-05"]},
+      {"id": "AUTH-05-FR-3", "covered_by": ["AUTH-05-TC-07", "AUTH-05-TC-08"]}
+    ],
+    "non_functional_requirements": [
+      {"id": "AUTH-05-NFR-performance", "covered_by": ["AUTH-05-TC-09"]},
+      {"id": "AUTH-05-NFR-security", "covered_by": ["AUTH-05-TC-10"]},
+      {"id": "AUTH-05-NFR-accessibility", "covered_by": ["AUTH-05-TC-11"]}
+    ],
+    "uncovered": []
+  }
+}
