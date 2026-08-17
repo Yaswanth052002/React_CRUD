@@ -1,46 +1,12 @@
 """
 End-to-end API tests using FastAPI's TestClient against an isolated
 in-memory SQLite database (separate from the dev users.db file).
+
+The client/engine/`get_db` override and the `_reset_db` fixture are
+shared with every other test module via `tests/conftest.py` (AUTH-02) —
+see that file's docstring for why they must not be redefined per-module.
 """
-import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
-from sqlalchemy.pool import StaticPool
-
-from app.main import app
-from app.database import get_db, Base
-from app.models import user  # noqa: F401  (ensure model is registered on Base)
-
-# --- Isolated test database -------------------------------------------
-TEST_DATABASE_URL = "sqlite:///:memory:"
-
-engine = create_engine(
-    TEST_DATABASE_URL,
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool,
-)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-
-def override_get_db():
-    db = TestingSessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-app.dependency_overrides[get_db] = override_get_db
-
-client = TestClient(app)
-
-
-@pytest.fixture(autouse=True)
-def _reset_db():
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-    yield
+from tests.conftest import client
 
 
 def make_user(**overrides):

@@ -71,6 +71,10 @@ class UserRepository:
     def get_by_email(self, email: str) -> Optional[User]:
         return self.db.query(User).filter(func.lower(User.email) == email.lower()).first()
 
+    def get_without_credential(self) -> Sequence[User]:
+        """Rows with no password_hash yet — targets of the AC4 provisioning migration."""
+        return self.db.query(User).filter(User.password_hash.is_(None)).all()
+
     def create(self, data: dict) -> User:
         user = User(**data)
         self.db.add(user)

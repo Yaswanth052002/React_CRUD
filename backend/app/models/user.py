@@ -2,7 +2,7 @@
 import enum
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, Integer, String, Enum, DateTime
+from sqlalchemy import Boolean, Column, Integer, String, Enum, DateTime
 from app.database import Base
 
 
@@ -29,5 +29,11 @@ class User(Base):
     phone = Column(String(30), nullable=False)
     role = Column(Enum(RoleEnum), nullable=False, default=RoleEnum.user)
     status = Column(Enum(StatusEnum), nullable=False, default=StatusEnum.active)
+    # Auth (AUTH-02): nullable placeholder hash column — AUTH-03 owns the real
+    # hash/verify scheme against this same column (see ADR-4 in
+    # docs/features/AUTH-02/PLAN.md). NULL means "not yet provisioned".
+    password_hash = Column(String, nullable=True, default=None)
+    # True until AC5's provisioning script sets a real password for this user.
+    must_reset_password = Column(Boolean, nullable=False, default=True)
     created_at = Column(DateTime, default=_utcnow, nullable=False)
     updated_at = Column(DateTime, default=_utcnow, onupdate=_utcnow, nullable=False)

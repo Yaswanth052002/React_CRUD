@@ -1,0 +1,30 @@
+..................................                                       [100%]
+=============================== warnings summary ===============================
+app/main.py:48
+  /Users/yaswanth.panthangi/Downloads/react-python-crud/backend/app/main.py:48: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    @app.on_event("startup")
+
+../.harness-venv/lib/python3.11/site-packages/fastapi/applications.py:4495
+  /Users/yaswanth.panthangi/Downloads/react-python-crud/.harness-venv/lib/python3.11/site-packages/fastapi/applications.py:4495: DeprecationWarning: 
+          on_event is deprecated, use lifespan event handlers instead.
+  
+          Read more about it in the
+          [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
+          
+    return self.router.on_event(event_type)
+
+tests/perf/test_login_perf.py::test_login_perf_smoke
+  /Users/yaswanth.panthangi/Downloads/react-python-crud/.harness-venv/lib/python3.11/site-packages/websockets/legacy/__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions
+    warnings.warn(  # deprecated in 14.0 - 2024-11-09
+
+tests/perf/test_login_perf.py::test_login_perf_smoke
+  /Users/yaswanth.panthangi/Downloads/react-python-crud/.harness-venv/lib/python3.11/site-packages/uvicorn/protocols/websockets/websockets_impl.py:16: DeprecationWarning: websockets.server.WebSocketServerProtocol is deprecated
+    from websockets.server import WebSocketServerProtocol
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+34 passed, 1 deselected, 4 warnings in 3.02s

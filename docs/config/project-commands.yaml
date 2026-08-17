@@ -32,3 +32,4 @@ preflight:
   - cd frontend && npm install
   - cd backend && pip install -r requirements.txt
   - cd backend && python -c "import app.main"
+  - cd backend && python -c "import jwt"

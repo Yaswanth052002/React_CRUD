@@ -17,7 +17,8 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.database import Base, engine, SessionLocal
 from app.seed import seed_if_empty
-from app.api import users, dashboard
+from app.services.auth_service import AuthService
+from app.api import users, dashboard, auth
 
 load_dotenv()
 
@@ -49,6 +50,7 @@ def on_startup():
     db = SessionLocal()
     try:
         seed_if_empty(db)
+        AuthService(db).provision_existing_users_with_random_password()
     finally:
         db.close()
 
@@ -56,7 +58,11 @@ def on_startup():
 # --- Centralized error handling ----------------------------------------
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
-    return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
+        headers=getattr(exc, "headers", None),
+    )
 
 
 @app.exception_handler(RequestValidationError)
@@ -82,6 +88,7 @@ async def unhandled_exception_handler(request: Request, exc: Exception):
 # --- Routers -------------------------------------------------------------
 app.include_router(users.router)
 app.include_router(dashboard.router)
+app.include_router(auth.router)
 
 
 @app.get("/api/health", tags=["health"])
