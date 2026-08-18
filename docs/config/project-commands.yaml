@@ -7,7 +7,7 @@
 
 typecheck:           (n/a — no TypeScript/mypy configured; react uses plain JSX, fastapi has no static type checker wired)
 test:                (cd frontend && npm run test) && (cd backend && pytest)
-test_unit:           (cd backend && pytest) # fastapi has the only unit suite today; frontend has no test files yet despite vitest being wired
+test_unit:           (cd backend && pytest) # fastapi has the dedicated unit suite; frontend component tests run via `test:` (npm run test) below
 test_integration:    (n/a — no integration suite configured)
 test_e2e:            (n/a — no e2e suite configured)
 lint:                (n/a — no linter configured for react or fastapi; TODO — add eslint + ruff/flake8)
@@ -34,3 +34,4 @@ preflight:
   - cd backend && python -c "import app.main"
   - cd backend && python -c "import passlib.context"
   - cd backend && python -c "import jwt"
+  - cd frontend && node -e "require.resolve('@testing-library/react'); require.resolve('@testing-library/jest-dom')"

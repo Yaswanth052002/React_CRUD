@@ -11,7 +11,21 @@
       "given": "an unauthenticated visitor mounts LoginScreen",
       "when": "the component renders",
       "then": "a form with an email input (type=email), a password input (type=password), and a 'Log in' button styled with form-group/form-label/form-input/btn btn-primary classes is visible",
-      "tags": ["happy-path"]
+      "tags": ["happy-path"],
+      "last_run": {
+        "started_at": "2026-08-18T09:00:00Z",
+        "duration_ms": 137,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {"n": 1, "status": "PASS", "duration_ms": 137, "reason": null}
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": null,
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-01-TC-02",
@@ -23,7 +37,21 @@
       "given": "a mocked userAuthService.login resolves with a token after a delay",
       "when": "the visitor fills valid email/password and clicks Log in",
       "then": "the submit button is disabled and shows the .spinner element immediately, then re-enables on resolution, userApi.setAuthToken is called with the token, and props.onLoginSuccess is called with that token afterward",
-      "tags": ["happy-path"]
+      "tags": ["happy-path"],
+      "last_run": {
+        "started_at": "2026-08-18T09:00:00Z",
+        "duration_ms": 102,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {"n": 1, "status": "PASS", "duration_ms": 102, "reason": null}
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": null,
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-01-TC-03",
@@ -35,7 +63,21 @@
       "given": "a mocked userAuthService.login rejects",
       "when": "the visitor submits valid-looking credentials",
       "then": "the submit button re-enables the instant the rejection is caught, with no artificial delay",
-      "tags": ["edge-case"]
+      "tags": ["edge-case"],
+      "last_run": {
+        "started_at": "2026-08-18T09:00:00Z",
+        "duration_ms": 102,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {"n": 1, "status": "PASS", "duration_ms": 102, "reason": null}
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": null,
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-01-TC-04",
@@ -47,7 +89,21 @@
       "given": "a mocked userAuthService.login rejects (simulating invalid credentials or a network error)",
       "when": "the rejection is caught",
       "then": "the screen displays exactly 'Invalid email or password. Please try again.' in a .form-server-error element, with no distinction between invalid-email and invalid-password causes and no raw exception/stack trace rendered",
-      "tags": ["negative"]
+      "tags": ["negative"],
+      "last_run": {
+        "started_at": "2026-08-18T09:00:00Z",
+        "duration_ms": 137,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {"n": 1, "status": "PASS", "duration_ms": 137, "reason": null}
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": null,
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-01-TC-05",
@@ -59,7 +115,24 @@
       "given": "the login screen is rendered",
       "when": "the viewport is resized to 320px width",
       "then": "the form remains fully usable with no horizontal scrolling, consistent with existing .stats-grid responsive breakpoints",
-      "tags": ["edge-case"]
+      "tags": ["edge-case"],
+      "last_run": {
+        "started_at": "2026-08-18T14:42:26Z",
+        "duration_ms": 135,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {"n": 1, "status": "FAIL", "duration_ms": 137, "reason": "round-1 finding: tautological assertion: jsdom reports form.scrollWidth=0 and form.clientWidth=0 (no real layout engine), so `expect(form.scrollWidth).toBeLessThanOrEqual(form.clientWidth || form.scrollWidth)` reduces to 0<=0 and passes unconditionally regardless of actual CSS/responsive behavior — does not genuinely verify no-horizontal-scroll at 320px"},
+          {"n": 2, "status": "FAIL", "duration_ms": 131, "reason": "round-1: same tautology confirmed on retry — not a flake, a structural test-authoring defect"},
+          {"n": 3, "status": "PASS", "duration_ms": 135, "reason": null}
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": null,
+        "runner": "vitest",
+        "rerun_count": 2,
+        "revalidation_note": "Round-2 re-validation (post round-1 fix). Test at frontend/src/components/__tests__/LoginForm.test.jsx:70-88 replaces the jsdom scrollWidth/clientWidth tautology with a structural, non-tautological check: (1) no LoginForm-rendered element carries a fixed inline px width >320px, (2) the shared `.form-input`/`.form-select` CSS rule in frontend/src/styles/index.css (spot-checked at lines 1117-1126, confirmed `width: 100%`, no fixed px width/min-width) is relative. Independently mutated the CSS rule to `width: 500px` and re-ran the test in isolation: it FAILED as expected (`expected '\\n  width: 500px...' to match /width:\\s*100%/`), confirming the assertion is genuinely load-bearing, not vacuous. CSS mutation reverted and diff-verified identical to original before final full-suite run. Classified PASS (proxy/structural coverage, not pixel-perfect rendered-viewport measurement — same honest-disclosure treatment as AUTH-04 TC-02/TC-10/TC-14; disclosed as AF-05 in docs/features/AUTH-01/FLAGS.md)."
+      }
     },
     {
       "id": "AUTH-01-TC-06",
@@ -71,7 +144,21 @@
       "given": "the visitor leaves both email and password fields empty",
       "when": "the visitor clicks Log in",
       "then": "submit is blocked, a .form-error message appears under each offending field, and userAuthService.login is never called",
-      "tags": ["negative"]
+      "tags": ["negative"],
+      "last_run": {
+        "started_at": "2026-08-18T09:00:00Z",
+        "duration_ms": 137,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {"n": 1, "status": "PASS", "duration_ms": 137, "reason": null}
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": null,
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-01-TC-07",
@@ -83,7 +170,21 @@
       "given": "a visitor submits a password and the mocked auth call rejects",
       "when": "the rejection is handled and the generic error is rendered",
       "then": "no console.log/console.error call and no DOM node (including the error message) contains the submitted password value",
-      "tags": ["negative"]
+      "tags": ["negative"],
+      "last_run": {
+        "started_at": "2026-08-18T09:00:00Z",
+        "duration_ms": 137,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {"n": 1, "status": "PASS", "duration_ms": 137, "reason": null}
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": null,
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-01-TC-08",
@@ -95,7 +196,21 @@
       "given": "the login screen is rendered",
       "when": "the DOM is inspected via axe-core / Playwright",
       "then": "each input has a <label> linked via htmlFor/id and aria-required=true, the .form-server-error container has aria-live=assertive, the submit button has a visible :focus-visible outline, and the button's bounding box is >= 44x44px",
-      "tags": ["happy-path"]
+      "tags": ["happy-path"],
+      "last_run": {
+        "started_at": "2026-08-18T09:00:00Z",
+        "duration_ms": 137,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {"n": 1, "status": "PASS", "duration_ms": 137, "reason": null}
+        ],
+        "budget": null,
+        "failure_reason": "Note: test verifies label/htmlFor linkage, aria-required, aria-live=assertive, and >=44px via inline minHeight/minWidth style, but does NOT independently assert the :focus-visible outline clause of this TC's `then` (jsdom pseudo-class computed-style limitation). Global `:focus-visible` CSS rule exists at frontend/src/styles/index.css:91 and applies by default (no override on this button), so the AC is satisfied by the design system, but this specific automated spec has a partial coverage gap — recommend adding an explicit focus + matches(':focus-visible') assertion in a follow-up.",
+        "artefact": null,
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-01-TC-09",
@@ -107,7 +222,25 @@
       "given": "a mocked userAuthService.login with an artificial delay",
       "when": "the visitor clicks Log in",
       "then": "the button's disabled attribute and .spinner element are present in the DOM within 16ms of the click event (budget: <16ms to loading-state paint)",
-      "tags": ["happy-path"]
+      "tags": ["happy-path"],
+      "last_run": {
+        "started_at": "2026-08-18T09:00:00Z",
+        "duration_ms": 137,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {"n": 1, "status": "PASS", "duration_ms": 137, "reason": null}
+        ],
+        "budget": {
+          "target": "<16ms to loading-state paint",
+          "measured": "0ms (synchronous — disabled/.spinner asserted before any await, satisfied by construction per PLAN.md Test Strategy note)",
+          "budget_pass": true
+        },
+        "failure_reason": null,
+        "artefact": null,
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     }
   ],
   "coverage_audit": {

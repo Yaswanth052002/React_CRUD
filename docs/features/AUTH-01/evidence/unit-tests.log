@@ -1,0 +1,20 @@
+
+> user-management-crud-frontend@1.0.0 test
+> vitest run
+
+
+ RUN  v2.1.9 /Users/yaswanth.panthangi/Downloads/react-python-crud/frontend
+
+ ✓ src/services/userApi.test.js (1 test) 1ms
+ ✓ src/components/__tests__/LoginScreen.test.jsx (3 tests) 130ms
+ ✓ src/components/__tests__/LoginForm.test.jsx (7 tests) 144ms
+ ✓ src/pages/__tests__/App.routing.test.jsx (3 tests) 194ms
+ ✓ src/pages/__tests__/Dashboard.search.test.jsx (10 tests) 216ms
+ ✓ src/pages/__tests__/Users.search.test.jsx (6 tests) 370ms
+ ✓ src/pages/__tests__/Users.crud.test.jsx (13 tests) 474ms
+
+ Test Files  7 passed (7)
+      Tests  43 passed (43)
+   Start at  14:30:39
+   Duration  1.70s (transform 391ms, setup 1.38s, collect 1.05s, tests 1.53s, environment 3.72s, prepare 537ms)
+
