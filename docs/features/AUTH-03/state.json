@@ -13,7 +13,7 @@
   "design_iteration": 0,
   "phase": "security-reviewed",
   "impl": "complete",
-  "impl_branch": "feature/AUTH-03",
+  "impl_branch": "feature/AUTH",
   "validation": "passed",
   "validation_summary": "2026-08-18 P=11/11 in 1 round (1 manual TC not counted)",
   "adrs_referenced": ["ADR-1"],

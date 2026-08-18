@@ -13,7 +13,7 @@
   "design_iteration": 0,
   "phase": "security-reviewed",
   "impl": "complete",
-  "impl_branch": "feature/AUTH-04",
+  "impl_branch": "feature/AUTH",
   "validation": "passed",
   "validation_summary": "2026-08-18 P=12/15, 3 partial (expected, pending AUTH-05) in 2 rounds",
   "adrs_referenced": ["ADR-1", "ADR-2", "ADR-3"],

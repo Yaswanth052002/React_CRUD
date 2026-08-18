@@ -13,7 +13,7 @@
   "design_iteration": 0,
   "phase": "security-reviewed",
   "impl": "complete",
-  "impl_branch": "feature/AUTH-01",
+  "impl_branch": "feature/AUTH",
   "validation": "passed",
   "validation_summary": "2026-08-18 P=9/9 in 2 rounds",
   "adrs_referenced": [],
@@ -187,8 +187,8 @@
       "owner": "Backend lead",
       "added_at": "2026-08-18T09:02:52Z",
       "added_by": "arh-implement (orchestrator, post-implementation review)",
-      "resolved_at": null,
-      "evidence": null
+      "resolved_at": "2026-08-18T15:30:00Z",
+      "evidence": "feature/AUTH commit a401e1b8 — merged feature/AUTH-04 into the shared feature/AUTH integration branch, removed AUTH-01's in-memory setAuthToken duplicate from frontend/src/services/userApi.js, kept AUTH-04's localStorage-backed version per its ADR-3. Verified frontend 59/59 tests, npm run build, backend 47/47 pytest all pass post-merge."
     }
   ],
   "agent_flags": [
