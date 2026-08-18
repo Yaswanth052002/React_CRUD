@@ -178,7 +178,7 @@
       "added_at": "2026-08-18T15:20:00Z",
       "added_by": "security-review-agent (AUTH-01 security review, F-004)",
       "resolved_at": null,
-      "evidence": "docs/features/AUTH-01/SECURITY-20260818.md#f-004"
+      "evidence": "docs/features/AUTH-01/SECURITY-20260818.md#f-004; escalated to Critical and reconfirmed still-open by docs/features/AUTH-05/SECURITY-20260818.md#f-001 (AUTH-05 mounted LoginScreen into App.jsx per this item's trigger condition; userAuthService.login() is still the mock, AUTH-02's real /api/auth/login is never called)"
     },
     {
       "item_id": "R-01-userApi-setAuthToken-collision",
