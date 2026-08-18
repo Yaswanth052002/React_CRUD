@@ -16,7 +16,7 @@
       ],
       "flow_path": "frontend/src/services/__tests__/userApi.logout.test.js",
       "last_run": {
-        "started_at": "2026-08-18T12:30:07Z",
+        "started_at": "2026-08-19T00:16:13Z",
         "duration_ms": 18,
         "status": "PASS",
         "verdict": "PASS",
@@ -33,7 +33,7 @@
         "artefact": null,
         "runner": "vitest",
         "rerun_count": 0,
-        "note": "fix-round-1: new module-level assertion test added to userApi.logout.test.js describe(\"userApi.logout() \u2014 declared e2e coverage (TC-01, TC-04)\"). Asserts real observable state (localStorage cleared, Authorization header unset, auth:logout logged) plus a mocked reproduction of AUTH-04's already-tested isAuthenticated-flip mechanism; does not claim to exercise AUTH-06's not-yet-existing Settings button click."
+        "note": "fix-round-1: new module-level assertion test added to userApi.logout.test.js describe(\"userApi.logout() \u2014 declared e2e coverage (TC-01, TC-04)\"). Asserts real observable state (localStorage cleared, Authorization header unset, auth:logout logged) plus a mocked reproduction of AUTH-04's already-tested isAuthenticated-flip mechanism; does not claim to exercise AUTH-06's not-yet-existing Settings button click. | post-merge regression re-validation (AUTH-full-epic merge, HEAD 1b168b1b): re-ran real against merged codebase, PASS."
       }
     },
     {
@@ -51,7 +51,7 @@
       ],
       "flow_path": "frontend/src/services/__tests__/userApi.logout.test.js",
       "last_run": {
-        "started_at": "2026-08-18T12:30:07Z",
+        "started_at": "2026-08-19T00:16:13Z",
         "duration_ms": 14,
         "status": "PASS",
         "verdict": "PASS",
@@ -67,7 +67,8 @@
         "failure_reason": null,
         "artefact": null,
         "runner": "vitest",
-        "rerun_count": 0
+        "rerun_count": 0,
+        "note": "post-merge regression re-validation (AUTH-full-epic merge, HEAD 1b168b1b): re-ran real against merged codebase, PASS."
       }
     },
     {
@@ -85,7 +86,7 @@
       ],
       "flow_path": "frontend/src/services/__tests__/userApi.logout.test.js",
       "last_run": {
-        "started_at": "2026-08-18T12:30:07Z",
+        "started_at": "2026-08-19T00:16:13Z",
         "duration_ms": 14,
         "status": "PASS",
         "verdict": "PASS",
@@ -101,7 +102,8 @@
         "failure_reason": null,
         "artefact": null,
         "runner": "vitest",
-        "rerun_count": 0
+        "rerun_count": 0,
+        "note": "post-merge regression re-validation (AUTH-full-epic merge, HEAD 1b168b1b): re-ran real against merged codebase, PASS."
       }
     },
     {
@@ -119,7 +121,7 @@
       ],
       "flow_path": "frontend/src/services/__tests__/userApi.logout.test.js",
       "last_run": {
-        "started_at": "2026-08-18T12:30:07Z",
+        "started_at": "2026-08-19T00:16:13Z",
         "duration_ms": 18,
         "status": "PASS",
         "verdict": "PASS",
@@ -136,7 +138,7 @@
         "artefact": null,
         "runner": "vitest",
         "rerun_count": 0,
-        "note": "fix-round-1: new module-level assertion test added to userApi.logout.test.js. Asserts no residual token via getStoredToken() and no Authorization header on subsequent request; the resulting 401+redirect is AUTH-04/AUTH-05's already-shipped behavior, not re-tested here."
+        "note": "fix-round-1: new module-level assertion test added to userApi.logout.test.js. Asserts no residual token via getStoredToken() and no Authorization header on subsequent request; the resulting 401+redirect is AUTH-04/AUTH-05's already-shipped behavior, not re-tested here. | post-merge regression re-validation (AUTH-full-epic merge, HEAD 1b168b1b): re-ran real against merged codebase, PASS."
       }
     },
     {
@@ -154,7 +156,7 @@
       ],
       "flow_path": "frontend/src/services/__tests__/userApi.logout.test.js",
       "last_run": {
-        "started_at": "2026-08-18T12:30:07Z",
+        "started_at": "2026-08-19T00:16:13Z",
         "duration_ms": 14,
         "status": "PASS",
         "verdict": "PASS",
@@ -170,7 +172,8 @@
         "failure_reason": null,
         "artefact": null,
         "runner": "vitest",
-        "rerun_count": 0
+        "rerun_count": 0,
+        "note": "post-merge regression re-validation (AUTH-full-epic merge, HEAD 1b168b1b): re-ran real against merged codebase, PASS."
       }
     },
     {
@@ -189,7 +192,7 @@
       ],
       "flow_path": "frontend/src/services/__tests__/userApi.logout.test.js",
       "last_run": {
-        "started_at": "2026-08-18T12:30:07Z",
+        "started_at": "2026-08-19T00:16:13Z",
         "duration_ms": 14,
         "status": "PASS",
         "verdict": "PASS",
@@ -205,7 +208,8 @@
         "failure_reason": null,
         "artefact": null,
         "runner": "vitest",
-        "rerun_count": 0
+        "rerun_count": 0,
+        "note": "post-merge regression re-validation (AUTH-full-epic merge, HEAD 1b168b1b): re-ran real against merged codebase, PASS."
       }
     },
     {
@@ -223,7 +227,7 @@
       ],
       "flow_path": "frontend/src/services/__tests__/userApi.logout.test.js",
       "last_run": {
-        "started_at": "2026-08-18T12:30:07Z",
+        "started_at": "2026-08-19T00:16:13Z",
         "duration_ms": 14,
         "status": "PASS",
         "verdict": "PASS",
@@ -239,7 +243,8 @@
         "failure_reason": null,
         "artefact": null,
         "runner": "vitest",
-        "rerun_count": 0
+        "rerun_count": 0,
+        "note": "post-merge regression re-validation (AUTH-full-epic merge, HEAD 1b168b1b): re-ran real against merged codebase, PASS."
       }
     },
     {
@@ -258,7 +263,7 @@
       ],
       "flow_path": "frontend/src/services/__tests__/userApi.logout.test.js",
       "last_run": {
-        "started_at": "2026-08-18T12:30:07Z",
+        "started_at": "2026-08-19T00:16:13Z",
         "duration_ms": 14,
         "status": "PASS",
         "verdict": "PASS",
@@ -274,7 +279,8 @@
         "failure_reason": null,
         "artefact": null,
         "runner": "vitest",
-        "rerun_count": 0
+        "rerun_count": 0,
+        "note": "post-merge regression re-validation (AUTH-full-epic merge, HEAD 1b168b1b): re-ran real against merged codebase, PASS."
       }
     },
     {
@@ -292,7 +298,7 @@
       ],
       "flow_path": "frontend/src/services/__tests__/userApi.logout.test.js",
       "last_run": {
-        "started_at": "2026-08-18T12:30:07Z",
+        "started_at": "2026-08-19T00:16:13Z",
         "duration_ms": 14,
         "status": "PASS",
         "verdict": "PASS",
@@ -309,7 +315,7 @@
         "artefact": null,
         "runner": "vitest",
         "rerun_count": 0,
-        "note": "TC assertion intentionally deviates from the literal PLAN wording ('the unauthorized handler fires'). AUTH-04's dedup guard (hadToken check) means a 401 arriving after logout() already cleared the token does NOT re-invoke the handler, by design, to prevent double-firing. Validation judgment: this is a correct, contract-consistent interpretation (re-invoking would violate AUTH-04's own locked dedup guarantee), not a genuine failure. Logged by implementer in docs/features/AUTH-07/QUESTIONS.md; no escalation needed."
+        "note": "TC assertion intentionally deviates from the literal PLAN wording ('the unauthorized handler fires'). AUTH-04's dedup guard (hadToken check) means a 401 arriving after logout() already cleared the token does NOT re-invoke the handler, by design, to prevent double-firing. Validation judgment: this is a correct, contract-consistent interpretation (re-invoking would violate AUTH-04's own locked dedup guarantee), not a genuine failure. Logged by implementer in docs/features/AUTH-07/QUESTIONS.md; no escalation needed. | post-merge regression re-validation (AUTH-full-epic merge, HEAD 1b168b1b): re-ran real against merged codebase, PASS."
       }
     },
     {
@@ -327,7 +333,7 @@
       ],
       "flow_path": "frontend/src/services/__tests__/userApi.logout.test.js",
       "last_run": {
-        "started_at": "2026-08-18T12:30:07Z",
+        "started_at": "2026-08-19T00:16:13Z",
         "duration_ms": 14,
         "status": "PASS",
         "verdict": "PASS",
@@ -347,7 +353,8 @@
         "failure_reason": null,
         "artefact": null,
         "runner": "vitest",
-        "rerun_count": 0
+        "rerun_count": 0,
+        "note": "post-merge regression re-validation (AUTH-full-epic merge, HEAD 1b168b1b): re-ran real against merged codebase, PASS."
       }
     },
     {
@@ -366,7 +373,7 @@
       ],
       "flow_path": "frontend/src/__tests__/App.logoutFocus.test.jsx",
       "last_run": {
-        "started_at": "2026-08-18T18:27:43Z",
+        "started_at": "2026-08-19T00:16:13Z",
         "duration_ms": 98,
         "status": "PASS",
         "verdict": "PASS",
@@ -383,7 +390,7 @@
         "artefact": null,
         "runner": "vitest",
         "rerun_count": 0,
-        "note": "round-4: new App.jsx-level test frontend/src/__tests__/App.logoutFocus.test.jsx mounts the REAL App/LoginScreen/LoginForm/Settings tree (only userApi mocked). Verified genuinely, not tautologically: (1) Tab-reachability proven by logoutButton.focus() + activeElement assertion succeeding (a tabIndex=-1 button could not receive focus this way) -- same pattern already accepted in App.authGate.test.jsx TC-11 for Sidebar buttons; (2) Enter/Space activation is approximated via fireEvent.click on the native <button> rather than a literal keydown-driven browser default action, because jsdom does not auto-fire click from keydown the way real browsers do and this repo has no Playwright/browser-automation runner (project-commands.yaml test_e2e: n/a) -- this is an honestly-documented jsdom-level approximation consistent with the repo's established precedent for declared e2e/a11y TCs (AUTH-01/04/05/06), not a fabricated pass, since there is no custom keydown handler on this native button to diverge from default semantics; (3) post-redirect focus-move to LoginForm's email input is proven for real -- LoginForm.jsx's new useEffect(() => emailInputRef.current?.focus(), []) fires on the real remount after isAuthenticated flips false, and the test asserts document.activeElement === emailInput via waitFor against the real DOM, no mock in the loop. Verdict: gap CLOSED. Independently re-run via npm run test: PASS (98ms), part of the 93/93 full-suite pass."
+        "note": "round-4: new App.jsx-level test frontend/src/__tests__/App.logoutFocus.test.jsx mounts the REAL App/LoginScreen/LoginForm/Settings tree (only userApi mocked). Verified genuinely, not tautologically: (1) Tab-reachability proven by logoutButton.focus() + activeElement assertion succeeding (a tabIndex=-1 button could not receive focus this way) -- same pattern already accepted in App.authGate.test.jsx TC-11 for Sidebar buttons; (2) Enter/Space activation is approximated via fireEvent.click on the native <button> rather than a literal keydown-driven browser default action, because jsdom does not auto-fire click from keydown the way real browsers do and this repo has no Playwright/browser-automation runner (project-commands.yaml test_e2e: n/a) -- this is an honestly-documented jsdom-level approximation consistent with the repo's established precedent for declared e2e/a11y TCs (AUTH-01/04/05/06), not a fabricated pass, since there is no custom keydown handler on this native button to diverge from default semantics; (3) post-redirect focus-move to LoginForm's email input is proven for real -- LoginForm.jsx's new useEffect(() => emailInputRef.current?.focus(), []) fires on the real remount after isAuthenticated flips false, and the test asserts document.activeElement === emailInput via waitFor against the real DOM, no mock in the loop. Verdict: gap CLOSED. Independently re-run via npm run test: PASS (98ms), part of the 93/93 full-suite pass. | post-merge regression re-validation (AUTH-full-epic merge, HEAD 1b168b1b): re-ran real against merged codebase, PASS."
       }
     }
   ],

@@ -15,15 +15,15 @@
         "happy-path"
       ],
       "last_run": {
-        "started_at": "2026-08-18T14:35:09Z",
-        "duration_ms": 15,
+        "started_at": "2026-08-18T18:54:17Z",
+        "duration_ms": 12,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 15,
+            "duration_ms": 12,
             "reason": null
           }
         ],
@@ -48,15 +48,15 @@
         "security"
       ],
       "last_run": {
-        "started_at": "2026-08-18T14:35:09Z",
-        "duration_ms": 12,
+        "started_at": "2026-08-18T18:54:17Z",
+        "duration_ms": 10,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 12,
+            "duration_ms": 10,
             "reason": null
           }
         ],
@@ -80,15 +80,15 @@
         "happy-path"
       ],
       "last_run": {
-        "started_at": "2026-08-18T14:35:09Z",
-        "duration_ms": 20,
+        "started_at": "2026-08-18T18:54:17Z",
+        "duration_ms": 10,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 20,
+            "duration_ms": 10,
             "reason": null
           }
         ],
@@ -112,20 +112,20 @@
         "happy-path"
       ],
       "last_run": {
-        "started_at": "2026-08-18T14:35:09Z",
-        "duration_ms": 9500,
+        "started_at": "2026-08-18T18:54:17Z",
+        "duration_ms": 8200,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 9500,
+            "duration_ms": 8200,
             "reason": null
           }
         ],
         "failure_reason": null,
-        "artefact": "manual docker-compose up verification (real daemon)",
+        "artefact": "manual docker-compose up verification (real daemon; re-verified post-merge on HEAD 1b168b1b, both unset-JWT_SECRET_KEY fail-fast and set-JWT_SECRET_KEY healthy-boot paths)",
         "runner": "docker-compose",
         "rerun_count": 0
       }
@@ -145,15 +145,15 @@
         "edge-case"
       ],
       "last_run": {
-        "started_at": "2026-08-18T14:35:09Z",
-        "duration_ms": 30,
+        "started_at": "2026-08-18T18:54:17Z",
+        "duration_ms": 22,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 30,
+            "duration_ms": 22,
             "reason": null
           }
         ],
@@ -178,15 +178,15 @@
         "edge-case"
       ],
       "last_run": {
-        "started_at": "2026-08-18T14:35:09Z",
-        "duration_ms": 28,
+        "started_at": "2026-08-18T18:54:17Z",
+        "duration_ms": 21,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 28,
+            "duration_ms": 21,
             "reason": null
           }
         ],
@@ -211,15 +211,15 @@
         "regression"
       ],
       "last_run": {
-        "started_at": "2026-08-18T14:35:09Z",
-        "duration_ms": 45,
+        "started_at": "2026-08-18T18:54:17Z",
+        "duration_ms": 40,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 45,
+            "duration_ms": 40,
             "reason": null
           }
         ],
@@ -243,15 +243,15 @@
         "happy-path"
       ],
       "last_run": {
-        "started_at": "2026-08-18T14:35:09Z",
-        "duration_ms": 5,
+        "started_at": "2026-08-18T18:54:17Z",
+        "duration_ms": 4,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 5,
+            "duration_ms": 4,
             "reason": null
           }
         ],
@@ -281,15 +281,15 @@
         "regression"
       ],
       "last_run": {
-        "started_at": "2026-08-18T14:35:09Z",
-        "duration_ms": 18,
+        "started_at": "2026-08-18T18:54:17Z",
+        "duration_ms": 14,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 18,
+            "duration_ms": 14,
             "reason": null
           }
         ],
