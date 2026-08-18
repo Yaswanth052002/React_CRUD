@@ -100,6 +100,14 @@ pip install -r requirements.txt
 cp .env.example .env             # adjust if needed
 ```
 
+**Backend environment variables** (`backend/.env`):
+
+| Variable          | Required | Default (local dev)                                   | Notes                                                                 |
+|-------------------|----------|---------------------------------------------------------|------------------------------------------------------------------------|
+| `DATABASE_URL`    | No       | `sqlite:///./users.db`                                  | SQLite file path relative to `backend/`.                               |
+| `CORS_ORIGINS`    | No       | `http://localhost:5173,http://127.0.0.1:5173`           | Comma-separated list of origins allowed to call this API.              |
+| `JWT_SECRET_KEY`  | **Yes**  | none — must be set                                      | Signs/verifies auth JWTs. The backend fails fast at startup with a readable error if this is missing or empty. Never use the `.env.example` placeholder (`CHANGE_ME`) in production — generate a random value, e.g. `openssl rand -hex 32`. Never commit a real secret. |
+
 ## 7. Frontend Installation
 
 ```bash
@@ -132,6 +140,23 @@ npm run dev
 
 Open `http://localhost:5173` in your browser — the dashboard loads live data from the FastAPI
 backend on `http://localhost:8000`.
+
+## 9a. Running via Docker Compose
+
+```bash
+export JWT_SECRET_KEY=$(openssl rand -hex 32)
+docker-compose up
+```
+
+- `docker-compose.yml`'s `backend` service passes `JWT_SECRET_KEY` (required — export it on the
+  host shell before running, as above) and `CORS_ORIGINS` (optional, defaults to
+  `http://localhost:5173,http://127.0.0.1:5173`) through to the container via its `environment:`
+  block. Neither is ever hardcoded as a literal in `docker-compose.yml`.
+- Backend: `http://localhost:8000` · Frontend: `http://localhost:5173`.
+- **CORS note**: the backend's existing `allow_headers=["*"]` CORS configuration already permits
+  the `Authorization` header used by the frontend's bearer-token auth flow across the
+  container-to-container origin boundary — no extra CORS configuration is needed for
+  authenticated requests to work under Docker Compose.
 
 ## 10. API Documentation
 

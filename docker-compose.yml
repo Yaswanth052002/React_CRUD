@@ -5,6 +5,11 @@ services:
     container_name: crud-backend
     ports:
       - "8000:8000"
+    # Passed through from the host shell/.env — never a literal secret here.
+    # JWT_SECRET_KEY is required (backend fails fast at startup if unset).
+    environment:
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173}
 
   frontend:
     build:

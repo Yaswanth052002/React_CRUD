@@ -11,7 +11,27 @@
       "given": "the repository's backend/.env.example file",
       "when": "the file is parsed for env var entries",
       "then": "a JWT_SECRET_KEY line is present with value CHANGE_ME (not a real secret) and is preceded by a comment describing its purpose and production-generation guidance",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T14:35:09Z",
+        "duration_ms": 15,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 15,
+            "reason": null
+          }
+        ],
+        "failure_reason": null,
+        "artefact": "backend/tests/test_config.py::test_env_example_documents_jwt_secret_key_with_comment",
+        "runner": "pytest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-08-TC-02",
@@ -23,7 +43,28 @@
       "given": "the repository's backend/.env.example file committed to version control",
       "when": "the JWT_SECRET_KEY line is inspected",
       "then": "its value is exactly the placeholder CHANGE_ME (or empty) and is never a random/production-looking secret string",
-      "tags": ["negative", "security"]
+      "tags": [
+        "negative",
+        "security"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T14:35:09Z",
+        "duration_ms": 12,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 12,
+            "reason": null
+          }
+        ],
+        "failure_reason": null,
+        "artefact": "backend/tests/test_config.py::test_env_example_jwt_secret_key_is_never_a_real_secret",
+        "runner": "pytest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-08-TC-03",
@@ -35,7 +76,27 @@
       "given": "docker-compose.yml's backend service definition",
       "when": "the environment: block is parsed",
       "then": "JWT_SECRET_KEY is listed referencing a host env var (e.g. ${JWT_SECRET_KEY}), never a literal secret, and CORS_ORIGINS is present or confirmed passed through",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T14:35:09Z",
+        "duration_ms": 20,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 20,
+            "reason": null
+          }
+        ],
+        "failure_reason": null,
+        "artefact": "backend/tests/test_docker_compose_config.py::test_backend_service_passes_jwt_secret_key_via_environment + test_backend_service_passes_cors_origins_via_environment",
+        "runner": "pytest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-08-TC-04",
@@ -47,7 +108,27 @@
       "given": "JWT_SECRET_KEY is exported on the host environment before docker-compose up",
       "when": "docker-compose up is run",
       "then": "the backend container starts successfully and the /api/health endpoint returns 200",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T14:35:09Z",
+        "duration_ms": 9500,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 9500,
+            "reason": null
+          }
+        ],
+        "failure_reason": null,
+        "artefact": "manual docker-compose up verification (real daemon)",
+        "runner": "docker-compose",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-08-TC-05",
@@ -59,7 +140,28 @@
       "given": "JWT_SECRET_KEY is unset in the backend process environment",
       "when": "the FastAPI app's on_startup() handler runs",
       "then": "startup raises an exception with the readable message 'JWT_SECRET_KEY environment variable is required' and no raw stack trace is surfaced to logs or clients",
-      "tags": ["negative", "edge-case"]
+      "tags": [
+        "negative",
+        "edge-case"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T14:35:09Z",
+        "duration_ms": 30,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 30,
+            "reason": null
+          }
+        ],
+        "failure_reason": null,
+        "artefact": "backend/tests/test_config.py::test_on_startup_raises_when_jwt_secret_key_missing",
+        "runner": "pytest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-08-TC-06",
@@ -71,7 +173,28 @@
       "given": "JWT_SECRET_KEY is set to an empty string in the backend process environment",
       "when": "the FastAPI app's on_startup() handler runs",
       "then": "startup raises the same readable 'JWT_SECRET_KEY environment variable is required' error as the unset case",
-      "tags": ["negative", "edge-case"]
+      "tags": [
+        "negative",
+        "edge-case"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T14:35:09Z",
+        "duration_ms": 28,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 28,
+            "reason": null
+          }
+        ],
+        "failure_reason": null,
+        "artefact": "backend/tests/test_config.py::test_on_startup_raises_when_jwt_secret_key_empty",
+        "runner": "pytest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-08-TC-07",
@@ -83,7 +206,28 @@
       "given": "JWT_SECRET_KEY is set to a non-empty value in the backend process environment",
       "when": "the FastAPI app starts",
       "then": "on_startup() completes without raising, and existing seed-data behavior is unaffected",
-      "tags": ["happy-path", "regression"]
+      "tags": [
+        "happy-path",
+        "regression"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T14:35:09Z",
+        "duration_ms": 45,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 45,
+            "reason": null
+          }
+        ],
+        "failure_reason": null,
+        "artefact": "backend/tests/test_config.py::test_on_startup_succeeds_and_seeds_when_jwt_secret_key_present",
+        "runner": "pytest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-08-TC-08",
@@ -95,7 +239,32 @@
       "given": "the backend container with JWT_SECRET_KEY validation added to on_startup()",
       "when": "startup time is measured with and without the validation logic",
       "then": "total added startup latency is well under the 1s budget (target: <10ms added)",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T14:35:09Z",
+        "duration_ms": 5,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 5,
+            "reason": null
+          }
+        ],
+        "failure_reason": null,
+        "artefact": "backend/tests/test_config.py::test_jwt_secret_key_validation_adds_negligible_latency",
+        "runner": "pytest",
+        "rerun_count": 0,
+        "budget": {
+          "target": "<10ms added startup latency",
+          "measured": "measured via time.perf_counter() in test, well under 10ms",
+          "budget_pass": true
+        }
+      }
     },
     {
       "id": "AUTH-08-TC-09",
@@ -107,7 +276,28 @@
       "given": "docker-compose is running with backend and frontend in separate containers, frontend served at http://localhost:5173 and backend at http://localhost:8000",
       "when": "the frontend calls a protected endpoint (e.g. GET /api/users) with an Authorization: Bearer <token> header",
       "then": "the CORS preflight succeeds and the request returns 200, not a CORS-rejected or 401/403 response, confirming allow_headers=[\"*\"] already permits Authorization",
-      "tags": ["happy-path", "regression"]
+      "tags": [
+        "happy-path",
+        "regression"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T14:35:09Z",
+        "duration_ms": 18,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 18,
+            "reason": null
+          }
+        ],
+        "failure_reason": null,
+        "artefact": "backend/tests/test_cors.py::test_cors_preflight_allows_authorization_header",
+        "runner": "pytest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-08-TC-10",
@@ -119,7 +309,10 @@
       "given": "the app is running via docker-compose up (backend and frontend containers)",
       "when": "a user logs in through the frontend UI, then refreshes the page",
       "then": "the user remains authenticated and protected endpoints continue to respond 200 without re-login",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": null
     },
     {
       "id": "AUTH-08-TC-11",
@@ -131,19 +324,58 @@
       "given": "the app is running via local dev (uvicorn on localhost:8000, npm run dev on localhost:5173)",
       "when": "a user logs in and refreshes the page",
       "then": "the login, protected-endpoint access, and refresh-persistence behavior matches the docker-compose case exactly",
-      "tags": ["happy-path", "regression"]
+      "tags": [
+        "happy-path",
+        "regression"
+      ],
+      "last_run": null
     }
   ],
   "coverage_audit": {
     "functional_requirements": [
-      {"id": "AUTH-08-FR-1", "covered_by": ["AUTH-08-TC-01"]},
-      {"id": "AUTH-08-FR-2", "covered_by": ["AUTH-08-TC-03", "AUTH-08-TC-04"]},
-      {"id": "AUTH-08-FR-3", "covered_by": ["AUTH-08-TC-05", "AUTH-08-TC-06", "AUTH-08-TC-07"]}
+      {
+        "id": "AUTH-08-FR-1",
+        "covered_by": [
+          "AUTH-08-TC-01"
+        ]
+      },
+      {
+        "id": "AUTH-08-FR-2",
+        "covered_by": [
+          "AUTH-08-TC-03",
+          "AUTH-08-TC-04"
+        ]
+      },
+      {
+        "id": "AUTH-08-FR-3",
+        "covered_by": [
+          "AUTH-08-TC-05",
+          "AUTH-08-TC-06",
+          "AUTH-08-TC-07"
+        ]
+      }
     ],
     "non_functional_requirements": [
-      {"id": "AUTH-08-NFR-performance", "covered_by": ["AUTH-08-TC-08"]},
-      {"id": "AUTH-08-NFR-security", "covered_by": ["AUTH-08-TC-02", "AUTH-08-TC-09"]},
-      {"id": "AUTH-08-NFR-observability", "covered_by": ["AUTH-08-TC-10", "AUTH-08-TC-11"]}
+      {
+        "id": "AUTH-08-NFR-performance",
+        "covered_by": [
+          "AUTH-08-TC-08"
+        ]
+      },
+      {
+        "id": "AUTH-08-NFR-security",
+        "covered_by": [
+          "AUTH-08-TC-02",
+          "AUTH-08-TC-09"
+        ]
+      },
+      {
+        "id": "AUTH-08-NFR-observability",
+        "covered_by": [
+          "AUTH-08-TC-10",
+          "AUTH-08-TC-11"
+        ]
+      }
     ],
     "uncovered": []
   }

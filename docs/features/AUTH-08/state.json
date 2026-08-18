@@ -11,12 +11,49 @@
   "design_artifact": "docs/features/AUTH-08/DESIGN.md",
   "design_provider": "none",
   "design_iteration": 0,
-  "phase": "plan-implementation",
+  "phase": "security-reviewed",
   "gate": "APPROVE",
-  "last_updated": "2026-08-17T23:10:00Z",
+  "last_updated": "2026-08-18T14:41:17Z",
   "plan": "complete",
   "plan_validation": "PASS",
+  "review": "PASS",
+  "review_report": "docs/features/AUTH-08/REVIEW.md",
+  "security": "PASS",
+  "security_findings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "tool_missing": []
+  },
+  "security_report": "docs/features/AUTH-08/SECURITY-20260818-1441.md",
   "plan_validation_rounds": 1,
+  "impl": "complete",
+  "impl_branch": "feature/AUTH",
+  "impl_tasks": [
+    {"task_id": "T-01", "status": "done", "completed_at": "2026-08-18T19:40:00Z", "files_touched": ["backend/.env.example"]},
+    {"task_id": "T-02", "status": "done", "completed_at": "2026-08-18T19:41:00Z", "files_touched": ["docker-compose.yml"]},
+    {"task_id": "T-03", "status": "done", "completed_at": "2026-08-18T19:42:00Z", "files_touched": ["backend/app/main.py"]},
+    {"task_id": "T-04", "status": "done", "completed_at": "2026-08-18T19:48:00Z", "files_touched": ["backend/tests/test_config.py"]},
+    {"task_id": "T-05", "status": "done", "completed_at": "2026-08-18T19:50:00Z", "files_touched": ["backend/tests/test_docker_compose_config.py"]},
+    {"task_id": "T-06", "status": "done", "completed_at": "2026-08-18T19:51:00Z", "files_touched": ["backend/tests/test_cors.py"]},
+    {"task_id": "T-07", "status": "done", "completed_at": "2026-08-18T19:55:00Z", "files_touched": ["README.md"]}
+  ],
+  "impl_evidence": {
+    "session_ended_at": "2026-08-18T20:00:00Z",
+    "rounds": 1,
+    "checks": {
+      "typecheck": {"status": "N/A", "source": "project-commands.yaml typecheck:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": "AF-01", "ran_at": null},
+      "unit_tests": {"status": "PASS", "source": "project-commands.yaml test_unit:/test:", "command": "(cd frontend && npm run test) && (cd backend && pytest)", "exit_code": 0, "evidence_path": "docs/features/AUTH-08/evidence/unit-tests.log", "flag_id": null, "ran_at": "2026-08-18T19:56:30Z", "extra_evidence_path": "docs/features/AUTH-08/evidence/frontend-unit-tests.log"},
+      "lint": {"status": "N/A", "source": "project-commands.yaml lint:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": "AF-02", "ran_at": null},
+      "runtime": {"status": "PASS", "source": "stack-smoke.md Run:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": "AF-04", "ran_at": "2026-08-18T19:57:15Z", "stacks": [
+        {"stack": "fastapi", "status": "PASS", "command": "uvicorn app.main:app --port 8001 (JWT_SECRET_KEY unset then set)", "exit_code": 0, "evidence_path": "docs/features/AUTH-08/evidence/runtime-fastapi.log", "boot_log_scan": "clean", "notes": "fail-fast verified separately: unset JWT_SECRET_KEY -> exit 3, single readable ERROR log line, no /api/health reachable, no seed run (see runtime-fastapi-missing-secret.log); set JWT_SECRET_KEY -> clean boot, /api/health 200", "extra_evidence_path": "docs/features/AUTH-08/evidence/runtime-fastapi-missing-secret.log"},
+        {"stack": "react", "status": "PASS", "command": "npm run dev -- --port 5175", "exit_code": 0, "evidence_path": "docs/features/AUTH-08/evidence/runtime-react.log", "boot_log_scan": "clean", "render_check": "unavailable"}
+      ]},
+      "compile": {"status": "PASS", "source": "project-commands.yaml build:", "command": "cd frontend && npm run build", "exit_code": 0, "evidence_path": "docs/features/AUTH-08/evidence/compile.log", "flag_id": null, "ran_at": "2026-08-18T19:57:45Z"},
+      "design_check": {"status": "N/A", "source": "project-commands.yaml design_check:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": "AF-03", "ran_at": null}
+    }
+  },
   "pending_carry_forward": [
     {
       "item_id": "R-08-jwt-signing-not-yet-implemented",

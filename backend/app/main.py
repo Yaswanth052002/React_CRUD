@@ -47,6 +47,10 @@ Base.metadata.create_all(bind=engine)
 
 @app.on_event("startup")
 def on_startup():
+    if not os.getenv("JWT_SECRET_KEY", "").strip():
+        logger.error("JWT_SECRET_KEY environment variable is required")
+        raise RuntimeError("JWT_SECRET_KEY environment variable is required")
+
     db = SessionLocal()
     try:
         seed_if_empty(db)
