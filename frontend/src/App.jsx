@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import Sidebar from "./components/Sidebar.jsx";
-import Header from "./components/Header.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Users from "./pages/Users.jsx";
+import Settings from "./pages/Settings.jsx";
 import LoginScreen from "./components/LoginScreen.jsx";
 import * as userApi from "./services/userApi.js";
 
@@ -22,35 +22,6 @@ function isTokenValid(token) {
   } catch {
     return false;
   }
-}
-
-function SettingsPlaceholder({ onMenuClick }) {
-  return (
-    <>
-      <Header title="Settings" onMenuClick={onMenuClick} />
-      <div className="page">
-        <div className="page__header">
-          <div className="page__eyebrow">Workspace</div>
-          <h1 className="page__title">Settings</h1>
-          <p className="page__desc">Configuration options for this console.</p>
-        </div>
-        <div className="panel">
-          <div className="state-block">
-            <div className="state-block__icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.6" />
-              </svg>
-            </div>
-            <div className="state-block__title">Nothing here yet</div>
-            <div className="state-block__desc">
-              Settings for this dashboard (API endpoint, theme, etc.) can be added here as the
-              project grows.
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
-  );
 }
 
 export default function App() {
@@ -96,8 +67,9 @@ export default function App() {
     setActiveView("dashboard");
   }
 
-  // Forward-reference: exists so AUTH-07's logout action has a ready-made
-  // handler to call; this story adds no logout-triggering UI element.
+  // Threaded to Settings.jsx as the onLogout prop (AUTH-06); Settings calls
+  // userApi.logout() first, then this handler, which flips isAuthenticated
+  // so AUTH-05's guard renders the Login screen.
   function handleLogout() {
     userApi.clearAuthToken();
     setIsAuthenticated(false);
@@ -129,7 +101,7 @@ export default function App() {
       />
       <div className="main-col">
         {activeView === "settings" ? (
-          <SettingsPlaceholder onMenuClick={() => setSidebarOpen(true)} />
+          <Settings onMenuClick={() => setSidebarOpen(true)} onLogout={handleLogout} />
         ) : activeView === "users" ? (
           <Users onMenuClick={() => setSidebarOpen(true)} onUserCountChange={setUserCount} />
         ) : (

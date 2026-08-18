@@ -227,6 +227,12 @@ Regular Users stats cards and no longer fetches the user list.
 4. **Delete** — click a row's delete icon → confirm in the dialog → `DELETE /api/users/{id}`.
 5. **Search** — the search box filters by name, email, or phone (debounced, backend-driven).
 6. **Filter** — the Role and Status dropdowns filter server-side alongside search.
+7. **Logout** — from the Settings screen, click **Logout** to clear the client-side session and
+   redirect to the Login screen; this makes no server-side call.
+
+The **Settings** screen (sidebar → "Settings") is read-only: it shows the signed-in user's own
+name and email (`GET /api/auth/me`) plus the Logout action above — there is no account-editing
+or password-change UI on this screen.
 
 Every mutation shows a loading state on its button, a success toast on completion, and a
 readable error message (never a raw stack trace) on failure.

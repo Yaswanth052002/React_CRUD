@@ -16,5 +16,51 @@
   "plan": "complete",
   "plan_validation": "PASS",
   "plan_validation_rounds": 1,
-  "last_updated": "2026-08-17T22:15:00Z"
+  "impl": "complete",
+  "impl_branch": "feature/AUTH",
+  "impl_tasks": [
+    {"task_id": "T-01", "status": "done", "completed_at": "2026-08-18T17:40:00Z", "files_touched": ["frontend/src/services/userApi.js"]},
+    {"task_id": "T-02", "status": "done", "completed_at": "2026-08-18T19:02:00Z", "files_touched": ["frontend/src/services/__tests__/userApi.logout.test.js"], "note": "fix-round-1: added TC-01/TC-04 module-level assertions (validation gap fix)"},
+    {"task_id": "T-03", "status": "done", "completed_at": "2026-08-18T17:48:00Z", "files_touched": ["frontend/src/services/__tests__/userApi.logout.test.js"]},
+    {"task_id": "T-04", "status": "done", "completed_at": "2026-08-18T17:50:00Z", "files_touched": ["frontend/src/services/__tests__/userApi.logout.test.js"]},
+    {"task_id": "T-05", "status": "done", "completed_at": "2026-08-18T17:51:00Z", "files_touched": ["README.md"]}
+  ],
+  "impl_evidence": {
+    "session_ended_at": "2026-08-18T19:05:00Z",
+    "rounds": 2,
+    "fix_round": {
+      "round": 1,
+      "trigger": "docs/features/AUTH-07/VALIDATION-20260818-1230.md — TC-01/TC-04/TC-11 zero coverage, 27.3% error rate",
+      "action": "Added TC-01/TC-04 module-level assertions to userApi.logout.test.js per PLAN.md § 7; recorded TC-11 as a tracked cross-story sequencing gap (AF-04) rather than fabricating coverage.",
+      "result": "unit_tests re-run PASS (80/80 frontend, 47/47 backend); compile re-run PASS."
+    },
+    "checks": {
+      "typecheck": {"status": "N/A", "source": "project-commands.yaml typecheck:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": "AF-01", "ran_at": null},
+      "unit_tests": {"status": "PASS", "source": "project-commands.yaml test_unit:/test:", "command": "(cd frontend && npm run test) && (cd backend && pytest)", "exit_code": 0, "evidence_path": "docs/features/AUTH-07/evidence/unit-tests-frontend-round2.log", "flag_id": null, "ran_at": "2026-08-18T19:03:00Z", "extra_evidence_path": "docs/features/AUTH-07/evidence/unit-tests-backend-round2.log"},
+      "lint": {"status": "N/A", "source": "project-commands.yaml lint:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": "AF-02", "ran_at": null},
+      "runtime": {"status": "PASS", "source": "stack-smoke.md Run:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": null, "ran_at": "2026-08-18T17:57:00Z", "stacks": [
+        {"stack": "fastapi", "status": "PASS", "command": "uvicorn app.main:app --port 8001", "exit_code": 0, "evidence_path": "docs/features/AUTH-07/evidence/runtime-fastapi.log", "boot_log_scan": "clean"},
+        {"stack": "react", "status": "PASS", "command": "npm run dev -- --port 5175", "exit_code": 0, "evidence_path": "docs/features/AUTH-07/evidence/runtime-react.log", "boot_log_scan": "clean"}
+      ]},
+      "compile": {"status": "PASS", "source": "project-commands.yaml build:", "command": "cd frontend && npm run build", "exit_code": 0, "evidence_path": "docs/features/AUTH-07/evidence/compile-round2.log", "flag_id": null, "ran_at": "2026-08-18T19:04:00Z"},
+      "design_check": {"status": "N/A", "source": "project-commands.yaml design_check:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": "AF-03", "ran_at": null}
+    }
+  },
+  "pending_carry_forward": [
+    {
+      "kind": "risk",
+      "tag": "plan-amendment-needed",
+      "flag_id": "AF-04",
+      "summary": "Round 4 (2026-08-18): AUTH-07-TC-11 coverage gap is CLOSED. New test frontend/src/__tests__/App.logoutFocus.test.jsx (mounts real App/LoginScreen/LoginForm/Settings) proves Tab-reachability of the Logout control, click-activation calling userApi.logout(), and focus landing on LoginForm's email input after the post-logout redirect. The fix required a useRef+useEffect focus-on-mount addition to frontend/src/components/LoginForm.jsx, which belongs to AUTH-01's file table (F-02), not AUTH-07's or AUTH-06's. This is a legitimate small validation-driven fix (same class as AUTH-01's own earlier TC-05 fix-loop precedent) but it edits a file outside the owning story's PLAN.md file table with no PLAN amendment recorded anywhere. Recommend a lightweight PLAN.md amendment (AUTH-01 or AUTH-07, whichever is judged the owning story for this NFR-accessibility behavior) recording the LoginForm.jsx change and its new test, for traceability. Does not block merge (TC-11 is Should-priority and now passing) but should be resolved before /arh-review signs off on wiring/traceability.",
+      "task_id": "T-02",
+      "created_at": "2026-08-18T19:00:00Z",
+      "updated_at": "2026-08-18T19:15:00Z",
+      "resolved_at": "2026-08-18T19:15:00Z",
+      "resolution": "PLAN amendment recorded: docs/features/AUTH-01/PLAN.md new Addendum (2026-08-18, post-AUTH-07 validation) section documents the LoginForm.jsx focus-on-mount addition and its owning test file; docs/features/AUTH-07/PLAN.md Cross-Feature Dependency Notes cross-references it."
+    }
+  ],
+  "review": "PASS",
+  "review_report": "docs/features/AUTH-07/REVIEW.md",
+  "phase": "review",
+  "last_updated": "2026-08-18T00:00:00Z"
 }

@@ -206,6 +206,12 @@ Risks from `docs/research/AUTH-07.md` § Risk register.
   visible is entirely AUTH-05's already-shipped scope (`docs/features/AUTH-05/PLAN.md`); this story
   only ensures `isAuthenticated` flips to `false`, which AUTH-05's existing render switch already
   reacts to. No code changes required in AUTH-05.
+- **AUTH-01** (`docs/features/AUTH-01/PLAN.md` F-02, `LoginForm.jsx`): validation of this story's
+  TC-11 (keyboard-operable Logout + focus moves to Login's primary field after redirect) found no
+  PLAN assigned an owner for the focus-management half. AUTH-01's `LoginForm.jsx` gained a small
+  mount-time `.focus()` addition to close it (documented in AUTH-01's PLAN.md Addendum,
+  2026-08-18); this story's new `App.logoutFocus.test.jsx` proves the end-to-end behavior since it
+  spans both `Settings.jsx`'s Logout control and `LoginForm.jsx`'s focus target.
 
 ## 7. Test Strategy
 

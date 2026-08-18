@@ -55,6 +55,19 @@ export function registerUnauthorizedHandler(callback) {
   unauthorizedHandler = callback;
 }
 
+/**
+ * Clears the client-side session. Synchronous, no arguments, no HTTP call.
+ *
+ * Tradeoff (accepted, stateless JWT): this only removes the token client-
+ * side — the cleared token remains cryptographically valid until its
+ * 60-minute TTL naturally expires, since there is no server-side revocation
+ * or blacklist. Acceptable for this internal, non-regulated admin tool.
+ */
+export function logout() {
+  clearAuthToken();
+  console.log("auth:logout", { timestamp: new Date().toISOString() });
+}
+
 // Request interceptor: attaches Authorization: Bearer <token> when a token
 // is present; attaches nothing when absent (no empty header).
 client.interceptors.request.use((config) => {
@@ -174,6 +187,20 @@ export async function login(email, password) {
 export async function getDashboardStats() {
   try {
     const res = await client.get("/api/dashboard/stats");
+    return res.data;
+  } catch (err) {
+    throw normalizeError(err);
+  }
+}
+
+/**
+ * Returns the currently authenticated user's identity, derived server-side
+ * from the caller's Bearer token. Resolves to exactly { name, email } — no
+ * id, role, or other field is ever included.
+ */
+export async function getCurrentUser() {
+  try {
+    const res = await client.get("/api/auth/me");
     return res.data;
   } catch (err) {
     throw normalizeError(err);

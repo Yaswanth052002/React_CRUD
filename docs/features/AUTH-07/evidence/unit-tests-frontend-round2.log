@@ -1,0 +1,51 @@
+
+> user-management-crud-frontend@1.0.0 test
+> vitest run --run
+
+
+ RUN  v3.2.7 /Users/yaswanth.panthangi/Downloads/react-python-crud/frontend
+
+ ✓ src/pages/__tests__/App.routing.test.jsx (3 tests) 204ms
+ ✓ src/pages/__tests__/Dashboard.search.test.jsx (10 tests) 271ms
+ ✓ src/pages/__tests__/Users.search.test.jsx (6 tests) 265ms
+ ✓ src/components/__tests__/LoginForm.test.jsx (7 tests) 216ms
+ ✓ src/__tests__/App.authGate.test.jsx (11 tests) 334ms
+ ✓ src/pages/__tests__/Users.crud.test.jsx (13 tests) 413ms
+ ✓ src/__tests__/App.auth.perf.test.jsx (1 test) 778ms
+   ✓ App.jsx mount-to-auth-state-set performance (TC-11 / NFR-performance) > TC-11: p95 mount-to-isAuthenticated-set latency is under 100ms across 100 iterations  778ms
+stdout | src/services/__tests__/userApi.auth.test.js > userApi.js auth-token surface > TC-09: dedup guard — a second 401 after the token is already null does not re-invoke the handler
+auth_session_expired
+
+stdout | src/services/__tests__/userApi.auth.test.js > userApi.js auth-token surface > TC-04: a 401 response clears the token and invokes the registered unauthorized handler
+auth_session_expired
+
+stdout | src/services/__tests__/userApi.logout.test.js > userApi.logout() > TC-02: calls clearAuthToken() exactly once and removes the auth_token key
+auth:logout { timestamp: [32m'2026-08-18T12:25:25.230Z'[39m }
+
+ ✓ src/services/__tests__/userApi.auth.test.js (8 tests) 5ms
+stdout | src/services/__tests__/userApi.logout.test.js > userApi.logout() > TC-03: performs no HTTP call and returns undefined synchronously
+auth:logout { timestamp: [32m'2026-08-18T12:25:25.233Z'[39m }
+
+stdout | src/services/__tests__/userApi.logout.test.js > userApi.logout() > TC-05: leaves no residual auth artifacts in localStorage, sessionStorage, or cookies
+auth:logout { timestamp: [32m'2026-08-18T12:25:25.234Z'[39m }
+
+stdout | src/services/__tests__/userApi.logout.test.js > userApi.logout() > TC-07: calling logout() twice in succession throws no error and ends cleared
+auth:logout { timestamp: [32m'2026-08-18T12:25:25.235Z'[39m }
+auth:logout { timestamp: [32m'2026-08-18T12:25:25.236Z'[39m }
+
+stdout | src/services/__tests__/userApi.logout.test.js > userApi.logout() — in-flight request race (TC-09) > TC-09: clears the token immediately; the delayed 401 is routed through the existing dedup-guarded interceptor path without a crash or a redundant handler call
+auth:logout { timestamp: [32m'2026-08-18T12:25:25.237Z'[39m }
+
+stdout | src/services/__tests__/userApi.logout.test.js > userApi.logout() — declared e2e coverage (TC-01, TC-04) > TC-04: after logout(), no residual token exists and outgoing requests carry no Authorization header
+auth:logout { timestamp: [32m'2026-08-18T12:25:25.240Z'[39m }
+
+ ✓ src/services/__tests__/userApi.logout.test.js (10 tests) 15ms
+ ✓ src/services/userApi.test.js (1 test) 1ms
+ ✓ src/__tests__/App.auth.test.jsx (7 tests) 62ms
+ ✓ src/components/__tests__/LoginScreen.test.jsx (3 tests) 78ms
+
+ Test Files  12 passed (12)
+      Tests  80 passed (80)
+   Start at  17:55:22
+   Duration  2.65s (transform 592ms, setup 2.17s, collect 1.62s, tests 2.64s, environment 6.20s, prepare 1.02s)
+

@@ -11,7 +11,28 @@
       "given": "an authenticated session with a valid stored token",
       "when": "getCurrentUser() is called",
       "then": "it issues a single GET /api/auth/me request and resolves to exactly {name, email}",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T12:16:00Z",
+        "duration_ms": 233,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 233,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Settings.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-06-TC-02",
@@ -23,7 +44,28 @@
       "given": "the GET /api/auth/me request fails (network error or non-2xx)",
       "when": "getCurrentUser() is called",
       "then": "it throws an error normalized via the same normalizeError pattern used by other userApi.js functions, never a raw stack trace",
-      "tags": ["negative"]
+      "tags": [
+        "negative"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T12:16:00Z",
+        "duration_ms": 233,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 233,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Settings.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-06-TC-03",
@@ -35,7 +77,28 @@
       "given": "a successful GET /api/auth/me response",
       "when": "Settings.jsx consumes the result",
       "then": "only name and email are read/rendered; role, id, and any other field are never accessed",
-      "tags": ["edge-case"]
+      "tags": [
+        "edge-case"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T12:16:00Z",
+        "duration_ms": 233,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 233,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Settings.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-06-TC-04",
@@ -47,7 +110,28 @@
       "given": "the Settings page is rendered for an authenticated user",
       "when": "the Logout button is clicked",
       "then": "userApi.logout() is called first, followed by props.onLogout(), with no additional network request",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T12:16:00Z",
+        "duration_ms": 233,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 233,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Settings.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-06-TC-05",
@@ -59,7 +143,28 @@
       "given": "the Logout button has been clicked",
       "when": "userApi.logout() and props.onLogout() resolve",
       "then": "Settings.jsx issues no router/navigation call itself; the Login transition happens only because onLogout flips isAuthenticated in App.jsx",
-      "tags": ["edge-case"]
+      "tags": [
+        "edge-case"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T12:16:00Z",
+        "duration_ms": 233,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 233,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Settings.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-06-TC-06",
@@ -71,7 +176,28 @@
       "given": "the Settings component's prop interface",
       "when": "Settings.jsx is rendered with no isAuthenticated prop supplied",
       "then": "the component renders identically to being supplied one, proving no such prop is read or required",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T12:16:00Z",
+        "duration_ms": 233,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 233,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Settings.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-06-TC-07",
@@ -83,7 +209,28 @@
       "given": "Settings.jsx has just mounted and the current-user fetch is in flight",
       "when": "the page renders before the fetch resolves",
       "then": "a spinner (reusing the existing .spinner class) is visible next to the name/email fields, not a full-page skeleton",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T12:16:00Z",
+        "duration_ms": 233,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 233,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Settings.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-06-TC-08",
@@ -95,7 +242,28 @@
       "given": "the current-user fetch rejects",
       "when": "Settings.jsx re-renders after the rejection",
       "then": "a readable inline banner replaces the fields (not a toast, not a raw stack trace) and remains visible without auto-dismissing",
-      "tags": ["negative"]
+      "tags": [
+        "negative"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T12:16:00Z",
+        "duration_ms": 233,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 233,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Settings.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-06-TC-09",
@@ -107,7 +275,28 @@
       "given": "Settings.jsx mounts once",
       "when": "the component lifecycle runs to completion without re-mounting",
       "then": "getCurrentUser() is called exactly once (empty-dependency useEffect), with no automatic retry loop and no polling, completing within the inherited 10s userApi.js timeout",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T12:16:00Z",
+        "duration_ms": 233,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 233,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Settings.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-06-TC-10",
@@ -119,7 +308,28 @@
       "given": "an authenticated request to GET /api/auth/me with a valid Bearer token",
       "when": "the request is sent",
       "then": "no user_id or identity parameter is included in the request; the returned identity matches the token's subject exclusively",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T12:16:00Z",
+        "duration_ms": 233,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 233,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Settings.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-06-TC-11",
@@ -131,7 +341,28 @@
       "given": "either a successful or a failed getCurrentUser() call",
       "when": "the result or error is handled by Settings.jsx",
       "then": "no name, email, or other PII appears in any console/application log output or in the displayed error message",
-      "tags": ["negative"]
+      "tags": [
+        "negative"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T12:16:00Z",
+        "duration_ms": 233,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 233,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Settings.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-06-TC-12",
@@ -143,20 +374,81 @@
       "given": "the current-user fetch has resolved successfully",
       "when": "the Settings page renders the name/email fields",
       "then": "each field uses the details-item / details-item__label / details-item__value classes consistent with UserDetails.jsx, ensuring consistent labelling structure",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T12:16:00Z",
+        "duration_ms": 233,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 233,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/pages/__tests__/Settings.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     }
   ],
   "coverage_audit": {
     "functional_requirements": [
-      {"id": "AUTH-06-FR-1", "covered_by": ["AUTH-06-TC-01", "AUTH-06-TC-02", "AUTH-06-TC-03"]},
-      {"id": "AUTH-06-FR-2", "covered_by": ["AUTH-06-TC-04", "AUTH-06-TC-05"]},
-      {"id": "AUTH-06-FR-3", "covered_by": ["AUTH-06-TC-06"]},
-      {"id": "AUTH-06-FR-4", "covered_by": ["AUTH-06-TC-07", "AUTH-06-TC-08"]}
+      {
+        "id": "AUTH-06-FR-1",
+        "covered_by": [
+          "AUTH-06-TC-01",
+          "AUTH-06-TC-02",
+          "AUTH-06-TC-03"
+        ]
+      },
+      {
+        "id": "AUTH-06-FR-2",
+        "covered_by": [
+          "AUTH-06-TC-04",
+          "AUTH-06-TC-05"
+        ]
+      },
+      {
+        "id": "AUTH-06-FR-3",
+        "covered_by": [
+          "AUTH-06-TC-06"
+        ]
+      },
+      {
+        "id": "AUTH-06-FR-4",
+        "covered_by": [
+          "AUTH-06-TC-07",
+          "AUTH-06-TC-08"
+        ]
+      }
     ],
     "non_functional_requirements": [
-      {"id": "AUTH-06-NFR-performance", "covered_by": ["AUTH-06-TC-09"]},
-      {"id": "AUTH-06-NFR-security", "covered_by": ["AUTH-06-TC-10", "AUTH-06-TC-11"]},
-      {"id": "AUTH-06-NFR-accessibility", "covered_by": ["AUTH-06-TC-12"]}
+      {
+        "id": "AUTH-06-NFR-performance",
+        "covered_by": [
+          "AUTH-06-TC-09"
+        ]
+      },
+      {
+        "id": "AUTH-06-NFR-security",
+        "covered_by": [
+          "AUTH-06-TC-10",
+          "AUTH-06-TC-11"
+        ]
+      },
+      {
+        "id": "AUTH-06-NFR-accessibility",
+        "covered_by": [
+          "AUTH-06-TC-12"
+        ]
+      }
     ],
     "uncovered": []
   }

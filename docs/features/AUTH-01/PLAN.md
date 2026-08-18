@@ -165,6 +165,17 @@ scope and would be a new, unrequested capability, not a task this story's ACs re
 - `npm run test` (Vitest) must be green pre-commit per `/arh-implement` Step 2, covering F-04 and
   F-05 in full.
 
+## Addendum (2026-08-18, post-AUTH-07 validation)
+
+`frontend/src/components/LoginForm.jsx` (F-02) gained one small addition outside this PLAN's
+original scope: a `useRef`+`useEffect` that moves keyboard focus to the email input on every
+mount. This was added during AUTH-07's validation to close AUTH-07-TC-11 (keyboard-operable
+Logout + focus moves to Login's primary field after the post-logout redirect) — no story's PLAN
+had assigned this behavior an owner, and `LoginForm.jsx` is this PLAN's file, so the fix landed
+here. New test coverage lives in `frontend/src/__tests__/App.logoutFocus.test.jsx` (an AUTH-07
+test file, since it exercises the full logout-redirect flow, not just `LoginForm` in isolation).
+No other change to this component's props, state, or contract.
+
 ## Plan validation
 
 - Date: 2026-08-17T18:10:00Z

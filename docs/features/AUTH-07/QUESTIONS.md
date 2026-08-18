@@ -1,0 +1,1 @@
+Should TC-09's in-flight-401 assert the unauthorized handler fires, given AUTH-04's dedup guard (`hadToken` check) skips it once logout() has already cleared the token synchronously — or is the guarded no-op the intended behavior? · task: T-03

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -24,6 +24,14 @@ export default function LoginForm({ onSubmit, isSubmitting, serverError }) {
   const [values, setValues] = useState(EMPTY_VALUES);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
+  const emailInputRef = useRef(null);
+
+  // Moves keyboard focus to the primary field (email) whenever this form
+  // mounts — covers both the initial Login view and a fresh mount after a
+  // logout-triggered redirect back to Login (AUTH-07-TC-11 / NFR-accessibility).
+  useEffect(() => {
+    emailInputRef.current?.focus();
+  }, []);
 
   const handleChange = (field) => (e) => {
     setValues((prev) => ({ ...prev, [field]: e.target.value }));
@@ -64,6 +72,7 @@ export default function LoginForm({ onSubmit, isSubmitting, serverError }) {
         </label>
         <input
           id="login-email"
+          ref={emailInputRef}
           className={`form-input ${err("email") ? "has-error" : ""}`}
           type="email"
           autoComplete="username"
