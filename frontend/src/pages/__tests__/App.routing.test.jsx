@@ -17,6 +17,10 @@ vi.mock("../../services/userApi.js", () => ({
   updateUser: vi.fn(),
   deleteUser: vi.fn(),
   getDashboardStats: vi.fn(),
+  getStoredToken: vi.fn(),
+  setAuthToken: vi.fn(),
+  clearAuthToken: vi.fn(),
+  registerUnauthorizedHandler: vi.fn(),
 }));
 
 function click(el) {

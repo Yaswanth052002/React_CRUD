@@ -30,6 +30,7 @@ format_for_py:       (n/a — no formatter configured)
 # validate-feature Phase 1.
 preflight:
   - cd frontend && npm install
+  - test -d frontend/node_modules/jwt-decode
   - cd backend && pip install -r requirements.txt
   - cd backend && python -c "import app.main"
   - cd backend && python -c "import passlib.context"
