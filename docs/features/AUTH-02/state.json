@@ -12,9 +12,18 @@
   "design_artifact": "docs/features/AUTH-02/DESIGN.md",
   "design_provider": "none",
   "design_iteration": 0,
-  "phase": "review",
+  "phase": "security-reviewed",
   "review": "PASS",
   "review_report": "docs/features/AUTH-02/REVIEW.md",
+  "security": "PASS",
+  "security_findings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 2,
+    "low": 5,
+    "tool_missing": []
+  },
+  "security_report": "docs/features/AUTH-02/SECURITY-20260818-1400.md",
   "needs_clarification_count": 0,
   "gate": "APPROVE",
   "plan": "complete",
@@ -222,5 +231,5 @@
       "design_check": {"status": "N/A", "source": "project-commands.yaml design_check:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": "AF-06", "ran_at": null}
     }
   },
-  "last_updated": "2026-08-18T18:48:07Z"
+  "last_updated": "2026-08-18T14:00:00Z"
 }
