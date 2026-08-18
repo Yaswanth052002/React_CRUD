@@ -69,14 +69,15 @@
     "design": "n/a",
     "rtm_source_sha": "5a019873bdc1df059c68aa5c582baf9511ca7414",
     "gate": "APPROVE",
-    "phase": "review",
+    "phase": "security-reviewed",
     "impl": "complete",
     "validation": "passed",
     "plan": "complete",
     "plan_validation": "PASS",
     "review": "PASS WITH WARNINGS",
     "review_report": "docs/features/AUTH-01/REVIEW.md",
-    "last_updated": "2026-08-18T15:10:00Z"
+    "security": "PASS",
+    "last_updated": "2026-08-18T09:31:00Z"
   },
   "AUTH-02": {
     "story": "validated",

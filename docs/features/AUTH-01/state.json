@@ -11,7 +11,7 @@
   "design_artifact": "docs/features/AUTH-01/DESIGN.md",
   "design_provider": "none",
   "design_iteration": 0,
-  "phase": "review",
+  "phase": "security-reviewed",
   "impl": "complete",
   "impl_branch": "feature/AUTH-01",
   "validation": "passed",
@@ -23,7 +23,16 @@
   "plan_validation_rounds": 1,
   "review": "PASS WITH WARNINGS",
   "review_report": "docs/features/AUTH-01/REVIEW.md",
-  "last_updated": "2026-08-18T15:10:00Z",
+  "security": "PASS",
+  "security_findings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 1,
+    "low": 0,
+    "tool_missing": []
+  },
+  "security_report": "docs/features/AUTH-01/SECURITY-20260818-1531.md",
+  "last_updated": "2026-08-18T09:31:00Z",
   "impl_tasks": [
     {
       "task_id": "T-01",
@@ -160,6 +169,17 @@
     }
   },
   "pending_carry_forward": [
+    {
+      "item_id": "F-004-mock-login-must-be-replaced",
+      "kind": "finding",
+      "tag": "auth",
+      "reason": "frontend/src/services/userAuthService.js's login() is a deliberate mock that resolves for any non-empty email/password pair (no real credential check). Not reachable today — LoginScreen/LoginForm/userAuthService have zero references from App.jsx/main.jsx, confirmed absent from the production build via grep of frontend/dist. Whichever story mounts LoginScreen into App.jsx (expected: AUTH-05) MUST first replace this mock with a real backend call (AUTH-02's login endpoint) — mounting it unreplaced would ship a universal auth bypass.",
+      "owner": "Backend lead",
+      "added_at": "2026-08-18T15:20:00Z",
+      "added_by": "security-review-agent (AUTH-01 security review, F-004)",
+      "resolved_at": null,
+      "evidence": "docs/features/AUTH-01/SECURITY-20260818.md#f-004"
+    },
     {
       "item_id": "R-01-userApi-setAuthToken-collision",
       "kind": "risk",
