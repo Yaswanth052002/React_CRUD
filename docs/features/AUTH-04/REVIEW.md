@@ -1,18 +1,24 @@
 # Code Review — feature/AUTH-04 (vs feature/AUTH-01)
 
-- Date: 2026-08-18T15:00:00Z
-- Mode: branch (feature/AUTH-04, parent feature/AUTH-01 — working-tree diff vs `git diff HEAD`, since AUTH-04 has no commits of its own beyond the shared AUTH-01 ancestor)
-- Files reviewed: 11 (7 changed, 3 new untracked test/doc files inspected, 1 docker-compose.yml stray diff)
-- Verdict: **PASS WITH WARNINGS**
+- Date: 2026-08-18T16:00:00Z
+- Mode: branch (feature/AUTH-04 @ a2ec706f, diffed against its actual parent `feature/AUTH-01` @ 58fe64c0, per `git diff feature/AUTH-01...feature/AUTH-04`)
+- Files reviewed: 16 (source: `frontend/src/services/userApi.js`, `frontend/src/App.jsx`, `frontend/package.json`, `docs/config/project-commands.yaml`, `frontend/src/pages/__tests__/App.routing.test.jsx`; new tests: `frontend/src/services/__tests__/userApi.auth.test.js`, `frontend/src/__tests__/App.auth.test.jsx`, `frontend/src/__tests__/App.auth.perf.test.jsx`; docs/state: `PLAN.md`, `FLAGS.md`, `state.json`, `docs/state/features.json`, two `VALIDATION-*.md`, `docs/test-cases/AUTH-04.json`, `docs/activity/2026-08.jsonl`; lockfile: `frontend/package-lock.json`)
+- Verdict: **PASS**
+
+## Re-run context: prior findings verified resolved
+
+This is a re-run against the final committed diff (a2ec706f) after 3 findings from the prior review were reportedly fixed. All 3 are confirmed genuinely resolved in this diff:
+
+1. **`docker-compose.yml` stray whitespace edit** — confirmed reverted. `git diff feature/AUTH-01...feature/AUTH-04 -- docker-compose.yml` returns empty; the file does not appear anywhere in the 23-file changed-file list for this branch.
+2. **`handleLoginSuccess` dropped `token` parameter** — confirmed fixed. `frontend/src/App.jsx` now reads `function handleLoginSuccess(_token) { setIsAuthenticated(true); setSessionExpiredMessage(null); }`, matching PLAN.md §3's `handleLoginSuccess(token: string) -> void` contract shape (parameter present, intentionally unused per the accompanying comment explaining `setAuthToken` already persisted it before this callback runs).
+3. **`state.json` AF-04 summary out of sync with FLAGS.md** — confirmed fixed. `docs/features/AUTH-04/state.json`'s AF-04 entry now reads "TC-02/TC-10/TC-14 can only be partially verified today ... TC-14 disclosure gap corrected in round-2 fix per VALIDATION-20260818-1420.md", matching `FLAGS.md`'s AF-04 correction which names TC-02/TC-10/TC-14 together.
 
 ## Executive summary
 
-AUTH-04 adds the token-storage/interceptor infrastructure exactly as scoped: `userApi.js` gains `getStoredToken`/`setAuthToken`/`clearAuthToken`/`registerUnauthorizedHandler` plus a request/response interceptor pair with a working 401 dedup guard, and `App.jsx` gains `isAuthenticated`/`sessionExpiredMessage` state and a mount-time expiry check — with the render tree still unconditionally mounted (no Sidebar/Header/LoginScreen gating), correctly deferring that to AUTH-05. The two-round validation history is genuine: round 1 correctly caught an undisclosed TC-14 gap and a false PLAN.md coverage claim, and round 2's fix (FLAGS.md correction, PLAN.md §7 correction, two new proxy tests) is itself surgical, non-tautological, and verified passing (49/49 tests, confirmed independently in this review). ADR-3's supersession claim is uncontested — AUTH-01 has no `impl` field and no `LoginScreen`/`setAuthToken` code exists on disk yet. No plaintext credentials are handled; only the opaque JWT is persisted (TC-12 verifies this). The `vi.mock("react", ...)` useState-wrapper trick in `App.auth.test.jsx` is sound and does not leak into other test files (verified by full suite run).
+AUTH-04 adds the token-storage/interceptor infrastructure exactly as scoped: `userApi.js` gains `getStoredToken`/`setAuthToken`/`clearAuthToken`/`registerUnauthorizedHandler` plus a request/response interceptor pair with a working 401 dedup guard (`hadToken` checked before `clearAuthToken()`, handler invoked only if a token was present — satisfies ADR-1 and research risk #1), and `App.jsx` gains `isAuthenticated`/`sessionExpiredMessage` state plus a mount-time `jwt-decode` expiry check, with the render tree still unconditionally mounted (no Sidebar/Header/LoginScreen gating) — correctly deferring that switch to AUTH-05 per PLAN.md's declared scope boundary. Layering is respected throughout: `App.jsx` never touches `localStorage` or `axios` directly, only calling into `userApi.js`; `userApi.js` remains the sole HTTP/storage entry point per `react-patterns` and `CLAUDE.md`. All three prior-review findings (stray `docker-compose.yml` edit, dropped `token` param, state/FLAGS drift) are confirmed resolved above. No new CRITICAL, HIGH, or MEDIUM findings surfaced in this fresh six-dimension pass. `npm run test` was re-run independently for this review: 49/49 tests pass across 8 files, including the new `userApi.auth.test.js` (8 tests), `App.auth.test.jsx` (7 tests), and `App.auth.perf.test.jsx` (1 test, p95 < 100ms). No SAST-pattern grep hits (eval/innerHTML/hardcoded secrets/PII-in-logs) in the diff. Only the opaque JWT is ever persisted (TC-12 verifies `localStorage.length === 1`, no password-shaped values). File scope is clean: every changed file maps to a PLAN.md F-01..F-07 row or an expected mirrored doc/state/lockfile artifact — no out-of-scope edits found.
 
-Warnings: an unrelated whitespace-only edit to `docker-compose.yml` is out of scope for this story's declared file list; `handleLoginSuccess`'s implemented signature drops the `token` parameter documented in PLAN.md §3/REQUIREMENTS.md FR-3 (currently harmless since the function is unused/forward-referenced, but is a drift risk for AUTH-05); and `state.json`'s AF-04 flag record was not updated to mention TC-14 the way `FLAGS.md`'s AF-04 was, creating a minor inconsistency between the two flag records for the same finding.
-
-🟢 strengths: honest partial-coverage disclosure, clean scope boundary, working dedup guard, no security regressions, all tests green.
-⚠️ warnings: one stray out-of-scope file edit, one signature drift from PLAN, one flag-record inconsistency.
+🟢 strengths: all 3 prior findings genuinely fixed, clean scope discipline, working dedup guard, honest partial-coverage disclosure, no security regressions, full green test run independently verified.
+⚠️ warnings: none blocking; two pre-existing LOW observations carried forward (see below), already deemed acceptable in the prior review and unchanged in nature.
 🛑 blockers: none.
 
 ## Findings summary
@@ -21,53 +27,31 @@ Warnings: an unrelated whitespace-only edit to `docker-compose.yml` is out of sc
 |----------|-------|----------------------------------------------------------|
 | CRITICAL |   0   | —                                                          |
 | HIGH     |   0   | —                                                          |
-| MEDIUM   |   2   | scope-creep (1), integration (1)                           |
-| LOW      |   2   | testability (1), scope-creep (1)                            |
+| MEDIUM   |   0   | —                                                          |
+| LOW      |   1   | module-structure (1, carried forward, deemed acceptable) |
 
 ## Detailed findings
 
-### MEDIUM
-
-#### F-1 — scope-creep: unrelated whitespace edit to `docker-compose.yml`
-- Category: scope-creep
-- Path: `docker-compose.yml:16`
-- Source: PLAN.md § 2 File and Module Plan (F-01..F-07 — `docker-compose.yml` is not listed); `.claude/rules/surgical-changes.md`
-- Description: The diff adds a trailing blank line with trailing whitespace after the `depends_on: - backend` block. This file is not in AUTH-04's declared file list and the change has no functional purpose (it doesn't add a service, port, or env var — Config drift dimensions C2/C3 in PLAN.md correctly report "no docker-compose.yml entry introduced by this story", which this stray edit technically contradicts).
-- Suggested fix: Revert the `docker-compose.yml` change; it is unrelated to any AUTH-04 task. If it was an accidental artifact of editor auto-save, discard it before commit.
-
-#### F-2 — integration: `handleLoginSuccess` signature drops the documented `token` parameter
-- Category: Integration points
-- Path: `frontend/src/App.jsx:89`
-- Source: PLAN.md § 3 Module Hierarchy (`handleLoginSuccess(token: string) -> void`); REQUIREMENTS.md FR-3 ("On successful login (`LoginScreen`'s `onLoginSuccess(token)` callback)...")
-- Description: The implemented `function handleLoginSuccess()` takes no parameters, whereas PLAN.md and REQUIREMENTS.md both specify `handleLoginSuccess(token)`. The PLAN's own rationale for the parameter is informational only in this story (LoginScreen already calls `setAuthToken` before invoking the callback, so AUTH-04 doesn't need the token value today), so this is not a functional bug in AUTH-04's current scope — but it is a spec/implementation drift that AUTH-05 will need to reconcile when wiring `onLoginSuccess={handleLoginSuccess}` to `LoginScreen`.
-- Suggested fix: Either update PLAN.md §3 to reflect the parameterless signature actually shipped, or add the unused `token` parameter now (`function handleLoginSuccess(token) { ... }`, ignoring `token` since `setAuthToken` is called by the caller) so the documented contract and the code match exactly, avoiding a silent signature mismatch AUTH-05 has to discover.
-
 ### LOW
 
-#### F-3 — testability: `state.json` AF-04 flag summary not updated in the round-1 fix
-- Category: Testability / documentation consistency
-- Path: `docs/features/AUTH-04/state.json` (`agent_flags[3]` / AF-04 `summary` field)
-- Source: FLAGS.md AF-04 "Correction (2026-08-18, round-1 fix ...)" note (which explicitly adds TC-14 to the disclosure)
-- Description: `FLAGS.md`'s AF-04 entry was correctly amended to name TC-14 alongside TC-02/TC-10. The mirrored `agent_flags[].summary` field in `state.json` for the same `flag_id: "AF-04"` still reads "TC-02/TC-10 can only be partially verified today" with no mention of TC-14, so a reader of `state.json` alone (without cross-referencing `FLAGS.md`) would miss that TC-14 is part of the same disclosed gap.
-- Suggested fix: Update `state.json`'s AF-04 `summary`/`rationale` text to mention TC-14 alongside TC-02/TC-10, matching `FLAGS.md`'s corrected wording, so both flag records stay in sync.
-
-#### F-4 — scope-creep (minor): `handleLoginSuccess`/`handleLogout` are currently dead code in `App.jsx`
-- Category: scope-creep / module structure
+#### F-1 — module-structure: `handleLoginSuccess`/`handleLogout` are currently dead code in `App.jsx`
+- Category: Module structure & boundaries
 - Path: `frontend/src/App.jsx:89-100`
 - Source: `.claude/rules/reusability-baseline.md` ("single responsibility... public APIs are intentional"); PLAN.md §3 explicitly labels both as "forward-reference"
-- Description: Both handlers are defined but never referenced anywhere in `App.jsx` (no `LoginScreen`/logout button exists yet to call them), so they are currently unreachable code. This is explicitly called out and justified in PLAN.md as intentional forward-references for AUTH-05/AUTH-07 to consume, so it is not a genuine violation — flagging only because unreferenced exported-from-nowhere functions can trip a future linter once one is configured (AF-02 notes no linter exists yet).
-- Suggested fix: No action required now; if/when ESLint is introduced (tracked as a pre-existing gap per AF-02), add an eslint-disable or confirm AUTH-05/AUTH-07 land soon enough that this isn't flagged as unused in CI.
+- Description: Both handlers are defined but never referenced anywhere in `App.jsx` (no `LoginScreen`/logout button exists yet to call them), so they are currently unreachable code. This is explicitly called out and justified in PLAN.md as intentional forward-references for AUTH-05/AUTH-07 to consume — carried forward unchanged from the prior review, which already deemed this acceptable. Re-flagged at LOW only because an eventual linter (currently absent, tracked as pre-existing gap AF-02) could flag these as unused.
+- Suggested fix: No action required now; revisit only if/when ESLint is introduced and flags these, or if AUTH-05/AUTH-07 land with a different signature than PLAN.md documents.
 
 ## What went well
 
-- Scope discipline: `App.jsx`'s render tree (`Sidebar`/`Header`/`Dashboard`/`Users`) is unconditionally mounted, exactly as PLAN.md requires — no premature Login-vs-protected-view gating was added.
-- The 401 dedup guard (`hadToken` checked before `clearAuthToken()`, handler invoked only if a token was present) correctly satisfies ADR-1's rationale and is verified by `TC-09`.
-- `localStorage` error handling never silently swallows in a way that hides bugs: `getStoredToken`/`clearAuthToken` fail safe (return null / no-op) as documented, and `setAuthToken` re-throws a readable `Error` rather than swallowing the original `DOMException`.
-- TC-02/TC-10/TC-14 are honestly disclosed as PARTIAL in both `FLAGS.md` and `docs/test-cases/AUTH-04.json`, with the round-1→round-2 validation trail showing the actual defect (undisclosed gap + false PLAN.md claim) was fixed, not just re-labeled.
-- The `vi.mock("react", ...)`/`vi.hoisted` useState-wrapper in `App.auth.test.jsx` is scoped to that file only (Vitest's default per-file module isolation) and does not affect `App.routing.test.jsx` or any other suite — confirmed by a full local run (49/49 tests passing across 8 files).
-- ADR-3's supersession claim is currently uncontested: `docs/features/AUTH-01/state.json` has no `impl` field and no `LoginScreen`/`setAuthToken` code exists on disk, so there is no actual conflict today.
-- No plaintext credentials are ever handled — only the opaque JWT is persisted (verified by TC-12: `localStorage.length === 1`, no `password`-matching values).
+- Scope discipline: `App.jsx`'s render tree (`Sidebar`/`Header`/`Dashboard`/`Users`) remains unconditionally mounted, exactly as PLAN.md requires — no premature Login-vs-protected-view gating was added, and no file outside the PLAN's F-01..F-07 list was touched (docker-compose.yml confirmed absent from the diff).
+- The 401 dedup guard is correctly implemented and verified by `TC-09` (a second in-flight 401 after the token is already cleared does not re-invoke the handler).
+- `localStorage` error handling never silently swallows in a way that hides bugs: `getStoredToken`/`clearAuthToken` fail safe (return null / no-op) as documented, and `setAuthToken` re-throws a readable `Error` rather than the raw `DOMException`.
+- `handleLoginSuccess`'s signature now matches PLAN.md's documented `(token: string) -> void` contract, closing the drift the prior review flagged, with a clear comment explaining why the parameter is unused today.
+- TC-02/TC-10/TC-14 remain honestly disclosed as PARTIAL in both `FLAGS.md` and `docs/test-cases/AUTH-04.json`; `state.json`'s AF-04 summary now matches `FLAGS.md` word-for-word on which TCs are affected, closing the second prior-review drift.
+- Independently re-run test suite: 49/49 passing (`userApi.auth.test.js`, `App.auth.test.jsx`, `App.auth.perf.test.jsx`, plus all pre-existing suites, including the updated `App.routing.test.jsx` mock additions for the new `userApi.js` exports).
+- No plaintext credentials are ever handled — only the opaque JWT is persisted (TC-12).
+- ADR-3's supersession claim remains uncontested: `docs/features/AUTH-01/state.json` has no `impl` field and no `LoginScreen`/`setAuthToken` code exists on disk, so there is no actual conflict today.
 
 ## Recommendation
 
-**PASS WITH WARNINGS.** No CRITICAL or HIGH findings; two MEDIUM findings (an out-of-scope `docker-compose.yml` whitespace edit, and a `handleLoginSuccess` signature drift from PLAN.md/REQUIREMENTS.md) should be addressed before merge but do not block. Revert the `docker-compose.yml` change and reconcile the `handleLoginSuccess` signature (either add the `token` param or update PLAN.md) as follow-ups; the `state.json` AF-04 summary drift (LOW) can be fixed in the same pass. Proceed to `/arh-security-review`.
+**PASS.** No CRITICAL, HIGH, or MEDIUM findings. All 3 findings from the prior review round are confirmed genuinely fixed in this commit (a2ec706f), not just re-labeled. One pre-existing LOW observation (dead-code forward-references) is carried forward unchanged and remains non-blocking, as PLAN.md explicitly documents the forward-reference intent for AUTH-05/AUTH-07. Proceed to `/arh-security-review`.
