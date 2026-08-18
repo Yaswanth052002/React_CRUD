@@ -11,10 +11,241 @@
   "design_artifact": "docs/features/AUTH-01/DESIGN.md",
   "design_provider": "none",
   "design_iteration": 0,
-  "phase": "plan-implementation",
+  "phase": "review",
+  "impl": "complete",
+  "impl_branch": "feature/AUTH-01",
+  "validation": "passed",
+  "validation_summary": "2026-08-18 P=9/9 in 2 rounds",
+  "adrs_referenced": [],
   "gate": "APPROVE",
   "plan": "complete",
   "plan_validation": "PASS",
   "plan_validation_rounds": 1,
-  "last_updated": "2026-08-17T18:10:00Z"
+  "review": "PASS WITH WARNINGS",
+  "review_report": "docs/features/AUTH-01/REVIEW.md",
+  "last_updated": "2026-08-18T15:10:00Z",
+  "impl_tasks": [
+    {
+      "task_id": "T-01",
+      "title": "Add setAuthToken export to userApi.js",
+      "status": "done",
+      "completed_at": "2026-08-18T14:20:00Z",
+      "files_touched": ["frontend/src/services/userApi.js"]
+    },
+    {
+      "task_id": "T-02",
+      "title": "Create mocked userAuthService.login(email, password)",
+      "status": "done",
+      "completed_at": "2026-08-18T14:21:00Z",
+      "files_touched": ["frontend/src/services/userAuthService.js"]
+    },
+    {
+      "task_id": "T-03",
+      "title": "Build LoginForm.jsx (fields, validation, loading UI, error region)",
+      "status": "done",
+      "completed_at": "2026-08-18T14:23:00Z",
+      "files_touched": ["frontend/src/components/LoginForm.jsx"]
+    },
+    {
+      "task_id": "T-04",
+      "title": "Build LoginScreen.jsx (container: call sequence + error/loading own)",
+      "status": "done",
+      "completed_at": "2026-08-18T14:24:00Z",
+      "files_touched": ["frontend/src/components/LoginScreen.jsx"]
+    },
+    {
+      "task_id": "T-05",
+      "title": "Unit tests: LoginForm.test.jsx (validation, a11y, responsive, security)",
+      "status": "done",
+      "completed_at": "2026-08-18T14:31:00Z",
+      "files_touched": [
+        "frontend/src/components/__tests__/LoginForm.test.jsx",
+        "frontend/package.json",
+        "frontend/vite.config.js",
+        "frontend/src/test-setup.js",
+        "docs/config/project-commands.yaml"
+      ]
+    },
+    {
+      "task_id": "T-06",
+      "title": "Integration tests: LoginScreen.test.jsx (call-sequence + generic error)",
+      "status": "done",
+      "completed_at": "2026-08-18T14:32:00Z",
+      "files_touched": ["frontend/src/components/__tests__/LoginScreen.test.jsx"]
+    }
+  ],
+  "impl_evidence": {
+    "session_ended_at": "2026-08-18T14:36:00Z",
+    "rounds": 1,
+    "checks": {
+      "typecheck": {
+        "status": "N/A",
+        "source": "project-commands.yaml typecheck:",
+        "command": null,
+        "exit_code": null,
+        "evidence_path": null,
+        "flag_id": "AF-01",
+        "ran_at": null
+      },
+      "unit_tests": {
+        "status": "PASS",
+        "source": "project-commands.yaml test:",
+        "command": "(cd frontend && npm run test) && (cd backend && pytest)",
+        "exit_code": 0,
+        "evidence_path": "docs/features/AUTH-01/evidence/unit-tests.log",
+        "evidence_path_backend": "docs/features/AUTH-01/evidence/unit-tests-backend.log",
+        "flag_id": null,
+        "ran_at": "2026-08-18T14:33:00Z",
+        "summary": "frontend: 7 test files / 43 tests passed (Vitest); backend: 16 passed (pytest)"
+      },
+      "lint": {
+        "status": "N/A",
+        "source": "project-commands.yaml lint:",
+        "command": null,
+        "exit_code": null,
+        "evidence_path": null,
+        "flag_id": "AF-02",
+        "ran_at": null
+      },
+      "runtime": {
+        "status": "PASS",
+        "source": "stack-smoke.md Run:",
+        "command": null,
+        "exit_code": null,
+        "evidence_path": null,
+        "flag_id": null,
+        "ran_at": "2026-08-18T14:35:00Z",
+        "stacks": [
+          {
+            "stack": "fastapi",
+            "status": "PASS",
+            "command": "uvicorn app.main:app --port 8124",
+            "exit_code": 0,
+            "evidence_path": "docs/features/AUTH-01/evidence/runtime-fastapi.log",
+            "boot_log_scan": "clean",
+            "health_check": "200"
+          },
+          {
+            "stack": "react",
+            "status": "PASS",
+            "command": "npm run dev -- --port 5184",
+            "exit_code": 0,
+            "evidence_path": "docs/features/AUTH-01/evidence/runtime-react.log",
+            "boot_log_scan": "clean",
+            "health_check": "200",
+            "render_check": "unavailable",
+            "flag_id": "AF-04",
+            "note": "boot-only check (200 + clean log); no browser/E2E runner configured in this repo (test_e2e: n/a) to assert client-side mount depth. LoginScreen itself is unmounted from App.jsx by design (AUTH-05 scope) so this boot check exercises the pre-existing app shell only."
+          }
+        ]
+      },
+      "compile": {
+        "status": "PASS",
+        "source": "project-commands.yaml build:",
+        "command": "cd frontend && npm run build",
+        "exit_code": 0,
+        "evidence_path": "docs/features/AUTH-01/evidence/compile.log",
+        "flag_id": null,
+        "ran_at": "2026-08-18T14:34:00Z"
+      },
+      "design_check": {
+        "status": "N/A",
+        "source": "project-commands.yaml design_check:",
+        "command": null,
+        "exit_code": null,
+        "evidence_path": null,
+        "flag_id": "AF-03",
+        "ran_at": null
+      }
+    }
+  },
+  "pending_carry_forward": [
+    {
+      "item_id": "R-01-userApi-setAuthToken-collision",
+      "kind": "risk",
+      "reason": "This story's T-01 adds an in-memory-header setAuthToken(token) to userApi.js, exactly as anticipated by AUTH-04's PLAN.md ADR-3 (which declares AUTH-04 the authoritative implementer with a localStorage-backed version). AUTH-04 is already implemented and pushed on a separate, unmerged branch (feature/AUTH-04). Whichever PR merges second (expected: AUTH-01, since AUTH-04 already exists) will hit a merge conflict on this function and must resolve by keeping AUTH-04's localStorage-backed version, discarding this story's in-memory variant — a mechanical, single-function replacement per ADR-3's own consequences section, not a design problem.",
+      "owner": "Backend lead",
+      "added_at": "2026-08-18T09:02:52Z",
+      "added_by": "arh-implement (orchestrator, post-implementation review)",
+      "resolved_at": null,
+      "evidence": null
+    }
+  ],
+  "agent_flags": [
+    {
+      "flag_id": "AF-01",
+      "kind": "other",
+      "summary": "typecheck dimension N/A — pre-existing repo-wide gap",
+      "source": "docs/config/project-commands.yaml",
+      "task_id": null,
+      "raised_at": "2026-08-18T14:36:00Z",
+      "raised_by": "implementation-agent",
+      "status": "defer",
+      "decision": "Deferred — out of scope for this story.",
+      "decided_by": "yaswanth.panthangi@apexon.com",
+      "decided_at": "2026-08-18T09:02:52Z",
+      "rationale": "Adding a type checker repo-wide is unrelated to AUTH-01's scope.",
+      "carry_forward_ref": null
+    },
+    {
+      "flag_id": "AF-02",
+      "kind": "other",
+      "summary": "lint dimension N/A — pre-existing repo-wide gap",
+      "source": "docs/config/project-commands.yaml",
+      "task_id": null,
+      "raised_at": "2026-08-18T14:36:00Z",
+      "raised_by": "implementation-agent",
+      "status": "defer",
+      "decision": "Deferred — out of scope for this story.",
+      "decided_by": "yaswanth.panthangi@apexon.com",
+      "decided_at": "2026-08-18T09:02:52Z",
+      "rationale": "Adding a linter repo-wide is unrelated to AUTH-01's scope.",
+      "carry_forward_ref": null
+    },
+    {
+      "flag_id": "AF-03",
+      "kind": "other",
+      "summary": "design_check dimension N/A — no design tooling in repo",
+      "source": "docs/config/project-commands.yaml",
+      "task_id": null,
+      "raised_at": "2026-08-18T14:36:00Z",
+      "raised_by": "implementation-agent",
+      "status": "reject",
+      "decision": "Flag rejected as noise — same rationale as prior stories' precedent.",
+      "decided_by": "yaswanth.panthangi@apexon.com",
+      "decided_at": "2026-08-18T09:02:52Z",
+      "rationale": "integrations.design=none was an explicit /arh-init decision; not a gap for this story to fix.",
+      "carry_forward_ref": null
+    },
+    {
+      "flag_id": "AF-04",
+      "kind": "other",
+      "summary": "runtime render_check unavailable — LoginScreen intentionally unmounted this story, no E2E runner in repo",
+      "source": "docs/config/stack-smoke.md",
+      "task_id": "T-04",
+      "raised_at": "2026-08-18T14:36:00Z",
+      "raised_by": "implementation-agent",
+      "status": "defer",
+      "decision": "Deferred — expected, matches this story's explicit no-App.jsx-wiring scope.",
+      "decided_by": "yaswanth.panthangi@apexon.com",
+      "decided_at": "2026-08-18T09:02:52Z",
+      "rationale": "LoginScreen is deliberately unmounted (AUTH-05 wires it in); boot-only evidence is the correct and only available evidence for this story's actual scope.",
+      "carry_forward_ref": null
+    },
+    {
+      "flag_id": "AF-05",
+      "kind": "risky-pattern",
+      "summary": "TC-05's fixed structural CSS-contract check is honest but still not a genuine rendered-viewport measurement — no browser/E2E runner exists in this repo",
+      "source": "frontend/src/components/__tests__/LoginForm.test.jsx",
+      "task_id": "T-05-fix",
+      "raised_at": "2026-08-18T14:50:00Z",
+      "raised_by": "implementation-agent",
+      "status": "defer",
+      "decision": "Deferred — pre-existing repo gap (no e2e runner); the structural check is the best available honest verification.",
+      "decided_by": "yaswanth.panthangi@apexon.com",
+      "decided_at": "2026-08-18T09:20:00Z",
+      "rationale": "Full pixel-accurate 320px reflow verification requires Playwright/Cypress, not configured in this repo (test_e2e: n/a). The structural check is independently mutation-tested and genuinely falsifiable, which is the material improvement over the round-1 tautology.",
+      "carry_forward_ref": null
+    }
+  ]
 }

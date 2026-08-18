@@ -92,3 +92,12 @@ export async function getDashboardStats() {
     throw normalizeError(err);
   }
 }
+
+/**
+ * Attaches the given auth token to the shared axios client so subsequent
+ * userApi.* calls carry it. In-memory only (no localStorage/cookie
+ * persistence) — persistence across reloads is a later story's scope.
+ */
+export function setAuthToken(token) {
+  client.defaults.headers.common.Authorization = `Bearer ${token}`;
+}
