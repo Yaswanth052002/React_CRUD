@@ -173,11 +173,20 @@
     "design": "n/a",
     "rtm_source_sha": "5a019873bdc1df059c68aa5c582baf9511ca7414",
     "gate": "APPROVE",
-    "phase": "review",
+    "phase": "security-reviewed",
     "plan": "complete",
     "plan_validation": "PASS",
-    "last_updated": "2026-08-18T13:04:47Z",
-    "review": "PASS"
+    "last_updated": "2026-08-18T14:17:00Z",
+    "review": "PASS",
+    "security": "PASS",
+    "security_findings": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0,
+      "tool_missing": []
+    },
+    "security_report": "docs/features/AUTH-06/SECURITY-20260818-1417.md"
   },
   "AUTH-07": {
     "story": "validated",
@@ -188,11 +197,12 @@
     "design": "n/a",
     "rtm_source_sha": "5a019873bdc1df059c68aa5c582baf9511ca7414",
     "gate": "APPROVE",
-    "phase": "review",
+    "phase": "security-reviewed",
     "plan": "complete",
     "plan_validation": "PASS",
     "review": "PASS",
-    "last_updated": "2026-08-18T00:00:00Z"
+    "security": "PASS",
+    "last_updated": "2026-08-18T19:20:00Z"
   },
   "AUTH-08": {
     "story": "validated",
