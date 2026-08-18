@@ -1,0 +1,31 @@
+
+> user-management-crud-frontend@1.0.0 test
+> vitest run
+
+
+ RUN  v3.2.7 /Users/yaswanth.panthangi/Downloads/react-python-crud/frontend
+
+ ✓ src/pages/__tests__/App.routing.test.jsx (3 tests) 158ms
+ ✓ src/components/__tests__/LoginForm.test.jsx (7 tests) 210ms
+ ✓ src/pages/__tests__/Dashboard.search.test.jsx (10 tests) 293ms
+ ✓ src/pages/__tests__/Users.search.test.jsx (6 tests) 299ms
+ ✓ src/__tests__/App.authGate.test.jsx (11 tests) 385ms
+ ✓ src/pages/__tests__/Users.crud.test.jsx (13 tests) 436ms
+ ✓ src/__tests__/App.auth.perf.test.jsx (1 test) 772ms
+   ✓ App.jsx mount-to-auth-state-set performance (TC-11 / NFR-performance) > TC-11: p95 mount-to-isAuthenticated-set latency is under 100ms across 100 iterations  771ms
+stdout | src/services/__tests__/userApi.auth.test.js > userApi.js auth-token surface > TC-09: dedup guard — a second 401 after the token is already null does not re-invoke the handler
+auth_session_expired
+
+stdout | src/services/__tests__/userApi.auth.test.js > userApi.js auth-token surface > TC-04: a 401 response clears the token and invokes the registered unauthorized handler
+auth_session_expired
+
+ ✓ src/services/__tests__/userApi.auth.test.js (8 tests) 5ms
+ ✓ src/services/userApi.test.js (1 test) 1ms
+ ✓ src/__tests__/App.auth.test.jsx (7 tests) 59ms
+ ✓ src/components/__tests__/LoginScreen.test.jsx (3 tests) 82ms
+
+ Test Files  11 passed (11)
+      Tests  70 passed (70)
+   Start at  15:21:26
+   Duration  2.61s (transform 372ms, setup 2.34s, collect 1.19s, tests 2.70s, environment 5.26s, prepare 907ms)
+

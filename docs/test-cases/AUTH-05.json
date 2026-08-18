@@ -11,7 +11,27 @@
       "given": "isAuthenticated is stubbed false and App.jsx renders",
       "when": "the component tree is queried",
       "then": "LoginScreen is present, and Sidebar/Header/activeView protected view are absent from the DOM (not just CSS-hidden)",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T11:20:00Z",
+        "duration_ms": 14,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 14,
+            "reason": null
+          }
+        ],
+        "failure_reason": null,
+        "artefact": "frontend/src/__tests__/App.authGate.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-05-TC-02",
@@ -23,7 +43,28 @@
       "given": "isAuthenticated is stubbed false",
       "when": "no Sidebar nav control is exposed to the user",
       "then": "there is no rendered control capable of setting activeView to dashboard, users, or settings",
-      "tags": ["edge-case", "security"]
+      "tags": [
+        "edge-case",
+        "security"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T11:20:00Z",
+        "duration_ms": 3,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 3,
+            "reason": null
+          }
+        ],
+        "failure_reason": null,
+        "artefact": "frontend/src/__tests__/App.authGate.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-05-TC-03",
@@ -35,7 +76,28 @@
       "given": "isAuthenticated is stubbed true and App.jsx renders",
       "when": "the Sidebar is queried",
       "then": "Sidebar renders exactly the three NAV_ITEMS (Dashboard, Users, Settings), each clickable and switching activeView as today",
-      "tags": ["happy-path", "regression"]
+      "tags": [
+        "happy-path",
+        "regression"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T11:20:00Z",
+        "duration_ms": 49,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 49,
+            "reason": null
+          }
+        ],
+        "failure_reason": null,
+        "artefact": "frontend/src/__tests__/App.authGate.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-05-TC-04",
@@ -47,7 +109,27 @@
       "given": "isAuthenticated is false and LoginScreen is mounted",
       "when": "onLoginSuccess(token) fires after a valid credential submit",
       "then": "isAuthenticated becomes true, activeView becomes dashboard, and Sidebar/Header/Dashboard render without a page reload",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T11:20:00Z",
+        "duration_ms": 10,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 10,
+            "reason": null
+          }
+        ],
+        "failure_reason": null,
+        "artefact": "frontend/src/__tests__/App.authGate.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-05-TC-05",
@@ -59,7 +141,28 @@
       "given": "a prior session had activeView set to users before logout",
       "when": "the user logs in again via onLoginSuccess(token)",
       "then": "activeView is dashboard, not the preserved users value",
-      "tags": ["edge-case", "regression"]
+      "tags": [
+        "edge-case",
+        "regression"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T11:20:00Z",
+        "duration_ms": 26,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 26,
+            "reason": null
+          }
+        ],
+        "failure_reason": null,
+        "artefact": "frontend/src/__tests__/App.authGate.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-05-TC-06",
@@ -71,7 +174,28 @@
       "given": "isAuthenticated is true and Users view is mounted",
       "when": "isAuthenticated flips to false (token expired/cleared)",
       "then": "Sidebar/Header/Users view unmount and LoginScreen renders, with no stale protected view left mounted",
-      "tags": ["edge-case", "security"]
+      "tags": [
+        "edge-case",
+        "security"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T11:20:00Z",
+        "duration_ms": 20,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 20,
+            "reason": null
+          }
+        ],
+        "failure_reason": null,
+        "artefact": "frontend/src/__tests__/App.authGate.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-05-TC-07",
@@ -83,7 +207,27 @@
       "given": "AUTH-04 sets sessionExpiredMessage to a non-null string on a 401/expiry event",
       "when": "App.jsx re-renders with isAuthenticated=false",
       "then": "LoginScreen receives that exact sessionExpiredMessage string as its sessionExpiredMessage prop, with no transformation or local default substituted",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T11:20:00Z",
+        "duration_ms": 8,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 8,
+            "reason": null
+          }
+        ],
+        "failure_reason": null,
+        "artefact": "frontend/src/__tests__/App.authGate.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-05-TC-08",
@@ -95,7 +239,28 @@
       "given": "App.jsx renders LoginScreen in any auth state",
       "when": "the props passed to LoginScreen are inspected",
       "then": "no authError prop is present; only onLoginSuccess and sessionExpiredMessage are passed",
-      "tags": ["negative", "contract"]
+      "tags": [
+        "negative",
+        "contract"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T11:20:00Z",
+        "duration_ms": 8,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 8,
+            "reason": null
+          }
+        ],
+        "failure_reason": null,
+        "artefact": "frontend/src/__tests__/App.authGate.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-05-TC-09",
@@ -107,7 +272,32 @@
       "given": "isAuthenticated toggles between false and true within a mounted App.jsx",
       "when": "network calls are captured for the duration of the toggle and re-render",
       "then": "no additional network request is issued by AUTH-05's own render logic beyond AUTH-04's existing auth-state check, and the branch resolves within the same paint (no added spinner state)",
-      "tags": ["performance"]
+      "tags": [
+        "performance"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T11:20:00Z",
+        "duration_ms": 12,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 12,
+            "reason": null
+          }
+        ],
+        "failure_reason": null,
+        "artefact": "frontend/src/__tests__/App.authGate.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0,
+        "budget": {
+          "target": "no additional network request beyond AUTH-04's existing auth-state check; branch resolves within same paint",
+          "measured": "0 additional userApi calls observed across false->true->false toggle (call-count comparison, not latency)",
+          "budget_pass": true
+        }
+      }
     },
     {
       "id": "AUTH-05-TC-10",
@@ -119,7 +309,28 @@
       "given": "isAuthenticated is false",
       "when": "the rendered DOM and any data-fetching calls from Dashboard/Users/Settings are inspected",
       "then": "no protected view component is present in the DOM and no data-fetching call to a protected endpoint fires",
-      "tags": ["security", "negative"]
+      "tags": [
+        "security",
+        "negative"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T11:20:00Z",
+        "duration_ms": 1,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 1,
+            "reason": null
+          }
+        ],
+        "failure_reason": null,
+        "artefact": "frontend/src/__tests__/App.authGate.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-05-TC-11",
@@ -131,19 +342,75 @@
       "given": "isAuthenticated is true and Sidebar is rendered",
       "when": "Tab is pressed repeatedly through the nav-item buttons",
       "then": "each nav-item button receives focus in order and shows a visible focus-visible outline",
-      "tags": ["happy-path", "accessibility"]
+      "tags": [
+        "happy-path",
+        "accessibility"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T11:20:00Z",
+        "duration_ms": 7,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 7,
+            "reason": null
+          }
+        ],
+        "failure_reason": null,
+        "artefact": "frontend/src/__tests__/App.authGate.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     }
   ],
   "coverage_audit": {
     "functional_requirements": [
-      {"id": "AUTH-05-FR-1", "covered_by": ["AUTH-05-TC-01", "AUTH-05-TC-02", "AUTH-05-TC-03", "AUTH-05-TC-06"]},
-      {"id": "AUTH-05-FR-2", "covered_by": ["AUTH-05-TC-04", "AUTH-05-TC-05"]},
-      {"id": "AUTH-05-FR-3", "covered_by": ["AUTH-05-TC-07", "AUTH-05-TC-08"]}
+      {
+        "id": "AUTH-05-FR-1",
+        "covered_by": [
+          "AUTH-05-TC-01",
+          "AUTH-05-TC-02",
+          "AUTH-05-TC-03",
+          "AUTH-05-TC-06"
+        ]
+      },
+      {
+        "id": "AUTH-05-FR-2",
+        "covered_by": [
+          "AUTH-05-TC-04",
+          "AUTH-05-TC-05"
+        ]
+      },
+      {
+        "id": "AUTH-05-FR-3",
+        "covered_by": [
+          "AUTH-05-TC-07",
+          "AUTH-05-TC-08"
+        ]
+      }
     ],
     "non_functional_requirements": [
-      {"id": "AUTH-05-NFR-performance", "covered_by": ["AUTH-05-TC-09"]},
-      {"id": "AUTH-05-NFR-security", "covered_by": ["AUTH-05-TC-10"]},
-      {"id": "AUTH-05-NFR-accessibility", "covered_by": ["AUTH-05-TC-11"]}
+      {
+        "id": "AUTH-05-NFR-performance",
+        "covered_by": [
+          "AUTH-05-TC-09"
+        ]
+      },
+      {
+        "id": "AUTH-05-NFR-security",
+        "covered_by": [
+          "AUTH-05-TC-10"
+        ]
+      },
+      {
+        "id": "AUTH-05-NFR-accessibility",
+        "covered_by": [
+          "AUTH-05-TC-11"
+        ]
+      }
     ],
     "uncovered": []
   }

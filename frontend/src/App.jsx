@@ -4,6 +4,7 @@ import Sidebar from "./components/Sidebar.jsx";
 import Header from "./components/Header.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Users from "./pages/Users.jsx";
+import LoginScreen from "./components/LoginScreen.jsx";
 import * as userApi from "./services/userApi.js";
 
 const SESSION_EXPIRED_MESSAGE = "Your session has expired. Please log in again.";
@@ -83,14 +84,16 @@ export default function App() {
     });
   }, []);
 
-  // Forward-reference: consumed by AUTH-05 when it wires LoginScreen into
-  // the render tree; LoginScreen itself calls userApi.setAuthToken before
-  // invoking this. Signature matches the locked onLoginSuccess={(token) =>
-  // void} contract (docs/features/AUTH-01/REQUIREMENTS.md); token is unused
-  // here since setAuthToken already persisted it, kept for contract parity.
+  // LoginScreen itself calls userApi.setAuthToken before invoking this.
+  // Signature matches the locked onLoginSuccess={(token) => void} contract
+  // (docs/features/AUTH-01/REQUIREMENTS.md); token is unused here since
+  // setAuthToken already persisted it, kept for contract parity. Also resets
+  // activeView to "dashboard" unconditionally (AUTH-05-FR-2 / condition C-5)
+  // so a stale view from a prior session never survives a fresh login.
   function handleLoginSuccess(_token) {
     setIsAuthenticated(true);
     setSessionExpiredMessage(null);
+    setActiveView("dashboard");
   }
 
   // Forward-reference: exists so AUTH-07's logout action has a ready-made
@@ -99,6 +102,20 @@ export default function App() {
     userApi.clearAuthToken();
     setIsAuthenticated(false);
     setSessionExpiredMessage(null);
+  }
+
+  // Locked contracts (AUTH-05-FR-1..3): `isAuthenticated` is always a plain
+  // boolean (never null/loading — AUTH-04's contract, condition C-1), and
+  // `LoginScreen` receives exactly `onLoginSuccess`/`sessionExpiredMessage` —
+  // no `authError` prop, no local transformation of `sessionExpiredMessage`
+  // (AUTH-01's contract, condition C-2/C-4). Do not reintroduce either.
+  if (!isAuthenticated) {
+    return (
+      <LoginScreen
+        onLoginSuccess={handleLoginSuccess}
+        sessionExpiredMessage={sessionExpiredMessage}
+      />
+    );
   }
 
   return (

@@ -4,6 +4,25 @@ import { createRoot } from "react-dom/client";
 import App from "../../App.jsx";
 import * as userApi from "../../services/userApi.js";
 
+// AUTH-05 C-3 audit fix: App.jsx's isAuthenticated initializer now calls
+// userApi.getStoredToken() and decodes the result via jwt-decode. Provide a
+// real base64url header.payload.signature triple with a far-future exp claim
+// so these pre-existing USR-01 nav/loading/a11y assertions keep exercising
+// the authenticated Sidebar/Header/activeView tree under the new auth gate.
+const { MOCK_TOKEN } = vi.hoisted(() => {
+  function base64url(obj) {
+    return btoa(JSON.stringify(obj))
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
+  }
+  return {
+    MOCK_TOKEN: `${base64url({ alg: "none" })}.${base64url({
+      exp: Math.floor(Date.now() / 1000) + 3600,
+    })}.signature`,
+  };
+});
+
 // Mock at the service boundary (per react-patterns: components/pages never call
 // Axios directly — mock ../services/userApi.js, not axios). Substitutes for the
 // `type: e2e` TCs declared in USR-01's test-case JSON — no e2e runner exists in
@@ -17,7 +36,7 @@ vi.mock("../../services/userApi.js", () => ({
   updateUser: vi.fn(),
   deleteUser: vi.fn(),
   getDashboardStats: vi.fn(),
-  getStoredToken: vi.fn(),
+  getStoredToken: vi.fn(() => MOCK_TOKEN),
   setAuthToken: vi.fn(),
   clearAuthToken: vi.fn(),
   registerUnauthorizedHandler: vi.fn(),

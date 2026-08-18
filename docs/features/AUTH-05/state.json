@@ -11,10 +11,34 @@
   "design_artifact": "docs/features/AUTH-05/DESIGN.md",
   "design_provider": "none",
   "design_iteration": 0,
-  "phase": "plan-implementation",
   "gate": "APPROVE",
   "plan": "complete",
   "plan_validation": "PASS",
   "plan_validation_rounds": 1,
-  "last_updated": "2026-08-17T23:10:00Z"
+  "impl": "complete",
+  "impl_branch": "feature/AUTH",
+  "impl_tasks": [
+    {"task_id": "T-01", "status": "done", "completed_at": "2026-08-18T15:00:00Z", "files_touched": ["frontend/src/App.jsx"]},
+    {"task_id": "T-02", "status": "done", "completed_at": "2026-08-18T15:05:00Z", "files_touched": ["frontend/src/pages/__tests__/App.routing.test.jsx"]},
+    {"task_id": "T-03", "status": "done", "completed_at": "2026-08-18T15:15:00Z", "files_touched": ["frontend/src/__tests__/App.authGate.test.jsx"]}
+  ],
+  "impl_evidence": {
+    "session_ended_at": "2026-08-18T15:25:00Z",
+    "rounds": 1,
+    "checks": {
+      "typecheck": {"status": "N/A", "source": "project-commands.yaml typecheck:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": "AF-01", "ran_at": null},
+      "unit_tests": {"status": "PASS", "source": "project-commands.yaml test_unit:/test:", "command": "(cd frontend && npm run test) && (cd backend && pytest)", "exit_code": 0, "evidence_path": "docs/features/AUTH-05/evidence/unit-tests-frontend.log", "flag_id": null, "ran_at": "2026-08-18T15:20:00Z", "extra_evidence_path": "docs/features/AUTH-05/evidence/unit-tests-backend.log"},
+      "lint": {"status": "N/A", "source": "project-commands.yaml lint:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": "AF-02", "ran_at": null},
+      "runtime": {"status": "PASS", "source": "stack-smoke.md Run:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": null, "ran_at": "2026-08-18T15:22:00Z", "stacks": [
+        {"stack": "fastapi", "status": "PASS", "command": "uvicorn app.main:app --port 8001", "exit_code": 0, "evidence_path": "docs/features/AUTH-05/evidence/runtime-fastapi.log", "boot_log_scan": "clean"},
+        {"stack": "react", "status": "PASS", "command": "npm run dev -- --port 5174", "exit_code": 0, "evidence_path": "docs/features/AUTH-05/evidence/runtime-react.log", "boot_log_scan": "clean"}
+      ]},
+      "compile": {"status": "PASS", "source": "project-commands.yaml build:", "command": "cd frontend && npm run build", "exit_code": 0, "evidence_path": "docs/features/AUTH-05/evidence/compile.log", "flag_id": null, "ran_at": "2026-08-18T15:23:00Z"},
+      "design_check": {"status": "N/A", "source": "project-commands.yaml design_check:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": "AF-03", "ran_at": null}
+    }
+  },
+  "review": "PASS",
+  "review_report": "docs/features/AUTH-05/REVIEW.md",
+  "phase": "review",
+  "last_updated": "2026-08-18T00:00:00Z"
 }

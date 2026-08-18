@@ -147,10 +147,12 @@
     "design": "n/a",
     "rtm_source_sha": "5a019873bdc1df059c68aa5c582baf9511ca7414",
     "gate": "APPROVE",
-    "phase": "plan-implementation",
+    "phase": "review",
     "plan": "complete",
     "plan_validation": "PASS",
-    "last_updated": "2026-08-17T23:10:00Z"
+    "review": "PASS",
+    "review_report": "docs/features/AUTH-05/REVIEW.md",
+    "last_updated": "2026-08-18T00:00:00Z"
   },
   "AUTH-06": {
     "story": "validated",

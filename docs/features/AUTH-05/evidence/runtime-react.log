@@ -1,0 +1,10 @@
+
+> user-management-crud-frontend@1.0.0 dev
+> vite --port 5174
+
+3:22:35 PM [vite] (client) Re-optimizing dependencies because lockfile has changed
+
+  VITE v7.3.6  ready in 181 ms
+
+  ➜  Local:   http://localhost:5174/
+  ➜  Network: use --host to expose
