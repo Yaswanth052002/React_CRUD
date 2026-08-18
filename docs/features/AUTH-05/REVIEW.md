@@ -125,3 +125,106 @@ None.
 
 PASS. No CRITICAL/HIGH/MEDIUM/LOW findings, no ADR violations, no scope-creep. Proceed to
 `/arh-security-review`.
+
+---
+
+# Addendum — Post-security-fix diff (2026-08-18, uncommitted working tree @ e28cf953/HEAD 20c29a58)
+
+- Date: 2026-08-18T18:00:00Z
+- Mode: current (uncommitted working-tree diff against `git diff HEAD` / branch feature/AUTH)
+- Trigger: `docs/features/AUTH-05/SECURITY-20260818.md` F-001 (Critical) — `LoginScreen.jsx`
+  still called the AUTH-01 mock `userAuthService.js` instead of AUTH-02's real
+  `POST /api/auth/login`. User elected to fix immediately rather than defer.
+- Files reviewed: 5 source/test files + 3 state/docs bookkeeping files
+- Verdict: **PASS**
+
+## Executive summary
+
+This is a fix-loop round on top of an already-reviewed/validated AUTH-05 implementation. The
+diff adds `login(email, password)` to `frontend/src/services/userApi.js`, repoints
+`LoginScreen.jsx`'s import to it, deletes the mock `userAuthService.js`, and updates the two
+test files that mocked the deleted module. It is a minimal, surgical fix precisely scoped to
+the Critical security finding. No other application code, layering, or contract is touched.
+
+🟢 `login()` matches the file's established try/catch/`normalizeError` pattern exactly.
+🟢 `LoginScreen.jsx` diff is a one-line import change; `handleSubmit` untouched.
+🟢 No orphaned `userAuthService` references anywhere in `frontend/src` (grep-verified).
+⚠️ None blocking.
+🛑 None.
+
+## Findings summary
+
+| Severity | Count | Category distribution |
+|----------|-------|------------------------|
+| CRITICAL |   0   | — |
+| HIGH     |   0   | — |
+| MEDIUM   |   0   | — |
+| LOW      |   0   | — |
+
+## Focus-area verification
+
+1. **`userApi.js` pattern consistency** — `login()` (lines 165-172) is placed among the other
+   exported functions and follows the identical shape used by `getUsers`/`getUser`/
+   `createUser`/`updateUser`/`deleteUser`: `try { const res = await client.<verb>(...); return
+   res.data; } catch (err) { throw normalizeError(err); }`. No special-casing (no bespoke error
+   handling, no bypass of `normalizeError`, no direct axios usage outside `client`). **Confirmed
+   consistent — no `design-patterns` finding.**
+
+2. **`LoginScreen.jsx` import-only change** — diff is exactly:
+   ```diff
+   -import { login } from "../services/userAuthService";
+   -import { setAuthToken } from "../services/userApi";
+   +import { login, setAuthToken } from "../services/userApi";
+   ```
+   `handleSubmit`, the `authError`/`isSubmitting` state, and the prop contract passed to
+   `LoginForm` (`onSubmit`, `isSubmitting`, `serverError={authError}`) are byte-for-byte
+   unchanged. No `authError` prop leakage reintroduced (the generic `GENERIC_AUTH_ERROR` message
+   is still the only string surfaced to `LoginForm`, per `security-baseline` no-leak requirement
+   and the story's existing TC-04/TC-07 contracts). **Confirmed — surgical, in line with
+   `.claude/rules/surgical-changes.md`.**
+
+3. **No orphaned `userAuthService` references** — `grep -rn "userAuthService"
+   frontend/src` returns no matches after the deletion. **Confirmed clean.**
+
+4. **Scope-creep check** — diff (`git diff HEAD --stat`) touches exactly:
+   `frontend/src/services/userApi.js` (+9), `frontend/src/components/LoginScreen.jsx` (import
+   line), `frontend/src/services/userAuthService.js` (deleted, -21),
+   `frontend/src/components/__tests__/LoginForm.test.jsx` (mock target renamed),
+   `frontend/src/components/__tests__/LoginScreen.test.jsx` (mock target renamed) — exactly the
+   five files the fix was scoped to. The remaining changed files
+   (`docs/features/AUTH-01/state.json` carry-forward-item resolution,
+   `docs/test-cases/AUTH-05.json` re-run timestamps from the independent re-validation,
+   `docs/activity/2026-08.jsonl` harness activity log) are state/evidence bookkeeping mandated
+   by the SDLC state-write contract, not production or test code, and do not alter application
+   behavior. **No scope-creep finding.**
+
+5. **Security-baseline check (`.claude/rules/security-baseline.md`)** — grepped the new `login`
+   function and its call site for logging of `email`/`password`/`token`: no `console.log`,
+   `print`, or `log.*` call appears in `login()` or in the deleted `userAuthService.js`'s
+   replacement path. The response-interceptor's existing `console.log("auth_session_expired")`
+   (pre-existing, AUTH-04, unrelated to this diff) logs only an opaque event string, no PII. The
+   credential values (`email`, `password`) flow directly into `client.post(...)` as the request
+   body and are never captured into a local var that's logged. **No PII-in-logs finding.**
+
+## Rule/pattern cross-check
+
+- `react-patterns` — `services/` remains the sole HTTP-call layer; `login` is exported the same
+  way as every sibling function; `components/` still doesn't import axios directly.
+- `security-baseline` — no credential logging introduced; error surfaced to the user remains the
+  generic, non-leaking `GENERIC_AUTH_ERROR` string (unchanged from before this fix).
+- `surgical-changes` — every changed line traces to the F-001 fix; no adjacent reformatting or
+  refactor bundled in.
+
+## What went well
+
+- The fix closes the Critical finding with the smallest possible diff — no new abstractions, no
+  incidental refactor of `userApi.js`'s existing functions.
+- Independent re-validation (`docs/features/AUTH-05/VALIDATION-20260818-1730.md`, 11/11 PASS,
+  including a live curl check of `POST /api/auth/login` returning a generic 401) was already
+  performed before this review, so the review's own findings and the runtime evidence agree.
+
+## Recommendation
+
+PASS. No CRITICAL/HIGH/MEDIUM/LOW findings, no ADR violations, no scope-creep. The Critical
+security finding F-001 is resolved. Proceed to `/arh-security-review` to close out the
+re-review of this specific fix (confirm F-001 marked resolved and no new findings introduced).

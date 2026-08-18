@@ -162,6 +162,15 @@ export async function deleteUser(id) {
   }
 }
 
+export async function login(email, password) {
+  try {
+    const res = await client.post("/api/auth/login", { email, password });
+    return res.data;
+  } catch (err) {
+    throw normalizeError(err);
+  }
+}
+
 export async function getDashboardStats() {
   try {
     const res = await client.get("/api/dashboard/stats");

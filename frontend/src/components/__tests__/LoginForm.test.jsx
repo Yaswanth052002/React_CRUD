@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import LoginForm from "../LoginForm";
 import LoginScreen from "../LoginScreen";
-import * as userAuthService from "../../services/userAuthService";
+import * as userApi from "../../services/userApi";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -89,7 +89,7 @@ describe("LoginForm", () => {
 });
 
 // AUTH-01-TC-04, TC-07, TC-09: full submit-cycle behaviour via LoginScreen with a mocked
-// userAuthService, exercising the loading/error states LoginForm renders.
+// userApi.login, exercising the loading/error states LoginForm renders.
 describe("LoginForm submit cycle (via LoginScreen)", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
@@ -106,7 +106,7 @@ describe("LoginForm submit cycle (via LoginScreen)", () => {
   }
 
   it("TC-04: rejected auth call shows exactly the generic non-leaking error message", async () => {
-    vi.spyOn(userAuthService, "login").mockRejectedValue(new Error("nope"));
+    vi.spyOn(userApi, "login").mockRejectedValue(new Error("nope"));
     render(<LoginScreen onLoginSuccess={vi.fn()} />);
 
     fillAndSubmit();
@@ -119,7 +119,7 @@ describe("LoginForm submit cycle (via LoginScreen)", () => {
   it("TC-07: password value never appears in the DOM or console after a rejected submit", async () => {
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-    vi.spyOn(userAuthService, "login").mockRejectedValue(new Error("nope"));
+    vi.spyOn(userApi, "login").mockRejectedValue(new Error("nope"));
     render(<LoginScreen onLoginSuccess={vi.fn()} />);
 
     fillAndSubmit();
@@ -132,7 +132,7 @@ describe("LoginForm submit cycle (via LoginScreen)", () => {
 
   it("TC-09: disabled state and spinner appear synchronously on click, before the auth call resolves", async () => {
     let resolveLogin;
-    vi.spyOn(userAuthService, "login").mockReturnValue(
+    vi.spyOn(userApi, "login").mockReturnValue(
       new Promise((resolve) => {
         resolveLogin = resolve;
       })

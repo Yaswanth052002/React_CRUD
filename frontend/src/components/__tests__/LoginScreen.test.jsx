@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import LoginScreen from "../LoginScreen";
-import * as userAuthService from "../../services/userAuthService";
 import * as userApi from "../../services/userApi";
 
 function fillAndSubmit(email = "user@example.com", password = "correct-password") {
@@ -15,8 +14,8 @@ describe("LoginScreen", () => {
     vi.restoreAllMocks();
   });
 
-  it("TC-02: on success calls userAuthService.login, then userApi.setAuthToken, then onLoginSuccess, in order", async () => {
-    vi.spyOn(userAuthService, "login").mockResolvedValue({ token: "abc123" });
+  it("TC-02: on success calls userApi.login, then userApi.setAuthToken, then onLoginSuccess, in order", async () => {
+    const loginSpy = vi.spyOn(userApi, "login").mockResolvedValue({ token: "abc123" });
     const setAuthTokenSpy = vi.spyOn(userApi, "setAuthToken").mockImplementation(() => {});
     const onLoginSuccess = vi.fn();
 
@@ -25,10 +24,10 @@ describe("LoginScreen", () => {
 
     await waitFor(() => expect(onLoginSuccess).toHaveBeenCalledWith("abc123"));
 
-    expect(userAuthService.login).toHaveBeenCalledWith("user@example.com", "correct-password");
+    expect(loginSpy).toHaveBeenCalledWith("user@example.com", "correct-password");
     expect(setAuthTokenSpy).toHaveBeenCalledWith("abc123");
 
-    const loginOrder = userAuthService.login.mock.invocationCallOrder[0];
+    const loginOrder = loginSpy.mock.invocationCallOrder[0];
     const setTokenOrder = setAuthTokenSpy.mock.invocationCallOrder[0];
     const successOrder = onLoginSuccess.mock.invocationCallOrder[0];
     expect(loginOrder).toBeLessThan(setTokenOrder);
@@ -36,7 +35,7 @@ describe("LoginScreen", () => {
   });
 
   it("TC-03: on rejection, the button re-enables immediately with no setAuthToken/onLoginSuccess call", async () => {
-    vi.spyOn(userAuthService, "login").mockRejectedValue(new Error("nope"));
+    vi.spyOn(userApi, "login").mockRejectedValue(new Error("nope"));
     const setAuthTokenSpy = vi.spyOn(userApi, "setAuthToken").mockImplementation(() => {});
     const onLoginSuccess = vi.fn();
 

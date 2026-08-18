@@ -177,8 +177,8 @@
       "owner": "Backend lead",
       "added_at": "2026-08-18T15:20:00Z",
       "added_by": "security-review-agent (AUTH-01 security review, F-004)",
-      "resolved_at": null,
-      "evidence": "docs/features/AUTH-01/SECURITY-20260818.md#f-004; escalated to Critical and reconfirmed still-open by docs/features/AUTH-05/SECURITY-20260818.md#f-001 (AUTH-05 mounted LoginScreen into App.jsx per this item's trigger condition; userAuthService.login() is still the mock, AUTH-02's real /api/auth/login is never called)"
+      "resolved_at": "2026-08-18T17:20:00Z",
+      "evidence": "docs/features/AUTH-01/SECURITY-20260818.md#f-004; escalated to Critical by docs/features/AUTH-05/SECURITY-20260818.md#f-001; resolved on feature/AUTH by adding login(email, password) to frontend/src/services/userApi.js (POST /api/auth/login), repointing LoginScreen.jsx to call it instead of the mock, and deleting frontend/src/services/userAuthService.js entirely along with its test references. Verified via curl against the real backend (401 + generic \"Invalid email or password.\" for bad credentials) and full frontend/backend test suites (70/70, 47/47) passing post-change."
     },
     {
       "item_id": "R-01-userApi-setAuthToken-collision",

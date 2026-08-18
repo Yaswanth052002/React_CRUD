@@ -1,7 +1,6 @@
 import { useState } from "react";
 import LoginForm from "./LoginForm";
-import { login } from "../services/userAuthService";
-import { setAuthToken } from "../services/userApi";
+import { login, setAuthToken } from "../services/userApi";
 
 const GENERIC_AUTH_ERROR = "Invalid email or password. Please try again.";
 
