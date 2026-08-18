@@ -45,6 +45,7 @@
     {"task_id": "T-10", "status": "done", "completed_at": "2026-08-18T06:05:00Z", "files_touched": ["docs/config/project-commands.yaml"]}
   ],
   "impl_carry_forward_fixes": [
+    "backend/app/services/user_service.py: create_user() now clears must_reset_password=False alongside password_hash — the ORM default (True) was never cleared for freshly-created users, so AuthService._verify_credentials rejected every create->login attempt (REGRESSION-01, found during full-epic regression sweep of AUTH-03; one-line fix, regression test AUTH-03-TC-13 in backend/tests/test_users.py; review addendum in docs/features/AUTH-03/REVIEW.md, 2026-08-18T21:52:00Z).",
     "backend/requirements.txt: pinned bcrypt==4.0.1 alongside passlib[bcrypt]==1.7.4 — passlib 1.7.4's bcrypt backend probes a bcrypt.__about__ attribute removed in bcrypt>=4.1, causing every hash/verify call to fail without this pin (root-cause-first fix; see FLAGS.md AF-01).",
     "backend/tests/test_provisioning.py: T-01/T-02's create-user API now always sets password_hash, so the AC4 'credential-less row' test fixtures were updated to null password_hash directly via the ORM after creation (simulating a pre-existing/imported row), since that state can no longer be produced via the API (condition C-2).",
     "backend/tests/perf/test_login_perf.py: added required password field to its fixture payload and switched its direct password_hash seeding call from the private _hash_password alias to the new public hash_password method (condition C-2)."
@@ -152,5 +153,5 @@
       "carry_forward_ref": null
     }
   ],
-  "last_updated": "2026-08-18T06:32:00Z"
+  "last_updated": "2026-08-18T21:52:00Z"
 }

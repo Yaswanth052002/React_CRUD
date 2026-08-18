@@ -15,7 +15,7 @@
         "happy-path"
       ],
       "last_run": {
-        "started_at": "2026-08-18T06:15:00Z",
+        "started_at": "2026-08-18T15:15:00Z",
         "duration_ms": 240,
         "status": "PASS",
         "verdict": "PASS",
@@ -62,7 +62,7 @@
         "happy-path"
       ],
       "last_run": {
-        "started_at": "2026-08-18T06:15:00Z",
+        "started_at": "2026-08-18T15:15:00Z",
         "duration_ms": 760,
         "status": "PASS",
         "verdict": "PASS",
@@ -94,7 +94,7 @@
         "negative"
       ],
       "last_run": {
-        "started_at": "2026-08-18T06:15:00Z",
+        "started_at": "2026-08-18T15:15:00Z",
         "duration_ms": 750,
         "status": "PASS",
         "verdict": "PASS",
@@ -126,7 +126,7 @@
         "negative"
       ],
       "last_run": {
-        "started_at": "2026-08-18T06:15:00Z",
+        "started_at": "2026-08-18T15:15:00Z",
         "duration_ms": 500,
         "status": "PASS",
         "verdict": "PASS",
@@ -158,7 +158,7 @@
         "happy-path"
       ],
       "last_run": {
-        "started_at": "2026-08-18T06:15:00Z",
+        "started_at": "2026-08-18T15:15:00Z",
         "duration_ms": 250,
         "status": "PASS",
         "verdict": "PASS",
@@ -190,7 +190,7 @@
         "happy-path"
       ],
       "last_run": {
-        "started_at": "2026-08-18T06:15:00Z",
+        "started_at": "2026-08-18T15:15:00Z",
         "duration_ms": 240,
         "status": "PASS",
         "verdict": "PASS",
@@ -222,7 +222,7 @@
         "happy-path"
       ],
       "last_run": {
-        "started_at": "2026-08-18T06:15:00Z",
+        "started_at": "2026-08-18T15:15:00Z",
         "duration_ms": 250,
         "status": "PASS",
         "verdict": "PASS",
@@ -254,7 +254,7 @@
         "negative"
       ],
       "last_run": {
-        "started_at": "2026-08-18T06:15:00Z",
+        "started_at": "2026-08-18T15:15:00Z",
         "duration_ms": 10,
         "status": "PASS",
         "verdict": "PASS",
@@ -287,7 +287,7 @@
         "negative"
       ],
       "last_run": {
-        "started_at": "2026-08-18T06:15:00Z",
+        "started_at": "2026-08-18T15:15:00Z",
         "duration_ms": 10,
         "status": "PASS",
         "verdict": "PASS",
@@ -319,7 +319,7 @@
         "happy-path"
       ],
       "last_run": {
-        "started_at": "2026-08-18T06:15:00Z",
+        "started_at": "2026-08-18T15:15:00Z",
         "duration_ms": 24180,
         "status": "PASS",
         "verdict": "PASS",
@@ -357,7 +357,7 @@
         "regression-compat"
       ],
       "last_run": {
-        "started_at": "2026-08-18T06:15:00Z",
+        "started_at": "2026-08-18T15:15:00Z",
         "duration_ms": 250,
         "status": "PASS",
         "verdict": "PASS",
@@ -374,6 +374,39 @@
         "runner": "pytest",
         "rerun_count": 0
       }
+    },
+    {
+      "id": "AUTH-03-TC-13",
+      "title": "Newly created user can log in immediately with the password supplied at creation",
+      "type": "integration",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-03-FR-1",
+      "given": "a full valid create-user payload including a plaintext password submitted via the real POST /api/users endpoint",
+      "when": "POST /api/auth/login is subsequently called with the same email and the exact same plaintext password",
+      "then": "the login succeeds with 200 and a token, because create_user clears must_reset_password when a password is supplied (regression: the ORM default of True previously left every freshly-created user permanently unable to log in)",
+      "tags": [
+        "regression-REGRESSION-01",
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T21:30:00Z",
+        "duration_ms": 550,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 550,
+            "reason": null
+          }
+        ],
+        "failure_reason": null,
+        "artefact": "backend/tests/test_users.py::test_newly_created_user_can_log_in_with_creation_password",
+        "runner": "pytest",
+        "rerun_count": 0
+      }
     }
   ],
   "coverage_audit": {
@@ -382,7 +415,8 @@
         "id": "AUTH-03-FR-1",
         "covered_by": [
           "AUTH-03-TC-01",
-          "AUTH-03-TC-02"
+          "AUTH-03-TC-02",
+          "AUTH-03-TC-13"
         ]
       },
       {

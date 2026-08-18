@@ -13,18 +13,19 @@
       "then": "a form with an email input (type=email), a password input (type=password), and a 'Log in' button styled with form-group/form-label/form-input/btn btn-primary classes is visible",
       "tags": ["happy-path"],
       "last_run": {
-        "started_at": "2026-08-18T09:00:00Z",
-        "duration_ms": 137,
+        "started_at": "2026-08-18T20:19:44Z",
+        "duration_ms": 133,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
-          {"n": 1, "status": "PASS", "duration_ms": 137, "reason": null}
+          {"n": 1, "status": "PASS", "duration_ms": 133, "reason": null}
         ],
         "budget": null,
         "failure_reason": null,
         "artefact": null,
         "runner": "vitest",
-        "rerun_count": 0
+        "rerun_count": 0,
+        "regression_round": "post-merge full-epic regression (AUTH-01..AUTH-08 merged, HEAD 6ab0e53e)"
       }
     },
     {
@@ -39,18 +40,20 @@
       "then": "the submit button is disabled and shows the .spinner element immediately, then re-enables on resolution, userApi.setAuthToken is called with the token, and props.onLoginSuccess is called with that token afterward",
       "tags": ["happy-path"],
       "last_run": {
-        "started_at": "2026-08-18T09:00:00Z",
-        "duration_ms": 102,
+        "started_at": "2026-08-18T20:19:44Z",
+        "duration_ms": 85,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
-          {"n": 1, "status": "PASS", "duration_ms": 102, "reason": null}
+          {"n": 1, "status": "PASS", "duration_ms": 85, "reason": null}
         ],
         "budget": null,
         "failure_reason": null,
         "artefact": null,
         "runner": "vitest",
-        "rerun_count": 0
+        "rerun_count": 0,
+        "regression_round": "post-merge full-epic regression (AUTH-01..AUTH-08 merged, HEAD 6ab0e53e)",
+        "stale_narrative_note": "TC wording says 'a mocked userAuthService.login resolves' — userAuthService.js was deleted by AUTH-05's security-review fix (mock login replaced with a real backend call via userApi.login, wired against the live FastAPI /api/auth/login endpoint per stack-smoke confirmation this run). The test file (LoginScreen.test.jsx) already spies on userApi.login/userApi.setAuthToken directly and the same call-order assertion (login -> setAuthToken -> onLoginSuccess) still holds against current merged behavior. Functionally PASS; TC narrative text is stale and should be reworded in a future TC-authoring pass to say 'userApi.login' instead of 'userAuthService.login'."
       }
     },
     {
@@ -65,18 +68,20 @@
       "then": "the submit button re-enables the instant the rejection is caught, with no artificial delay",
       "tags": ["edge-case"],
       "last_run": {
-        "started_at": "2026-08-18T09:00:00Z",
-        "duration_ms": 102,
+        "started_at": "2026-08-18T20:19:44Z",
+        "duration_ms": 85,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
-          {"n": 1, "status": "PASS", "duration_ms": 102, "reason": null}
+          {"n": 1, "status": "PASS", "duration_ms": 85, "reason": null}
         ],
         "budget": null,
         "failure_reason": null,
         "artefact": null,
         "runner": "vitest",
-        "rerun_count": 0
+        "rerun_count": 0,
+        "regression_round": "post-merge full-epic regression (AUTH-01..AUTH-08 merged, HEAD 6ab0e53e)",
+        "stale_narrative_note": "Same userAuthService->userApi.login supersession as TC-02; assertion (immediate re-enable on rejection) still holds — test spies on userApi.login directly."
       }
     },
     {
@@ -91,18 +96,20 @@
       "then": "the screen displays exactly 'Invalid email or password. Please try again.' in a .form-server-error element, with no distinction between invalid-email and invalid-password causes and no raw exception/stack trace rendered",
       "tags": ["negative"],
       "last_run": {
-        "started_at": "2026-08-18T09:00:00Z",
-        "duration_ms": 137,
+        "started_at": "2026-08-18T20:19:44Z",
+        "duration_ms": 88,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
-          {"n": 1, "status": "PASS", "duration_ms": 137, "reason": null}
+          {"n": 1, "status": "PASS", "duration_ms": 88, "reason": null}
         ],
         "budget": null,
         "failure_reason": null,
         "artefact": null,
         "runner": "vitest",
-        "rerun_count": 0
+        "rerun_count": 0,
+        "regression_round": "post-merge full-epic regression (AUTH-01..AUTH-08 merged, HEAD 6ab0e53e)",
+        "stale_narrative_note": "TC wording says 'mocked userAuthService.login rejects' — mock deleted (AUTH-05). LoginScreen.jsx's catch-block still hard-codes the same single generic 'Invalid email or password. Please try again.' string regardless of the underlying error, so the AC holds against the real backend call too (confirmed live: POST /api/auth/login with a bad password returns 401 {\"detail\":\"Invalid email or password.\"} from the real FastAPI server during this run's stack smoke, and LoginScreen still renders its own hardcoded generic string, not the raw backend detail)."
       }
     },
     {
@@ -131,7 +138,8 @@
         "artefact": null,
         "runner": "vitest",
         "rerun_count": 2,
-        "revalidation_note": "Round-2 re-validation (post round-1 fix). Test at frontend/src/components/__tests__/LoginForm.test.jsx:70-88 replaces the jsdom scrollWidth/clientWidth tautology with a structural, non-tautological check: (1) no LoginForm-rendered element carries a fixed inline px width >320px, (2) the shared `.form-input`/`.form-select` CSS rule in frontend/src/styles/index.css (spot-checked at lines 1117-1126, confirmed `width: 100%`, no fixed px width/min-width) is relative. Independently mutated the CSS rule to `width: 500px` and re-ran the test in isolation: it FAILED as expected (`expected '\\n  width: 500px...' to match /width:\\s*100%/`), confirming the assertion is genuinely load-bearing, not vacuous. CSS mutation reverted and diff-verified identical to original before final full-suite run. Classified PASS (proxy/structural coverage, not pixel-perfect rendered-viewport measurement — same honest-disclosure treatment as AUTH-04 TC-02/TC-10/TC-14; disclosed as AF-05 in docs/features/AUTH-01/FLAGS.md)."
+        "revalidation_note": "Round-2 re-validation (post round-1 fix). Test at frontend/src/components/__tests__/LoginForm.test.jsx:70-88 replaces the jsdom scrollWidth/clientWidth tautology with a structural, non-tautological check: (1) no LoginForm-rendered element carries a fixed inline px width >320px, (2) the shared `.form-input`/`.form-select` CSS rule in frontend/src/styles/index.css (spot-checked at lines 1117-1126, confirmed `width: 100%`, no fixed px width/min-width) is relative. Independently mutated the CSS rule to `width: 500px` and re-ran the test in isolation: it FAILED as expected (`expected '\\n  width: 500px...' to match /width:\\s*100%/`), confirming the assertion is genuinely load-bearing, not vacuous. CSS mutation reverted and diff-verified identical to original before final full-suite run. Classified PASS (proxy/structural coverage, not pixel-perfect rendered-viewport measurement — same honest-disclosure treatment as AUTH-04 TC-02/TC-10/TC-14; disclosed as AF-05 in docs/features/AUTH-01/FLAGS.md).",
+        "regression_round": "post-merge full-epic regression (AUTH-01..AUTH-08 merged, HEAD 6ab0e53e). LoginForm.jsx unchanged with respect to this assertion (the AUTH-07 focus-on-mount addition does not touch inline widths or the .form-input CSS rule); still PASS, confirmed 2026-08-18T20:19:44Z."
       }
     },
     {
@@ -146,18 +154,20 @@
       "then": "submit is blocked, a .form-error message appears under each offending field, and userAuthService.login is never called",
       "tags": ["negative"],
       "last_run": {
-        "started_at": "2026-08-18T09:00:00Z",
-        "duration_ms": 137,
+        "started_at": "2026-08-18T20:19:44Z",
+        "duration_ms": 90,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
-          {"n": 1, "status": "PASS", "duration_ms": 137, "reason": null}
+          {"n": 1, "status": "PASS", "duration_ms": 90, "reason": null}
         ],
         "budget": null,
         "failure_reason": null,
         "artefact": null,
         "runner": "vitest",
-        "rerun_count": 0
+        "rerun_count": 0,
+        "regression_round": "post-merge full-epic regression (AUTH-01..AUTH-08 merged, HEAD 6ab0e53e)",
+        "stale_narrative_note": "TC wording says 'userAuthService.login is never called' — mock module deleted (AUTH-05). Current test (LoginForm.test.jsx TC-06) asserts the local `onSubmit` callback prop is never called on empty-field submit, which is the correct current-architecture equivalent (LoginForm no longer knows about any auth service — LoginScreen owns the userApi.login call one layer up). Assertion intent preserved; wording should be updated to 'onSubmit is never called' in a future TC-authoring pass."
       }
     },
     {
@@ -172,18 +182,20 @@
       "then": "no console.log/console.error call and no DOM node (including the error message) contains the submitted password value",
       "tags": ["negative"],
       "last_run": {
-        "started_at": "2026-08-18T09:00:00Z",
-        "duration_ms": 137,
+        "started_at": "2026-08-18T20:19:44Z",
+        "duration_ms": 92,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
-          {"n": 1, "status": "PASS", "duration_ms": 137, "reason": null}
+          {"n": 1, "status": "PASS", "duration_ms": 92, "reason": null}
         ],
         "budget": null,
         "failure_reason": null,
         "artefact": null,
         "runner": "vitest",
-        "rerun_count": 0
+        "rerun_count": 0,
+        "regression_round": "post-merge full-epic regression (AUTH-01..AUTH-08 merged, HEAD 6ab0e53e)",
+        "stale_narrative_note": "Same userAuthService->userApi.login supersession as TC-02/TC-04; assertion (no password leak to DOM/console) still enforced and passing against userApi.login spy."
       }
     },
     {
@@ -198,18 +210,19 @@
       "then": "each input has a <label> linked via htmlFor/id and aria-required=true, the .form-server-error container has aria-live=assertive, the submit button has a visible :focus-visible outline, and the button's bounding box is >= 44x44px",
       "tags": ["happy-path"],
       "last_run": {
-        "started_at": "2026-08-18T09:00:00Z",
-        "duration_ms": 137,
+        "started_at": "2026-08-18T20:19:44Z",
+        "duration_ms": 96,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
-          {"n": 1, "status": "PASS", "duration_ms": 137, "reason": null}
+          {"n": 1, "status": "PASS", "duration_ms": 96, "reason": null}
         ],
         "budget": null,
-        "failure_reason": "Note: test verifies label/htmlFor linkage, aria-required, aria-live=assertive, and >=44px via inline minHeight/minWidth style, but does NOT independently assert the :focus-visible outline clause of this TC's `then` (jsdom pseudo-class computed-style limitation). Global `:focus-visible` CSS rule exists at frontend/src/styles/index.css:91 and applies by default (no override on this button), so the AC is satisfied by the design system, but this specific automated spec has a partial coverage gap — recommend adding an explicit focus + matches(':focus-visible') assertion in a follow-up.",
+        "failure_reason": "Note (carried from round 1, still applicable): test verifies label/htmlFor linkage, aria-required, aria-live=assertive, and >=44px via inline minHeight/minWidth style, but does NOT independently assert the :focus-visible outline clause of this TC's `then` (jsdom pseudo-class computed-style limitation). Global `:focus-visible` CSS rule exists at frontend/src/styles/index.css:91 and applies by default (no override on this button), so the AC is satisfied by the design system, but this specific automated spec has a partial coverage gap — recommend adding an explicit focus + matches(':focus-visible') assertion in a follow-up.",
         "artefact": null,
         "runner": "vitest",
-        "rerun_count": 0
+        "rerun_count": 0,
+        "regression_round": "post-merge full-epic regression (AUTH-01..AUTH-08 merged, HEAD 6ab0e53e). AUTH-07's focus-on-mount effect (email input auto-focused via useEffect) does not conflict with this TC's label/aria-required/aria-live/44px assertions — confirmed still PASS."
       }
     },
     {
@@ -224,12 +237,12 @@
       "then": "the button's disabled attribute and .spinner element are present in the DOM within 16ms of the click event (budget: <16ms to loading-state paint)",
       "tags": ["happy-path"],
       "last_run": {
-        "started_at": "2026-08-18T09:00:00Z",
-        "duration_ms": 137,
+        "started_at": "2026-08-18T20:19:44Z",
+        "duration_ms": 98,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
-          {"n": 1, "status": "PASS", "duration_ms": 137, "reason": null}
+          {"n": 1, "status": "PASS", "duration_ms": 98, "reason": null}
         ],
         "budget": {
           "target": "<16ms to loading-state paint",
@@ -239,7 +252,9 @@
         "failure_reason": null,
         "artefact": null,
         "runner": "vitest",
-        "rerun_count": 0
+        "rerun_count": 0,
+        "regression_round": "post-merge full-epic regression (AUTH-01..AUTH-08 merged, HEAD 6ab0e53e)",
+        "stale_narrative_note": "Same userAuthService->userApi.login supersession; budget assertion (synchronous disabled/.spinner before await) unaffected by the swap and still budget_pass: true."
       }
     }
   ],

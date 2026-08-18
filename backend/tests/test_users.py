@@ -165,6 +165,32 @@ def test_create_user_persists_bcrypt_hash_distinct_from_plaintext():
         db.close()
 
 
+# --- regression-AUTH-03-TC-01: a freshly created user can log in immediately
+# with the password supplied at creation. create_user must clear
+# must_reset_password (defaults True on the model for the provisioning-
+# migration path) since a real password was already set — otherwise
+# AuthService._verify_credentials treats the account as unprovisioned and
+# every login attempt is rejected, even with the correct password.
+
+
+def test_newly_created_user_can_log_in_with_creation_password():
+    plaintext = "correct-horse-battery-staple"
+    created = client.post("/api/users", json=make_user(email="fresh.login@example.com", password=plaintext)).json()
+
+    db = TestingSessionLocal()
+    try:
+        user = AuthService(db).repo.get_by_id(created["id"])
+        assert user.must_reset_password is False
+    finally:
+        db.close()
+
+    resp = client.post(
+        "/api/auth/login", json={"email": "fresh.login@example.com", "password": plaintext}
+    )
+    assert resp.status_code == 200
+    assert "token" in resp.json()
+
+
 # --- AUTH-03-TC-09/TC-10: no invented default password --------------------
 
 

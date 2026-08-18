@@ -15,15 +15,15 @@
         "happy-path"
       ],
       "last_run": {
-        "started_at": "2026-08-18T06:50:00Z",
-        "duration_ms": 15,
+        "started_at": "2026-08-18T21:15:00Z",
+        "duration_ms": 12,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 15,
+            "duration_ms": 12,
             "reason": null
           }
         ],
@@ -48,15 +48,15 @@
         "happy-path"
       ],
       "last_run": {
-        "started_at": "2026-08-18T06:50:00Z",
-        "duration_ms": 15,
+        "started_at": "2026-08-18T21:15:00Z",
+        "duration_ms": 12,
         "status": "PASS",
         "verdict": "PARTIAL",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 15,
+            "duration_ms": 12,
             "reason": "Passes against today's observable proxy only (no clearAuthToken/log call for absent token); full behavior (Login-only render within 100ms, zero protected fetches) blocked because App.jsx does not yet gate rendering on isAuthenticated \u2014 deferred to AUTH-05 per FLAGS.md AF-04."
           }
         ],
@@ -81,15 +81,15 @@
         "edge-case"
       ],
       "last_run": {
-        "started_at": "2026-08-18T06:50:00Z",
-        "duration_ms": 15,
+        "started_at": "2026-08-18T21:15:00Z",
+        "duration_ms": 12,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 15,
+            "duration_ms": 12,
             "reason": null
           }
         ],
@@ -114,16 +114,16 @@
         "happy-path"
       ],
       "last_run": {
-        "started_at": "2026-08-18T06:50:00Z",
-        "duration_ms": 15,
+        "started_at": "2026-08-18T21:15:00Z",
+        "duration_ms": 2,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 15,
-            "reason": "Verified via mocked axios interceptor error object (status 401), not a live backend 401 \u2014 this branch's backend has no auth-guarded endpoint yet (AUTH-02/03 not merged here); confirmed via curl that /api/users returns 200 regardless of Authorization header."
+            "duration_ms": 2,
+            "reason": null
           }
         ],
         "budget": null,
@@ -148,15 +148,15 @@
         "edge-case"
       ],
       "last_run": {
-        "started_at": "2026-08-18T06:50:00Z",
-        "duration_ms": 15,
+        "started_at": "2026-08-18T21:15:00Z",
+        "duration_ms": 12,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 15,
+            "duration_ms": 12,
             "reason": null
           }
         ],
@@ -181,15 +181,15 @@
         "negative"
       ],
       "last_run": {
-        "started_at": "2026-08-18T06:50:00Z",
-        "duration_ms": 15,
+        "started_at": "2026-08-18T21:15:00Z",
+        "duration_ms": 2,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 15,
+            "duration_ms": 2,
             "reason": null
           }
         ],
@@ -214,15 +214,15 @@
         "negative"
       ],
       "last_run": {
-        "started_at": "2026-08-18T06:50:00Z",
-        "duration_ms": 15,
+        "started_at": "2026-08-18T21:15:00Z",
+        "duration_ms": 2,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 15,
+            "duration_ms": 2,
             "reason": null
           }
         ],
@@ -247,15 +247,15 @@
         "happy-path"
       ],
       "last_run": {
-        "started_at": "2026-08-18T06:50:00Z",
-        "duration_ms": 15,
+        "started_at": "2026-08-18T21:15:00Z",
+        "duration_ms": 2,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 15,
+            "duration_ms": 2,
             "reason": null
           }
         ],
@@ -281,16 +281,16 @@
         "regression-guard"
       ],
       "last_run": {
-        "started_at": "2026-08-18T06:50:00Z",
-        "duration_ms": 15,
+        "started_at": "2026-08-18T21:15:00Z",
+        "duration_ms": 2,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 15,
-            "reason": "Verified via mocked interceptor (two simulated 401 error objects), same real-backend limitation as TC-04."
+            "duration_ms": 2,
+            "reason": null
           }
         ],
         "budget": null,
@@ -315,15 +315,15 @@
         "contract"
       ],
       "last_run": {
-        "started_at": "2026-08-18T06:50:00Z",
-        "duration_ms": 15,
+        "started_at": "2026-08-18T21:15:00Z",
+        "duration_ms": 12,
         "status": "PASS",
         "verdict": "PARTIAL",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 15,
+            "duration_ms": 12,
             "reason": "Passes against today's observable proxy only (handler registered once, invocation does not throw); full sessionExpiredMessage-prop-to-LoginScreen threading cannot be exercised because LoginScreen is not yet mounted by App.jsx (AUTH-05 scope) \u2014 deferred per FLAGS.md AF-04."
           }
         ],
@@ -348,15 +348,15 @@
         "happy-path"
       ],
       "last_run": {
-        "started_at": "2026-08-18T06:50:00Z",
-        "duration_ms": 707,
+        "started_at": "2026-08-18T21:15:00Z",
+        "duration_ms": 767,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 707,
+            "duration_ms": 767,
             "reason": null
           }
         ],
@@ -385,15 +385,15 @@
         "security"
       ],
       "last_run": {
-        "started_at": "2026-08-18T06:50:00Z",
-        "duration_ms": 15,
+        "started_at": "2026-08-18T21:15:00Z",
+        "duration_ms": 2,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 15,
+            "duration_ms": 2,
             "reason": null
           }
         ],
@@ -418,15 +418,15 @@
         "happy-path"
       ],
       "last_run": {
-        "started_at": "2026-08-18T06:50:00Z",
-        "duration_ms": 15,
+        "started_at": "2026-08-18T21:15:00Z",
+        "duration_ms": 2,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 15,
+            "duration_ms": 2,
             "reason": null
           }
         ],
@@ -451,35 +451,23 @@
         "accessibility"
       ],
       "last_run": {
-        "started_at": "2026-08-18T14:05:40Z",
-        "duration_ms": 15,
+        "started_at": "2026-08-18T21:15:00Z",
+        "duration_ms": 12,
         "status": "PASS",
         "verdict": "PARTIAL",
         "attempts": [
           {
             "n": 1,
-            "status": "FAIL",
-            "duration_ms": 15,
-            "reason": "No test exists for this TC and no aria-live implementation exists: grep of frontend/src for 'aria-live' finds only an unrelated instance in Users.jsx; LoginScreen component does not exist in this codebase yet (AUTH-01/AUTH-05 scope). PLAN.md Test Strategy table row claims App.auth.test.jsx covers TC-14, but the file (read directly) contains no TC-14 test. Unlike TC-02/TC-10, this gap is not disclosed in FLAGS.md AF-04 \u2014 should be added there or fixed."
-          },
-          {
-            "n": 2,
-            "status": "FAIL",
-            "duration_ms": 15,
-            "reason": "Round-1 fix (2026-08-18): disclosure gap corrected \u2014 FLAGS.md AF-04 now explicitly lists TC-14 alongside TC-02/TC-10, and PLAN.md's Test Strategy table (\u00a7 7) no longer claims full TC-14 coverage; it now labels the row 'partial \u2014 deferred to AUTH-05'. A partial/proxy test ('TC-14 (partial): sessionExpiredMessage state is set to the exact required string when the unauthorized handler fires' / its 'never set' counterpart) was added to App.auth.test.jsx, asserting AUTH-04's actual owned behavior \u2014 the state value, not the DOM/aria-live rendering. Verdict remains FAIL (not PASS) because the literal TC-14 requirement (aria-live region on the Login screen) still cannot be exercised until AUTH-01/AUTH-05 land LoginScreen; left for validation to re-assess whether the disclosed-and-proxied gap changes the verdict semantics."
-          },
-          {
-            "n": 3,
             "status": "PASS",
-            "duration_ms": 15,
-            "reason": "Round-2 re-validation (2026-08-18): re-confirmed FLAGS.md AF-04 discloses TC-14 alongside TC-02/TC-10 (with an explicit 'Correction (2026-08-18, round-1 fix)' note), PLAN.md \u00a7 7's Test Strategy row is corrected to 'partial \u2014 deferred to AUTH-05' with no false full-coverage claim, and PLAN.md \u00a7 5 T-05's Notes column explicitly states TC-14 is partial/proxy only. Both new proxy tests in App.auth.test.jsx were read in full and executed: 'TC-14 (partial): sessionExpiredMessage state is set to the exact required string when the unauthorized handler fires' (asserts capturedStateSets contains the exact copy 'Your session has expired. Please log in again.' after the registered unauthorized handler fires) and its negative counterpart (asserts the exact string is never captured when there is nothing to expire) both pass under `npm run test -- --run` (49/49 total). The underlying defect from round 1 (undisclosed gap + false PLAN.md coverage claim) is fully remediated; the only remaining gap (no aria-live DOM region because LoginScreen does not exist) is the same disclosed, deferred-to-AUTH-05 scope boundary already applied to TC-02/TC-10. Re-classified FAIL to PARTIAL to match that treatment \u2014 same underlying capability gap, now honestly documented and proxy-tested."
+            "duration_ms": 12,
+            "reason": "Literal AC (aria-live region on Login screen) cannot be exercised until AUTH-05 lands LoginScreen; the state-value proxy passes and the gap is now disclosed in FLAGS.md AF-04 and PLAN.md \u00a7 5/\u00a7 7 (no longer a documentation defect)."
           }
         ],
         "budget": null,
         "failure_reason": "Literal AC (aria-live region on Login screen) cannot be exercised until AUTH-05 lands LoginScreen; the state-value proxy passes and the gap is now disclosed in FLAGS.md AF-04 and PLAN.md \u00a7 5/\u00a7 7 (no longer a documentation defect).",
         "artefact": "frontend/src/__tests__/App.auth.test.jsx",
         "runner": "vitest",
-        "rerun_count": 2
+        "rerun_count": 0
       }
     },
     {
@@ -496,15 +484,15 @@
         "contract"
       ],
       "last_run": {
-        "started_at": "2026-08-18T06:50:00Z",
-        "duration_ms": 15,
+        "started_at": "2026-08-18T21:15:00Z",
+        "duration_ms": 2,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 15,
+            "duration_ms": 2,
             "reason": null
           }
         ],

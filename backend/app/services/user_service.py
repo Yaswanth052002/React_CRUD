@@ -55,6 +55,7 @@ class UserService:
         plaintext_password = data.pop("password")
         try:
             data["password_hash"] = AuthService(self.db).hash_password(plaintext_password)
+            data["must_reset_password"] = False
         except PasswordHashingError:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

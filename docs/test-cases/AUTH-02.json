@@ -15,15 +15,15 @@
         "happy-path"
       ],
       "last_run": {
-        "started_at": "2026-08-18T00:59:30Z",
-        "duration_ms": 140,
+        "started_at": "2026-08-18T14:58:00Z",
+        "duration_ms": 132,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 140,
+            "duration_ms": 132,
             "reason": null
           }
         ],
@@ -48,15 +48,15 @@
         "security"
       ],
       "last_run": {
-        "started_at": "2026-08-18T00:59:30Z",
-        "duration_ms": 140,
+        "started_at": "2026-08-18T14:58:00Z",
+        "duration_ms": 128,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 140,
+            "duration_ms": 128,
             "reason": null
           }
         ],
@@ -81,15 +81,15 @@
         "edge-case"
       ],
       "last_run": {
-        "started_at": "2026-08-18T00:59:30Z",
-        "duration_ms": 70,
+        "started_at": "2026-08-18T14:58:00Z",
+        "duration_ms": 65,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 70,
+            "duration_ms": 65,
             "reason": null
           }
         ],
@@ -114,15 +114,15 @@
         "edge-case"
       ],
       "last_run": {
-        "started_at": "2026-08-18T00:59:30Z",
-        "duration_ms": 190,
+        "started_at": "2026-08-18T14:58:00Z",
+        "duration_ms": 180,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 190,
+            "duration_ms": 180,
             "reason": null
           }
         ],
@@ -147,15 +147,15 @@
         "edge-case"
       ],
       "last_run": {
-        "started_at": "2026-08-18T00:59:30Z",
-        "duration_ms": 130,
+        "started_at": "2026-08-18T14:58:00Z",
+        "duration_ms": 121,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 130,
+            "duration_ms": 121,
             "reason": null
           }
         ],
@@ -179,15 +179,15 @@
         "happy-path"
       ],
       "last_run": {
-        "started_at": "2026-08-18T00:59:30Z",
-        "duration_ms": 150,
+        "started_at": "2026-08-18T14:58:00Z",
+        "duration_ms": 145,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 150,
+            "duration_ms": 145,
             "reason": null
           }
         ],
@@ -212,15 +212,15 @@
         "regression"
       ],
       "last_run": {
-        "started_at": "2026-08-18T00:59:30Z",
-        "duration_ms": 80,
+        "started_at": "2026-08-18T14:58:00Z",
+        "duration_ms": 77,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 80,
+            "duration_ms": 77,
             "reason": null
           }
         ],
@@ -244,15 +244,15 @@
         "happy-path"
       ],
       "last_run": {
-        "started_at": "2026-08-18T00:59:30Z",
-        "duration_ms": 190,
+        "started_at": "2026-08-18T14:58:00Z",
+        "duration_ms": 183,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 190,
+            "duration_ms": 183,
             "reason": null
           }
         ],
@@ -277,15 +277,15 @@
         "negative"
       ],
       "last_run": {
-        "started_at": "2026-08-18T00:59:30Z",
-        "duration_ms": 90,
+        "started_at": "2026-08-18T14:58:00Z",
+        "duration_ms": 88,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 90,
+            "duration_ms": 88,
             "reason": null
           }
         ],
@@ -310,15 +310,15 @@
         "security"
       ],
       "last_run": {
-        "started_at": "2026-08-18T00:59:30Z",
-        "duration_ms": 430,
+        "started_at": "2026-08-18T14:58:00Z",
+        "duration_ms": 410,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 430,
+            "duration_ms": 410,
             "reason": null
           }
         ],
@@ -342,15 +342,15 @@
         "regression"
       ],
       "last_run": {
-        "started_at": "2026-08-18T00:59:30Z",
-        "duration_ms": 10,
+        "started_at": "2026-08-18T14:58:00Z",
+        "duration_ms": 9,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 10,
+            "duration_ms": 9,
             "reason": null
           }
         ],
@@ -374,15 +374,15 @@
         "performance"
       ],
       "last_run": {
-        "started_at": "2026-08-18T00:59:30Z",
-        "duration_ms": 7500,
+        "started_at": "2026-08-18T14:58:00Z",
+        "duration_ms": 8190,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 7500,
+            "duration_ms": 8190,
             "reason": null
           }
         ],
@@ -412,15 +412,15 @@
         "negative"
       ],
       "last_run": {
-        "started_at": "2026-08-18T00:59:30Z",
-        "duration_ms": 260,
+        "started_at": "2026-08-18T14:58:00Z",
+        "duration_ms": 240,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 260,
+            "duration_ms": 240,
             "reason": null
           }
         ],
