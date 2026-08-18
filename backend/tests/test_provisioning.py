@@ -20,6 +20,7 @@ def make_user(**overrides):
         "phone": "9876500001",
         "role": "User",
         "status": "Active",
+        "password": "irrelevant-signup-password",
     }
     payload.update(overrides)
     return payload
@@ -29,12 +30,22 @@ def make_user(**overrides):
 
 
 def test_migration_provisions_every_credential_less_row():
+    # AUTH-03 now sets `password_hash` at create-user time, so a credential-
+    # less row can no longer be produced via the create-user API path
+    # (FR-4 — no invented default password). This test simulates AC4's
+    # actual target: a pre-existing/imported row that predates AUTH-03's
+    # password requirement, by nulling `password_hash` directly after
+    # creation via the ORM (never via the API, which rejects it).
     created_a = client.post("/api/users", json=make_user(email="cred.less.a@example.com")).json()
     created_b = client.post("/api/users", json=make_user(email="cred.less.b@example.com")).json()
 
     db = TestingSessionLocal()
     try:
         service = AuthService(db)
+        user_a = service.repo.get_by_id(created_a["id"])
+        user_a.password_hash = None
+        user_a.must_reset_password = True
+
         # Row B already has a hash — must be left untouched.
         user_b = service.repo.get_by_id(created_b["id"])
         pre_existing_hash = service._hash_password("already-set")
@@ -57,11 +68,18 @@ def test_migration_provisions_every_credential_less_row():
 
 
 def test_migration_rerun_is_a_noop_for_already_provisioned_rows():
+    # See test_migration_provisions_every_credential_less_row: simulate a
+    # pre-existing/imported credential-less row via the ORM, since the
+    # create-user API always sets `password_hash` now (FR-4).
     created = client.post("/api/users", json=make_user(email="idempotent@example.com")).json()
 
     db = TestingSessionLocal()
     try:
         service = AuthService(db)
+        user = service.repo.get_by_id(created["id"])
+        user.password_hash = None
+        db.commit()
+
         first_count = service.provision_existing_users_with_random_password()
         assert first_count == 1
 
@@ -92,7 +110,7 @@ def test_set_user_initial_password_sets_hash_and_clears_reset_flag():
         user = service.repo.get_by_id(created["id"])
         assert user.password_hash is not None
         assert user.must_reset_password is False
-        assert service._verify_password(user.password_hash, "brand-new-password") is True
+        assert service.verify_credentials("script.target@example.com", "brand-new-password") is True
     finally:
         db.close()
 

@@ -22,6 +22,7 @@ def make_user(**overrides):
         "phone": "9876500000",
         "role": "User",
         "status": "Active",
+        "password": "irrelevant-signup-password",
     }
     payload.update(overrides)
     return payload
@@ -42,7 +43,7 @@ def _provision(email: str, password: str, must_reset: bool = False):
     try:
         service = AuthService(db)
         user = service.repo.get_by_id(created["id"])
-        user.password_hash = service._hash_password(password)
+        user.password_hash = service.hash_password(password)
         user.must_reset_password = must_reset
         db.commit()
     finally:

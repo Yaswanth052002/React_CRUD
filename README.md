@@ -159,13 +159,19 @@ running.
   "email": "john@test.com",
   "phone": "9876543210",
   "role": "User",
-  "status": "Active"
+  "status": "Active",
+  "password": "correct-horse-battery-staple"
 }
 ```
 
+`password` is **required on `POST /api/users`** (min 8 characters) — the server hashes it with
+bcrypt (work factor 12) before persisting; the plaintext value is never stored, logged, or
+returned. No API response — list, get, create, or update — ever includes a `password` or
+`password_hash` field.
+
 **Validation rules:** `name` ≥ 2 chars, `email` must be a valid address, `phone` must match
-`^[0-9+\-() ]{7,20}$`, `role` ∈ `{Admin, User}`, `status` ∈ `{Active, Inactive}`, `email` must
-be unique (a duplicate returns `409 Conflict`).
+`^[0-9+\-() ]{7,20}$`, `role` ∈ `{Admin, User}`, `status` ∈ `{Active, Inactive}`, `password` ≥ 8
+chars (required on create), `email` must be unique (a duplicate returns `409 Conflict`).
 
 **Request body for POST `/api/auth/login`:**
 
@@ -185,8 +191,9 @@ same email within a rolling 60-minute window, further attempts return `429` with
 
 ### 11a. Provisioning an initial password for an existing user
 
-Every user row created before this feature (or via the CRUD API, which does not collect a
-password) has no credential and cannot log in until an operator sets one. On startup, the
+Every user row created before this feature has no credential and cannot log in until an
+operator sets one (the CRUD API now requires a `password` on every new user — see §10). On
+startup, the
 backend automatically assigns every credential-less row a random, unusable password hash and
 marks it `must_reset_password = true` — this only prevents an unauthenticated login, it does
 not give the user a usable password.

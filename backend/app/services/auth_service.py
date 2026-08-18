@@ -6,7 +6,6 @@ provisioning migration, and the AC5 operator-provisioning helper. Calls
 is introduced.
 """
 import hashlib
-import hmac
 import logging
 import os
 import secrets
@@ -16,6 +15,8 @@ from typing import Optional
 
 import jwt
 from fastapi import HTTPException, status
+from passlib.context import CryptContext
+from passlib.exc import UnknownHashError
 from sqlalchemy.orm import Session
 
 from app.models.user import User
@@ -23,6 +24,14 @@ from app.repositories.user_repository import UserRepository
 from app.schemas.auth import LoginResponse
 
 logger = logging.getLogger("auth_service")
+
+# ADR-1 (AUTH-03): bcrypt via passlib, work factor 12 — replaces AUTH-02's
+# stdlib pbkdf2_hmac placeholder in place.
+_pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__rounds=12)
+
+
+class PasswordHashingError(Exception):
+    """Raised when the underlying hashing library fails unexpectedly (AUTH-03 NFR-security)."""
 
 # Single shared error message/status for every invalid-login outcome (FR-2/FR-3):
 # unknown email, wrong password, and an unprovisioned (must_reset_password=true)
@@ -39,9 +48,6 @@ _failed_attempts: dict[str, list[float]] = {}
 # JWT (ADR-5): access-token TTL fixed at 60 minutes per AUTH-04's decision log.
 _JWT_TTL_MINUTES = 60
 _JWT_ALGORITHM = "HS256"
-
-_PBKDF2_ITERATIONS = 260_000
-
 
 def _hash_email(email: str) -> str:
     """Opaque key for rate-limiting/logging — never log the plaintext email."""
@@ -98,39 +104,55 @@ class AuthService:
             {"password_hash": self._hash_password(plaintext_password), "must_reset_password": False},
         )
 
-    # -- Password hashing (ADR-4: stdlib placeholder — AUTH-03 supplies the ----
-    # -- real argon2id/bcrypt scheme against these same columns) --------------
+    # -- Password hashing (ADR-1, AUTH-03): bcrypt via passlib, work factor 12,
+    # -- replacing AUTH-02's stdlib pbkdf2_hmac placeholder in place. ---------
+
+    def hash_password(self, plaintext: str) -> str:
+        """
+        Hash a plaintext password with bcrypt (work factor 12). Never logs or
+        echoes the plaintext. Raises `PasswordHashingError` (never a raw
+        library exception) if the underlying hashing library fails.
+        """
+        try:
+            return _pwd_context.hash(plaintext)
+        except Exception:
+            logger.warning("Password hashing failed due to a library error")
+            raise PasswordHashingError("Could not process the password. Please try again later.")
+
+    def verify_credentials(self, email: str, plaintext: str) -> bool:
+        """
+        Constant-time bcrypt verify of `plaintext` against the stored hash for
+        `email`. Returns a plain boolean; never raises, and never distinguishes
+        "no such user" from "wrong password" or a foreign/malformed hash
+        format (e.g. AUTH-02's placeholder `salt$hex_digest` rows — ADR-1).
+        """
+        user = self.repo.get_by_email(email)
+        if not user or not user.password_hash:
+            return False
+        try:
+            return _pwd_context.verify(plaintext, user.password_hash)
+        except UnknownHashError:
+            # Foreign/placeholder hash format (e.g. AUTH-02's pbkdf2_hmac
+            # rows) — expected incompatibility per ADR-1, not a failure to log.
+            return False
+        except Exception:
+            logger.warning("Password verification failed due to a library error", extra={"user_id": user.id})
+            return False
 
     def _hash_password(self, plaintext: str) -> str:
-        salt = secrets.token_hex(16)
-        digest = hashlib.pbkdf2_hmac("sha256", plaintext.encode("utf-8"), salt.encode("utf-8"), _PBKDF2_ITERATIONS)
-        return f"{salt}${digest.hex()}"
-
-    def _verify_password(self, stored_hash: str, plaintext: str) -> bool:
-        try:
-            salt, expected_hex = stored_hash.split("$", 1)
-        except ValueError:
-            return False
-        digest = hashlib.pbkdf2_hmac("sha256", plaintext.encode("utf-8"), salt.encode("utf-8"), _PBKDF2_ITERATIONS)
-        return hmac.compare_digest(digest.hex(), expected_hex)
+        """Internal alias kept for AC4/AC5 provisioning call sites (ADR-1: delegates to `hash_password`)."""
+        return self.hash_password(plaintext)
 
     def _generate_unusable_hash(self) -> str:
         """A hash of a random, never-provisioned-to-anyone password — never verifies."""
         return self._hash_password(secrets.token_urlsafe(32))
 
-    # A fixed-format dummy hash used to keep `_verify_credentials`'s work
-    # equivalent whether or not a matching user exists (FR-2 timing safety).
-    _DUMMY_HASH = "0" * 32 + "$" + "0" * 64
-
     def _verify_credentials(self, user: Optional[User], plaintext: str) -> bool:
-        stored_hash = user.password_hash if (user and user.password_hash) else self._DUMMY_HASH
-        matches = self._verify_password(stored_hash, plaintext)
-
         if user is None:
             return False
         if user.must_reset_password:
             return False
-        return matches
+        return self.verify_credentials(user.email, plaintext)
 
     # -- Rate limiting (ADR-2) --------------------------------------------
 

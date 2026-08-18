@@ -30,13 +30,14 @@ def _provision(email: str, password: str):
             "phone": "9876500002",
             "role": "User",
             "status": "Active",
+            "password": "irrelevant-signup-password",
         },
     )
     db = TestingSessionLocal()
     try:
         service = AuthService(db)
         user = service.repo.get_by_email(email)
-        user.password_hash = service._hash_password(password)
+        user.password_hash = service.hash_password(password)
         user.must_reset_password = False
         db.commit()
     finally:

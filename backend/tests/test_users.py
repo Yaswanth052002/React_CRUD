@@ -6,7 +6,8 @@ The client/engine/`get_db` override and the `_reset_db` fixture are
 shared with every other test module via `tests/conftest.py` (AUTH-02) —
 see that file's docstring for why they must not be redefined per-module.
 """
-from tests.conftest import client
+from tests.conftest import client, TestingSessionLocal
+from app.services.auth_service import AuthService
 
 
 def make_user(**overrides):
@@ -16,6 +17,7 @@ def make_user(**overrides):
         "phone": "9876500000",
         "role": "User",
         "status": "Active",
+        "password": "irrelevant-signup-password",
     }
     payload.update(overrides)
     return payload
@@ -143,6 +145,39 @@ def test_search_filters_by_name_email_phone():
     results = resp.json()["items"]
     assert len(results) == 1
     assert results[0]["name"] == "Alice Wonderland"
+
+
+# --- AUTH-03-TC-01: create user persists bcrypt hash, never plaintext -----
+
+
+def test_create_user_persists_bcrypt_hash_distinct_from_plaintext():
+    plaintext = "correct-horse-battery-staple"
+    created = client.post("/api/users", json=make_user(password=plaintext)).json()
+
+    db = TestingSessionLocal()
+    try:
+        service = AuthService(db)
+        user = service.repo.get_by_id(created["id"])
+        assert user.password_hash is not None
+        assert user.password_hash.startswith("$2b$")
+        assert user.password_hash != plaintext
+    finally:
+        db.close()
+
+
+# --- AUTH-03-TC-09/TC-10: no invented default password --------------------
+
+
+def test_create_user_without_password_rejected_with_422():
+    payload = make_user()
+    del payload["password"]
+    resp = client.post("/api/users", json=payload)
+    assert resp.status_code == 422
+
+
+def test_create_user_with_empty_password_rejected_with_422():
+    resp = client.post("/api/users", json=make_user(password=""))
+    assert resp.status_code == 422
 
 
 def test_role_and_status_filters():

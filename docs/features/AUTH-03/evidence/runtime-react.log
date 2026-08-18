@@ -1,0 +1,9 @@
+
+> user-management-crud-frontend@1.0.0 dev
+> vite --port 5184
+
+
+  VITE v5.4.21  ready in 187 ms
+
+  ➜  Local:   http://localhost:5184/
+  ➜  Network: use --host to expose

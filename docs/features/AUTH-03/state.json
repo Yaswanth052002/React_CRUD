@@ -11,11 +11,45 @@
   "design_artifact": "docs/features/AUTH-03/DESIGN.md",
   "design_provider": "none",
   "design_iteration": 0,
-  "phase": "plan-implementation",
+  "phase": "review",
+  "review": "PASS WITH WARNINGS",
+  "review_report": "docs/features/AUTH-03/REVIEW.md",
   "gate": "APPROVE",
   "plan": "complete",
   "plan_validation": "PASS",
   "plan_validation_rounds": 1,
+  "impl_tasks": [
+    {"task_id": "T-01", "status": "done", "completed_at": "2026-08-18T06:05:00Z", "files_touched": ["backend/requirements.txt"]},
+    {"task_id": "T-02", "status": "done", "completed_at": "2026-08-18T06:05:00Z", "files_touched": ["backend/app/schemas/user.py"]},
+    {"task_id": "T-03", "status": "done", "completed_at": "2026-08-18T06:05:00Z", "files_touched": ["backend/app/services/auth_service.py"]},
+    {"task_id": "T-04", "status": "done", "completed_at": "2026-08-18T06:05:00Z", "files_touched": ["backend/app/services/user_service.py"]},
+    {"task_id": "T-05", "status": "done", "completed_at": "2026-08-18T06:05:00Z", "files_touched": ["backend/tests/test_password_hashing.py"]},
+    {"task_id": "T-06", "status": "done", "completed_at": "2026-08-18T06:05:00Z", "files_touched": ["backend/tests/test_auth.py"]},
+    {"task_id": "T-07", "status": "done", "completed_at": "2026-08-18T06:05:00Z", "files_touched": ["backend/tests/test_users.py"]},
+    {"task_id": "T-08", "status": "done", "completed_at": "2026-08-18T06:05:00Z", "files_touched": ["backend/tests/test_response_schema_audit.py"]},
+    {"task_id": "T-09", "status": "done", "completed_at": "2026-08-18T06:05:00Z", "files_touched": ["README.md"]},
+    {"task_id": "T-10", "status": "done", "completed_at": "2026-08-18T06:05:00Z", "files_touched": ["docs/config/project-commands.yaml"]}
+  ],
+  "impl_carry_forward_fixes": [
+    "backend/requirements.txt: pinned bcrypt==4.0.1 alongside passlib[bcrypt]==1.7.4 — passlib 1.7.4's bcrypt backend probes a bcrypt.__about__ attribute removed in bcrypt>=4.1, causing every hash/verify call to fail without this pin (root-cause-first fix; see FLAGS.md AF-01).",
+    "backend/tests/test_provisioning.py: T-01/T-02's create-user API now always sets password_hash, so the AC4 'credential-less row' test fixtures were updated to null password_hash directly via the ORM after creation (simulating a pre-existing/imported row), since that state can no longer be produced via the API (condition C-2).",
+    "backend/tests/perf/test_login_perf.py: added required password field to its fixture payload and switched its direct password_hash seeding call from the private _hash_password alias to the new public hash_password method (condition C-2)."
+  ],
+  "impl_evidence": {
+    "session_ended_at": "2026-08-18T06:06:00Z",
+    "rounds": 1,
+    "checks": {
+      "typecheck": {"status": "N/A", "source": "project-commands.yaml typecheck:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": "AF-02", "ran_at": null},
+      "unit_tests": {"status": "PASS", "source": "project-commands.yaml test_unit:", "command": "cd backend && pytest", "exit_code": 0, "evidence_path": "docs/features/AUTH-03/evidence/unit-tests.log", "flag_id": null, "ran_at": "2026-08-18T06:05:30Z"},
+      "lint": {"status": "N/A", "source": "project-commands.yaml lint:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": "AF-03", "ran_at": null},
+      "runtime": {"status": "PASS", "source": "stack-smoke.md Run:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": null, "ran_at": "2026-08-18T06:04:30Z", "stacks": [
+        {"stack": "fastapi", "status": "PASS", "command": "cd backend && uvicorn app.main:app --port 8010", "exit_code": null, "evidence_path": "docs/features/AUTH-03/evidence/runtime-fastapi.log", "boot_log_scan": "clean", "notes": "GET /api/health 200; POST /api/users response body confirmed free of password/password_hash keys"},
+        {"stack": "react", "status": "PASS", "command": "cd frontend && npm run dev -- --port 5184", "exit_code": null, "evidence_path": "docs/features/AUTH-03/evidence/runtime-react.log", "boot_log_scan": "clean", "render_check": "unavailable"}
+      ]},
+      "compile": {"status": "PASS", "source": "project-commands.yaml build:", "command": "cd frontend && npm run build", "exit_code": 0, "evidence_path": "docs/features/AUTH-03/evidence/compile.log", "flag_id": null, "ran_at": "2026-08-18T06:05:45Z"},
+      "design_check": {"status": "N/A", "source": "project-commands.yaml design_check:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": "AF-04", "ran_at": null}
+    }
+  },
   "decisions": [
     {
       "decision_id": "D-01",
@@ -38,9 +72,71 @@
       "owner": "Backend lead",
       "added_at": "2026-08-17T19:15:00Z",
       "added_by": "plan-implementation/03-tasks (risk accepted)",
-      "resolved_at": null,
-      "evidence": null
+      "resolved_at": "2026-08-18T06:05:46Z",
+      "evidence": "AUTH-02 implemented on feature/AUTH-02 (commit 59dab247) and merged into feature/AUTH-03's branch ancestry; backend/app/services/auth_service.py and password_hash/must_reset_password columns confirmed present before AUTH-03's implementation began."
     }
   ],
-  "last_updated": "2026-08-17T19:15:00Z"
+  "agent_flags": [
+    {
+      "flag_id": "AF-01",
+      "kind": "bug-fix",
+      "summary": "passlib[bcrypt]==1.7.4 incompatible with bcrypt>=4.1 (missing __about__ attribute); pinned bcrypt==4.0.1 as a companion fix",
+      "source": "backend/requirements.txt",
+      "task_id": "T-01",
+      "raised_at": "2026-08-18T06:05:00Z",
+      "raised_by": "implementation-agent",
+      "status": "accept",
+      "decision": "Accepted — required root-cause fix, well-documented upstream compatibility gap.",
+      "decided_by": "yaswanth.panthangi@apexon.com",
+      "decided_at": "2026-08-18T06:05:46Z",
+      "rationale": "Without this pin, every hash/verify call throws AttributeError; the fix is a version pin, not a design change.",
+      "carry_forward_ref": null
+    },
+    {
+      "flag_id": "AF-02",
+      "kind": "other",
+      "summary": "typecheck dimension N/A — pre-existing repo-wide gap",
+      "source": "docs/config/project-commands.yaml",
+      "task_id": null,
+      "raised_at": "2026-08-18T06:06:00Z",
+      "raised_by": "implementation-agent",
+      "status": "defer",
+      "decision": "Deferred — out of scope for this story.",
+      "decided_by": "yaswanth.panthangi@apexon.com",
+      "decided_at": "2026-08-18T06:05:46Z",
+      "rationale": "Adding a type checker repo-wide is unrelated to AUTH-03's scope.",
+      "carry_forward_ref": null
+    },
+    {
+      "flag_id": "AF-03",
+      "kind": "other",
+      "summary": "lint dimension N/A — pre-existing repo-wide gap",
+      "source": "docs/config/project-commands.yaml",
+      "task_id": null,
+      "raised_at": "2026-08-18T06:06:00Z",
+      "raised_by": "implementation-agent",
+      "status": "defer",
+      "decision": "Deferred — out of scope for this story.",
+      "decided_by": "yaswanth.panthangi@apexon.com",
+      "decided_at": "2026-08-18T06:05:46Z",
+      "rationale": "Adding a linter repo-wide is unrelated to AUTH-03's scope.",
+      "carry_forward_ref": null
+    },
+    {
+      "flag_id": "AF-04",
+      "kind": "other",
+      "summary": "design_check dimension N/A — backend-only story, no design tooling in repo",
+      "source": "docs/config/project-commands.yaml",
+      "task_id": null,
+      "raised_at": "2026-08-18T06:06:00Z",
+      "raised_by": "implementation-agent",
+      "status": "reject",
+      "decision": "Flag rejected as noise — same rationale as SRF-01/USR-01/AUTH-02 precedent.",
+      "decided_by": "yaswanth.panthangi@apexon.com",
+      "decided_at": "2026-08-18T06:05:46Z",
+      "rationale": "integrations.design=none was an explicit /arh-init decision; not a gap for this backend story to fix.",
+      "carry_forward_ref": null
+    }
+  ],
+  "last_updated": "2026-08-18T06:20:00Z"
 }

@@ -11,10 +11,12 @@ from sqlalchemy.orm import Session
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
 from app.schemas.user import UserCreate, UserListResponse, UserUpdate
+from app.services.auth_service import AuthService, PasswordHashingError
 
 
 class UserService:
     def __init__(self, db: Session):
+        self.db = db
         self.repo = UserRepository(db)
 
     def list_users(
@@ -48,7 +50,18 @@ class UserService:
                 status_code=status.HTTP_409_CONFLICT,
                 detail=f"A user with email '{payload.email}' already exists",
             )
-        return self.repo.create(payload.model_dump())
+
+        data = payload.model_dump()
+        plaintext_password = data.pop("password")
+        try:
+            data["password_hash"] = AuthService(self.db).hash_password(plaintext_password)
+        except PasswordHashingError:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Could not process the request. Please try again later.",
+            )
+
+        return self.repo.create(data)
 
     def update_user(self, user_id: int, payload: UserUpdate) -> User:
         user = self.get_user(user_id)
