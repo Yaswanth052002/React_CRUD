@@ -193,3 +193,35 @@ def test_login_fails_generically_when_jwt_secret_key_is_unset(monkeypatch):
     assert resp.json() == {"detail": "Could not process login. Please try again later."}
     assert "jwt" not in resp.text.lower()
     assert "traceback" not in resp.text.lower()
+
+
+# --- regression-AUTH-06-TC-01: GET /api/auth/me ----------------------------
+# Discovered missing during a full-epic post-merge validation sweep: no
+# story's PLAN ever implemented this route, though AUTH-06's Settings.jsx
+# and AUTH-04's frontend both assume it exists. Mocked frontend tests never
+# caught the gap because they mock userApi.getCurrentUser() directly.
+
+
+def test_me_returns_exactly_name_and_email_for_the_bearer_tokens_owner():
+    email = "me.endpoint@example.com"
+    _provision(email, "me-password", must_reset=False)
+
+    login_resp = client.post("/api/auth/login", json={"email": email, "password": "me-password"})
+    token = login_resp.json()["token"]
+
+    resp = client.get("/api/auth/me", headers={"Authorization": f"Bearer {token}"})
+
+    assert resp.status_code == 200
+    assert resp.json() == {"name": "Test User", "email": email}
+
+
+def test_me_without_a_token_is_rejected():
+    resp = client.get("/api/auth/me")
+    assert resp.status_code == 401
+    assert resp.json() == {"detail": "Could not validate credentials."}
+
+
+def test_me_with_an_invalid_token_returns_generic_401():
+    resp = client.get("/api/auth/me", headers={"Authorization": "Bearer not-a-real-token"})
+    assert resp.status_code == 401
+    assert resp.json() == {"detail": "Could not validate credentials."}

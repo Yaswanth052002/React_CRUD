@@ -87,3 +87,142 @@ JWT TTL assertion gap, and the already-accepted email-only rate-limiter keying) 
 follow-up items, not blockers. Address F-1 and F-2 opportunistically before AUTH-03/AUTH-04
 build on this endpoint's token/audit behavior, and carry F-3 forward as a tracked follow-up
 story once a shared rate-limit store exists.
+
+---
+
+## Addendum — 2026-08-18T22:30:00Z — GET /api/auth/me epic gap fix
+
+- Target: working tree vs `feature/AUTH` HEAD `eb946e72` (uncommitted fix found during a
+  full-epic post-merge regression validation sweep; the gap and root cause are documented in
+  `docs/features/AUTH-06/VALIDATION-20260818-1601.md` § `LIVE-01`).
+- Mode: current (working tree).
+- Files reviewed: 4 code files (`backend/app/api/auth.py`, `backend/app/schemas/auth.py`,
+  `backend/app/services/auth_service.py`, `backend/tests/test_auth.py`).
+  `docs/activity/2026-08.jsonl`, `docs/test-cases/AUTH-05.json`, `docs/test-cases/AUTH-06.json`,
+  and the untracked `docs/features/AUTH-05/VALIDATION-*.md` /
+  `docs/features/AUTH-06/VALIDATION-*.md` / `docs/sessions/` / `tmp/` paths also carry
+  uncommitted changes in the working tree, but these are bookkeeping/telemetry/validation
+  artefacts from the same interrupted sweep, not code under review here — no findings raised
+  against them, consistent with AUTH-03's REGRESSION-01 addendum precedent above.
+- Verdict: **PASS WITH WARNINGS**
+
+### Bug and fix
+
+No PLAN.md across AUTH-02, AUTH-04, or AUTH-06 ever implemented `GET /api/auth/me`: AUTH-02's
+file table (F-01..F-14) only builds `POST /api/auth/login` plus provisioning; AUTH-04 is
+frontend-only; AUTH-06's `REQUIREMENTS.md` explicitly placed the backend route "Out" of its own
+scope and attributed it to "AUTH-04/AUTH-02's implementation." The endpoint fell into a genuine
+cross-plan gap, masked because `Settings.test.jsx` mocks `userApi.getCurrentUser()` at the HTTP
+boundary and `backend/tests/test_auth.py` had no `/me` coverage. The fix adds
+`AuthService.get_current_user_from_token(token)` (decodes/verifies the bearer JWT via
+`os.getenv("JWT_SECRET_KEY")`, loads the user by the `sub` claim through
+`UserRepository.get_by_email`), a `CurrentUserResponse {name, email}` schema, and a
+`GET /api/auth/me` route in `api/auth.py` using an `HTTPBearer`-backed `get_current_user`
+dependency.
+
+### 1. Layering (module structure & boundaries)
+
+- `api/auth.py`'s new `get_current_user` dependency and `me` route call only
+  `AuthService(db).get_current_user_from_token(...)` — the service layer. The service calls
+  only `self.repo.get_by_email(email)` — the repository layer. No router-level SQL, no
+  raw `Session` query in `api/` or `services/`. Matches `fastapi-patterns` § Layering &
+  dependency rules and `README.md` §2's `api → service → repository → models` diagram exactly.
+- No finding.
+
+### 2. Response shape (safety-security / contract)
+
+- `CurrentUserResponse(name=current_user.name, email=current_user.email)` is constructed with
+  explicit named fields, not `CurrentUserResponse.model_validate(current_user)` or any
+  `**dict`/wildcard pattern — `id`, `role`, `status`, `phone`, and `password_hash` are not
+  reachable through this endpoint even if the `User` ORM model gains fields later. Matches
+  `docs/features/AUTH-06/REQUIREMENTS.md` C-1's locked `{name: string, email: string}` contract
+  exactly (also independently restated in AUTH-06's `PLAN.md`/`REVIEW.md`).
+- No finding.
+
+### 3. Security — generic error discipline (safety-security)
+
+- `get_current_user_from_token` raises the identical `HTTPException(401, "Could not validate
+  credentials.")` object for every internal failure mode (missing `JWT_SECRET_KEY`, invalid/
+  expired JWT, missing `sub` claim, unknown user) — confirmed by
+  `test_me_with_an_invalid_token_returns_generic_401` asserting the exact body. No PII (email,
+  token value) is logged anywhere in the new code path — confirmed by inspection, no `log`/
+  `print` calls were added. This matches AUTH-02's existing `login()` generic-401 pattern
+  (`.claude/rules/security-baseline.md` § Core, "errors shown to end users contain no stack
+  traces or internal identifiers").
+- **Finding (MEDIUM, safety-security): the no-token case is NOT covered by the same generic
+  contract.** `fastapi.security.HTTPBearer()` is instantiated with its default
+  `auto_error=True`, so a request with **no** `Authorization` header never reaches
+  `get_current_user_from_token` at all — Starlette/FastAPI short-circuits with `403
+  {"detail": "Not authenticated"}`, a different status code and a different message than the
+  malformed/expired/unknown-user case's `401 {"detail": "Could not validate credentials."}`.
+  `test_me_without_a_token_is_rejected` was written to accept either
+  (`assert resp.status_code in (401, 403)`), which normalizes the test to the inconsistency
+  rather than the code to a single contract — masking a real behavioral difference an
+  API consumer (or a future authz middleware keyed on status code) could observe. This is a
+  narrower version of the same "distinguishable auth failure" concern
+  `.claude/rules/security-baseline.md` guards against for ownership checks
+  ("Return HTTP 404, never 403... 403 confirms existence") — here it isn't an existence leak,
+  but it is an avoidable, undocumented two-shape error contract for what the code's own
+  docstring calls a "single generic 401."
+  - Path: `backend/app/api/auth.py:12` (`_bearer_scheme = HTTPBearer()`),
+    `backend/tests/test_auth.py:221-223`.
+  - Suggested fix: construct `HTTPBearer(auto_error=False)` and check `credentials is None`
+    inside `get_current_user`, raising the same `HTTPException(401, "Could not validate
+    credentials.")` used by the service layer — normalizing the missing-header case to the
+    identical 401 contract used everywhere else in this file — then tighten the test to assert
+    `== 401` and the exact body, not `in (401, 403)`.
+
+### 4. Testability
+
+- The three new tests exercise the real HTTP path end-to-end (`client.post(.../login)` then
+  `client.get(.../me)` with the real returned token) rather than calling
+  `AuthService` methods directly or mocking JWT decode — this is exactly the class of coverage
+  whose absence caused the original regression (mocked-only tests never caught a missing route).
+  Confirmed locally via the stated `pytest` 60/60 pass count (up from 57 — 3 new tests, matching
+  T-count here).
+- Minor gap tied to Finding #3 above: `test_me_without_a_token_is_rejected` asserting `in (401,
+  403)` is a weakened assertion rather than a precise one; folded into the MEDIUM finding above
+  rather than double-counted.
+
+### 5. Documentation trail (adr-violation / traceability)
+
+- This fix is not attributable to a single task row in any PLAN.md — it closes a genuine
+  cross-story gap between AUTH-02, AUTH-04, and AUTH-06 (none of their PLANs list this file
+  action), not a violation of a written ADR. AUTH-02 is the correct home for this addendum: it
+  already owns the file-table slots for all four files this fix touches
+  (`backend/app/api/auth.py` = F-03, `backend/app/schemas/auth.py` = F-02,
+  `backend/app/services/auth_service.py` = F-01, `backend/tests/test_auth.py` = F-06).
+  AUTH-06 is the consumer that surfaced the gap via its live-contract validation
+  (`docs/features/AUTH-06/VALIDATION-20260818-1601.md` `LIVE-01`) and should cross-link here
+  rather than duplicate this review.
+- **Finding (LOW, informational): no regression-tagged test case was registered.**
+  `backend/tests/test_auth.py`'s new tests are labeled
+  `regression-AUTH-06-TC-01` in a comment, but neither `docs/test-cases/AUTH-02.json` nor
+  `docs/test-cases/AUTH-06.json` gained a corresponding `regression-AUTH-06-TC-01`-tagged entry
+  in this diff (both files' diffs are timestamp-only churn from re-running existing TCs).
+  Recommend adding the regression-tagged TC entry to `docs/test-cases/AUTH-02.json` (this is now
+  an AUTH-02-owned route) per the epic's regression-tag protocol, and adding an
+  `impl_carry_forward_fixes` entry to `docs/features/AUTH-02/state.json` mirroring the
+  AUTH-03/REGRESSION-01 precedent, for discoverability without opening this review file. Not
+  blocking.
+
+### Findings summary (addendum)
+
+| Severity | Count | Category distribution |
+|----------|-------|------------------------|
+| CRITICAL | 0 | — |
+| HIGH | 0 | — |
+| MEDIUM | 1 | safety-security (1) — inconsistent no-token (403) vs invalid-token (401) error contract |
+| LOW | 1 | adr-violation/traceability (1) — informational, missing regression-tagged TC registry entry |
+
+### Recommendation (addendum)
+
+**PASS WITH WARNINGS.** Layering, response-shape discipline, and generic-error handling for
+malformed/expired/unknown-user tokens are all correct and match this epic's established
+patterns; the fix is scoped exactly to the missing route and its direct dependencies with no
+adjacent-code drift. The one MEDIUM finding (missing-header 403 vs. every-other-failure 401) is
+a real, fixable inconsistency but not a security leak — fix it by setting
+`HTTPBearer(auto_error=False)` and normalizing to 401 before merging to `main`, or explicitly
+accept it as a documented v1 limitation (mirroring how AUTH-02's F-3 rate-limiter gap was
+accepted) if there's a reason to keep FastAPI's default behavior. The LOW finding is
+informational only. No blocker to proceeding to `/arh-security-review`.

@@ -15,15 +15,15 @@
         "happy-path"
       ],
       "last_run": {
-        "started_at": "2026-08-18T12:16:00Z",
-        "duration_ms": 233,
+        "started_at": "2026-08-19T00:04:52Z",
+        "duration_ms": 182,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 233,
+            "duration_ms": 182,
             "reason": null
           }
         ],
@@ -48,15 +48,15 @@
         "negative"
       ],
       "last_run": {
-        "started_at": "2026-08-18T12:16:00Z",
-        "duration_ms": 233,
+        "started_at": "2026-08-19T00:04:52Z",
+        "duration_ms": 182,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 233,
+            "duration_ms": 182,
             "reason": null
           }
         ],
@@ -81,15 +81,15 @@
         "edge-case"
       ],
       "last_run": {
-        "started_at": "2026-08-18T12:16:00Z",
-        "duration_ms": 233,
+        "started_at": "2026-08-19T00:04:52Z",
+        "duration_ms": 182,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 233,
+            "duration_ms": 182,
             "reason": null
           }
         ],
@@ -114,15 +114,15 @@
         "happy-path"
       ],
       "last_run": {
-        "started_at": "2026-08-18T12:16:00Z",
-        "duration_ms": 233,
+        "started_at": "2026-08-19T00:04:52Z",
+        "duration_ms": 182,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 233,
+            "duration_ms": 182,
             "reason": null
           }
         ],
@@ -147,15 +147,15 @@
         "edge-case"
       ],
       "last_run": {
-        "started_at": "2026-08-18T12:16:00Z",
-        "duration_ms": 233,
+        "started_at": "2026-08-19T00:04:52Z",
+        "duration_ms": 182,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 233,
+            "duration_ms": 182,
             "reason": null
           }
         ],
@@ -180,15 +180,15 @@
         "happy-path"
       ],
       "last_run": {
-        "started_at": "2026-08-18T12:16:00Z",
-        "duration_ms": 233,
+        "started_at": "2026-08-19T00:04:52Z",
+        "duration_ms": 182,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 233,
+            "duration_ms": 182,
             "reason": null
           }
         ],
@@ -213,15 +213,15 @@
         "happy-path"
       ],
       "last_run": {
-        "started_at": "2026-08-18T12:16:00Z",
-        "duration_ms": 233,
+        "started_at": "2026-08-19T00:04:52Z",
+        "duration_ms": 182,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 233,
+            "duration_ms": 182,
             "reason": null
           }
         ],
@@ -246,15 +246,15 @@
         "negative"
       ],
       "last_run": {
-        "started_at": "2026-08-18T12:16:00Z",
-        "duration_ms": 233,
+        "started_at": "2026-08-19T00:04:52Z",
+        "duration_ms": 182,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 233,
+            "duration_ms": 182,
             "reason": null
           }
         ],
@@ -279,15 +279,15 @@
         "happy-path"
       ],
       "last_run": {
-        "started_at": "2026-08-18T12:16:00Z",
-        "duration_ms": 233,
+        "started_at": "2026-08-19T00:04:52Z",
+        "duration_ms": 182,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 233,
+            "duration_ms": 182,
             "reason": null
           }
         ],
@@ -312,15 +312,15 @@
         "happy-path"
       ],
       "last_run": {
-        "started_at": "2026-08-18T12:16:00Z",
-        "duration_ms": 233,
+        "started_at": "2026-08-19T00:04:52Z",
+        "duration_ms": 182,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 233,
+            "duration_ms": 182,
             "reason": null
           }
         ],
@@ -345,15 +345,15 @@
         "negative"
       ],
       "last_run": {
-        "started_at": "2026-08-18T12:16:00Z",
-        "duration_ms": 233,
+        "started_at": "2026-08-19T00:04:52Z",
+        "duration_ms": 182,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 233,
+            "duration_ms": 182,
             "reason": null
           }
         ],
@@ -378,15 +378,15 @@
         "happy-path"
       ],
       "last_run": {
-        "started_at": "2026-08-18T12:16:00Z",
-        "duration_ms": 233,
+        "started_at": "2026-08-19T00:04:52Z",
+        "duration_ms": 182,
         "status": "PASS",
         "verdict": "PASS",
         "attempts": [
           {
             "n": 1,
             "status": "PASS",
-            "duration_ms": 233,
+            "duration_ms": 182,
             "reason": null
           }
         ],
@@ -394,6 +394,40 @@
         "failure_reason": null,
         "artefact": "frontend/src/pages/__tests__/Settings.test.jsx",
         "runner": "vitest",
+        "rerun_count": 0
+      }
+    },
+    {
+      "id": "AUTH-06-TC-13",
+      "title": "GET /api/auth/me exists on the real backend and returns exactly {name, email} for the bearer token's owner",
+      "type": "contract",
+      "automatable": true,
+      "priority": "Must",
+      "requirement_id": "AUTH-06-FR-1",
+      "given": "a user created via POST /api/users and logged in via POST /api/auth/login with a real, running backend (no mocks)",
+      "when": "GET /api/auth/me is called with the resulting Bearer token, and again with no token, and again with an invalid token",
+      "then": "the authenticated call returns 200 with exactly {name, email}; the no-token and invalid-token calls both return the same generic 401 {\"detail\": \"Could not validate credentials.\"}",
+      "tags": [
+        "regression-AUTH-06-TC-01",
+        "regression"
+      ],
+      "last_run": {
+        "started_at": "2026-08-19T00:04:52Z",
+        "duration_ms": 210,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 210,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "backend/tests/test_auth.py::test_me_returns_exactly_name_and_email_for_the_bearer_tokens_owner, ::test_me_without_a_token_is_rejected, ::test_me_with_an_invalid_token_returns_generic_401",
+        "runner": "pytest",
         "rerun_count": 0
       }
     }
@@ -405,7 +439,8 @@
         "covered_by": [
           "AUTH-06-TC-01",
           "AUTH-06-TC-02",
-          "AUTH-06-TC-03"
+          "AUTH-06-TC-03",
+          "AUTH-06-TC-13"
         ]
       },
       {

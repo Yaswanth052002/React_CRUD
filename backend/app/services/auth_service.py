@@ -201,3 +201,30 @@ class AuthService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Could not process login. Please try again later.",
             )
+
+    # -- Current-user resolution (GET /api/auth/me) ------------------------
+
+    def get_current_user_from_token(self, token: str) -> User:
+        """
+        Decodes and verifies a bearer JWT, then loads the user it identifies.
+        Any failure (missing/invalid/expired token, unknown user) raises a
+        single generic 401 — never distinguishes the reason to the caller.
+        """
+        secret = os.getenv("JWT_SECRET_KEY")
+        unauthorized = HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials.",
+        )
+        if not secret:
+            raise unauthorized
+        try:
+            payload = jwt.decode(token, secret, algorithms=[_JWT_ALGORITHM])
+        except jwt.PyJWTError:
+            raise unauthorized
+        email = payload.get("sub")
+        if not email:
+            raise unauthorized
+        user = self.repo.get_by_email(email)
+        if not user:
+            raise unauthorized
+        return user

@@ -13,3 +13,10 @@ class LoginResponse(BaseModel):
     """Successful login response — `token` is a signed JWT (see AuthService)."""
 
     token: str
+
+
+class CurrentUserResponse(BaseModel):
+    """Response for GET /api/auth/me — never includes id, role, or any other field."""
+
+    name: str
+    email: str

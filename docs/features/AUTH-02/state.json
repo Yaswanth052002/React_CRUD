@@ -18,7 +18,7 @@
   "validation": "passed",
   "validation_summary": "2026-08-18 P=13/13 in 1 round",
   "adrs_referenced": ["ADR-1", "ADR-2", "ADR-3", "ADR-4", "ADR-5"],
-  "review": "PASS",
+  "review": "PASS WITH WARNINGS",
   "review_report": "docs/features/AUTH-02/REVIEW.md",
   "security": "PASS",
   "security_findings": {
@@ -98,6 +98,9 @@
     }
   ],
   "pending_carry_forward": [],
+  "impl_carry_forward_fixes": [
+    "backend/app/api/auth.py, backend/app/schemas/auth.py, backend/app/services/auth_service.py, backend/tests/test_auth.py: added GET /api/auth/me (AuthService.get_current_user_from_token, CurrentUserResponse {name, email}, HTTPBearer-backed get_current_user dependency) — no PLAN.md across AUTH-02/AUTH-04/AUTH-06 ever implemented this route, a cross-plan gap discovered by AUTH-06's live-contract regression check (docs/features/AUTH-06/VALIDATION-20260818-1601.md LIVE-01); review addendum in docs/features/AUTH-02/REVIEW.md, 2026-08-18T22:30:00Z, verdict PASS WITH WARNINGS (MEDIUM: HTTPBearer default auto_error=True yields 403 for a missing token vs. 401 for every other auth failure — recommend auto_error=False normalized to 401)."
+  ],
   "agent_flags": [
     {
       "flag_id": "AF-01",
@@ -237,5 +240,5 @@
       "design_check": {"status": "N/A", "source": "project-commands.yaml design_check:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": "AF-06", "ran_at": null}
     }
   },
-  "last_updated": "2026-08-18T14:00:00Z"
+  "last_updated": "2026-08-18T22:30:00Z"
 }
