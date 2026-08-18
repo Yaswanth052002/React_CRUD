@@ -20,9 +20,15 @@
   "adrs_referenced": ["ADR-1", "ADR-2", "ADR-3", "ADR-4", "ADR-5"],
   "review": "PASS",
   "review_report": "docs/features/AUTH-02/REVIEW.md",
-  "security": "BLOCKED",
-  "security_findings": {"critical": 0, "high": 1, "medium": 3, "low": 8, "tool_missing": []},
-  "security_report": "docs/features/AUTH-02/SECURITY-20260818.md",
+  "security": "PASS",
+  "security_findings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 2,
+    "low": 5,
+    "tool_missing": []
+  },
+  "security_report": "docs/features/AUTH-02/SECURITY-20260818-1400.md",
   "governance_profile": "standard",
   "needs_clarification_count": 0,
   "gate": "APPROVE",
@@ -231,5 +237,5 @@
       "design_check": {"status": "N/A", "source": "project-commands.yaml design_check:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": "AF-06", "ran_at": null}
     }
   },
-  "last_updated": "2026-08-18T06:41:00Z"
+  "last_updated": "2026-08-18T14:00:00Z"
 }

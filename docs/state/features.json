@@ -95,8 +95,16 @@
     "validation": "passed",
     "review": "PASS",
     "review_report": "docs/features/AUTH-02/REVIEW.md",
-    "security": "BLOCKED",
-    "last_updated": "2026-08-18T06:41:00Z",
+    "security": "PASS",
+    "security_findings": {
+      "critical": 0,
+      "high": 0,
+      "medium": 2,
+      "low": 5,
+      "tool_missing": []
+    },
+    "security_report": "docs/features/AUTH-02/SECURITY-20260818-1400.md",
+    "last_updated": "2026-08-18T14:00:00Z",
     "plan": "complete",
     "plan_validation": "PASS"
   },
