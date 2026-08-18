@@ -11,7 +11,28 @@
       "given": "a valid, unexpired token is present in localStorage before App.jsx mounts",
       "when": "App.jsx mounts (simulating a browser refresh)",
       "then": "isAuthenticated is initialized to true, Login is not rendered, and the previously active view re-renders",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T06:50:00Z",
+        "duration_ms": 15,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 15,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/__tests__/App.auth.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-04-TC-02",
@@ -23,7 +44,28 @@
       "given": "no token exists in localStorage (first visit or previously cleared)",
       "when": "App.jsx mounts",
       "then": "isAuthenticated is initialized to false, Login is rendered within 100ms of mount, and no GET /api/dashboard/stats or GET /api/users request is issued",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T06:50:00Z",
+        "duration_ms": 15,
+        "status": "PASS",
+        "verdict": "PARTIAL",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 15,
+            "reason": "Passes against today's observable proxy only (no clearAuthToken/log call for absent token); full behavior (Login-only render within 100ms, zero protected fetches) blocked because App.jsx does not yet gate rendering on isAuthenticated \u2014 deferred to AUTH-05 per FLAGS.md AF-04."
+          }
+        ],
+        "budget": null,
+        "failure_reason": "Passes against today's observable proxy only (no clearAuthToken/log call for absent token); full behavior (Login-only render within 100ms, zero protected fetches) blocked because App.jsx does not yet gate rendering on isAuthenticated \u2014 deferred to AUTH-05 per FLAGS.md AF-04.",
+        "artefact": "frontend/src/__tests__/App.auth.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-04-TC-03",
@@ -35,7 +77,28 @@
       "given": "a token is present in localStorage but its exp claim is in the past",
       "when": "App.jsx mounts and performs the jwt-decode expiry check",
       "then": "the token is cleared, isAuthenticated is set to false, and sessionExpiredMessage is set to 'Your session has expired. Please log in again.'",
-      "tags": ["edge-case"]
+      "tags": [
+        "edge-case"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T06:50:00Z",
+        "duration_ms": 15,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 15,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/__tests__/App.auth.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-04-TC-04",
@@ -47,7 +110,28 @@
       "given": "the Admin is authenticated on the Users view and calls updateUser, which the backend rejects with 401",
       "when": "the response interceptor observes the 401",
       "then": "clearAuthToken is called, the registered unauthorized handler fires, isAuthenticated becomes false, and sessionExpiredMessage is set (not a generic/opaque error toast)",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T06:50:00Z",
+        "duration_ms": 15,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 15,
+            "reason": "Verified via mocked axios interceptor error object (status 401), not a live backend 401 \u2014 this branch's backend has no auth-guarded endpoint yet (AUTH-02/03 not merged here); confirmed via curl that /api/users returns 200 regardless of Authorization header."
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/services/__tests__/userApi.auth.test.js",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-04-TC-05",
@@ -59,7 +143,29 @@
       "given": "localStorage holds a string that is not a valid JWT",
       "when": "App.jsx mounts and jwt-decode throws while parsing it",
       "then": "isAuthenticated is set to false with no uncaught exception and no stack trace surfaced to the user",
-      "tags": ["negative", "edge-case"]
+      "tags": [
+        "negative",
+        "edge-case"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T06:50:00Z",
+        "duration_ms": 15,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 15,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/__tests__/App.auth.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-04-TC-06",
@@ -71,7 +177,28 @@
       "given": "localStorage.getItem is mocked to throw (e.g. storage disabled)",
       "when": "getStoredToken() is called during App.jsx mount",
       "then": "getStoredToken returns null (throw is not propagated) and isAuthenticated is set to false",
-      "tags": ["negative"]
+      "tags": [
+        "negative"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T06:50:00Z",
+        "duration_ms": 15,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 15,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/services/__tests__/userApi.auth.test.js",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-04-TC-07",
@@ -83,7 +210,28 @@
       "given": "localStorage.setItem is mocked to throw (e.g. quota exceeded)",
       "when": "setAuthToken(token) is called after a successful login",
       "then": "the error is caught and a readable, non-stack-trace error condition is surfaced rather than an uncaught exception",
-      "tags": ["negative"]
+      "tags": [
+        "negative"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T06:50:00Z",
+        "duration_ms": 15,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 15,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/services/__tests__/userApi.auth.test.js",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-04-TC-08",
@@ -95,7 +243,28 @@
       "given": "a token is stored via setAuthToken",
       "when": "any userApi.js HTTP call is made (e.g. getUsers)",
       "then": "the outgoing request carries an Authorization: Bearer <token> header; when no token is stored, no Authorization header is attached",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T06:50:00Z",
+        "duration_ms": 15,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 15,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/services/__tests__/userApi.auth.test.js",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-04-TC-09",
@@ -107,7 +276,29 @@
       "given": "two protected requests are in-flight and both receive 401; the first response clears the token",
       "when": "the second 401 response arrives after the token is already null",
       "then": "the registered unauthorized handler is invoked exactly once, not twice (no duplicate redirect/message reset)",
-      "tags": ["edge-case", "regression-guard"]
+      "tags": [
+        "edge-case",
+        "regression-guard"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T06:50:00Z",
+        "duration_ms": 15,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 15,
+            "reason": "Verified via mocked interceptor (two simulated 401 error objects), same real-backend limitation as TC-04."
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/services/__tests__/userApi.auth.test.js",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-04-TC-10",
@@ -119,7 +310,29 @@
       "given": "a 401 or expiry event has set sessionExpiredMessage to a non-null string in App.jsx",
       "when": "App.jsx renders LoginScreen",
       "then": "LoginScreen receives a sessionExpiredMessage prop with that value and receives no authError prop",
-      "tags": ["happy-path", "contract"]
+      "tags": [
+        "happy-path",
+        "contract"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T06:50:00Z",
+        "duration_ms": 15,
+        "status": "PASS",
+        "verdict": "PARTIAL",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 15,
+            "reason": "Passes against today's observable proxy only (handler registered once, invocation does not throw); full sessionExpiredMessage-prop-to-LoginScreen threading cannot be exercised because LoginScreen is not yet mounted by App.jsx (AUTH-05 scope) \u2014 deferred per FLAGS.md AF-04."
+          }
+        ],
+        "budget": null,
+        "failure_reason": "Passes against today's observable proxy only (handler registered once, invocation does not throw); full sessionExpiredMessage-prop-to-LoginScreen threading cannot be exercised because LoginScreen is not yet mounted by App.jsx (AUTH-05 scope) \u2014 deferred per FLAGS.md AF-04.",
+        "artefact": "frontend/src/__tests__/App.auth.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-04-TC-11",
@@ -131,7 +344,32 @@
       "given": "a valid token is present in localStorage",
       "when": "App.jsx mounts 100 times in a benchmark loop, measuring time from mount to isAuthenticated being set",
       "then": "p95 latency is < 100ms across the 100 iterations",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T06:50:00Z",
+        "duration_ms": 707,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 707,
+            "reason": null
+          }
+        ],
+        "budget": {
+          "target": "p95 < 100ms across 100 iterations",
+          "measured": "p95 < 100ms (assertion passed; exact ms not machine-parsed from vitest stdout)",
+          "budget_pass": true
+        },
+        "failure_reason": null,
+        "artefact": "frontend/src/__tests__/App.auth.perf.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-04-TC-12",
@@ -143,7 +381,28 @@
       "given": "a successful login has occurred and setAuthToken has been called",
       "when": "localStorage contents are inspected after login",
       "then": "only the opaque JWT is present under the auth-token key; no password, password hash, or other credential material is present anywhere in localStorage",
-      "tags": ["security"]
+      "tags": [
+        "security"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T06:50:00Z",
+        "duration_ms": 15,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 15,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/services/__tests__/userApi.auth.test.js",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-04-TC-13",
@@ -155,7 +414,28 @@
       "given": "a 401 response is received or an expired token is detected on mount",
       "when": "the session-expiry handling path runs",
       "then": "a client-side auth_session_expired event is logged with no token value, no email, and no other PII in its payload",
-      "tags": ["happy-path"]
+      "tags": [
+        "happy-path"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T06:50:00Z",
+        "duration_ms": 15,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 15,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/services/__tests__/userApi.auth.test.js, frontend/src/__tests__/App.auth.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     },
     {
       "id": "AUTH-04-TC-14",
@@ -167,7 +447,40 @@
       "given": "sessionExpiredMessage is set to a non-null string and LoginScreen is rendered",
       "when": "an axe-core / DOM scan inspects the rendered Login screen",
       "then": "the message text appears inside an aria-live region reachable by assistive technology",
-      "tags": ["accessibility"]
+      "tags": [
+        "accessibility"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T14:05:40Z",
+        "duration_ms": 15,
+        "status": "PASS",
+        "verdict": "PARTIAL",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "FAIL",
+            "duration_ms": 15,
+            "reason": "No test exists for this TC and no aria-live implementation exists: grep of frontend/src for 'aria-live' finds only an unrelated instance in Users.jsx; LoginScreen component does not exist in this codebase yet (AUTH-01/AUTH-05 scope). PLAN.md Test Strategy table row claims App.auth.test.jsx covers TC-14, but the file (read directly) contains no TC-14 test. Unlike TC-02/TC-10, this gap is not disclosed in FLAGS.md AF-04 \u2014 should be added there or fixed."
+          },
+          {
+            "n": 2,
+            "status": "FAIL",
+            "duration_ms": 15,
+            "reason": "Round-1 fix (2026-08-18): disclosure gap corrected \u2014 FLAGS.md AF-04 now explicitly lists TC-14 alongside TC-02/TC-10, and PLAN.md's Test Strategy table (\u00a7 7) no longer claims full TC-14 coverage; it now labels the row 'partial \u2014 deferred to AUTH-05'. A partial/proxy test ('TC-14 (partial): sessionExpiredMessage state is set to the exact required string when the unauthorized handler fires' / its 'never set' counterpart) was added to App.auth.test.jsx, asserting AUTH-04's actual owned behavior \u2014 the state value, not the DOM/aria-live rendering. Verdict remains FAIL (not PASS) because the literal TC-14 requirement (aria-live region on the Login screen) still cannot be exercised until AUTH-01/AUTH-05 land LoginScreen; left for validation to re-assess whether the disclosed-and-proxied gap changes the verdict semantics."
+          },
+          {
+            "n": 3,
+            "status": "PASS",
+            "duration_ms": 15,
+            "reason": "Round-2 re-validation (2026-08-18): re-confirmed FLAGS.md AF-04 discloses TC-14 alongside TC-02/TC-10 (with an explicit 'Correction (2026-08-18, round-1 fix)' note), PLAN.md \u00a7 7's Test Strategy row is corrected to 'partial \u2014 deferred to AUTH-05' with no false full-coverage claim, and PLAN.md \u00a7 5 T-05's Notes column explicitly states TC-14 is partial/proxy only. Both new proxy tests in App.auth.test.jsx were read in full and executed: 'TC-14 (partial): sessionExpiredMessage state is set to the exact required string when the unauthorized handler fires' (asserts capturedStateSets contains the exact copy 'Your session has expired. Please log in again.' after the registered unauthorized handler fires) and its negative counterpart (asserts the exact string is never captured when there is nothing to expire) both pass under `npm run test -- --run` (49/49 total). The underlying defect from round 1 (undisclosed gap + false PLAN.md coverage claim) is fully remediated; the only remaining gap (no aria-live DOM region because LoginScreen does not exist) is the same disclosed, deferred-to-AUTH-05 scope boundary already applied to TC-02/TC-10. Re-classified FAIL to PARTIAL to match that treatment \u2014 same underlying capability gap, now honestly documented and proxy-tested."
+          }
+        ],
+        "budget": null,
+        "failure_reason": "Literal AC (aria-live region on Login screen) cannot be exercised until AUTH-05 lands LoginScreen; the state-value proxy passes and the gap is now disclosed in FLAGS.md AF-04 and PLAN.md \u00a7 5/\u00a7 7 (no longer a documentation defect).",
+        "artefact": "frontend/src/__tests__/App.auth.test.jsx",
+        "runner": "vitest",
+        "rerun_count": 2
+      }
     },
     {
       "id": "AUTH-04-TC-15",
@@ -179,21 +492,89 @@
       "given": "userApi.login(email, password) is mocked to resolve with { token: '<jwt>' }",
       "when": "the login success handler processes the resolved value",
       "then": "setAuthToken is called with exactly the token string field, with no other shape assumed",
-      "tags": ["contract"]
+      "tags": [
+        "contract"
+      ],
+      "last_run": {
+        "started_at": "2026-08-18T06:50:00Z",
+        "duration_ms": 15,
+        "status": "PASS",
+        "verdict": "PASS",
+        "attempts": [
+          {
+            "n": 1,
+            "status": "PASS",
+            "duration_ms": 15,
+            "reason": null
+          }
+        ],
+        "budget": null,
+        "failure_reason": null,
+        "artefact": "frontend/src/services/__tests__/userApi.auth.test.js",
+        "runner": "vitest",
+        "rerun_count": 0
+      }
     }
   ],
   "coverage_audit": {
     "functional_requirements": [
-      {"id": "AUTH-04-FR-1", "covered_by": ["AUTH-04-TC-03", "AUTH-04-TC-05"]},
-      {"id": "AUTH-04-FR-2", "covered_by": ["AUTH-04-TC-06", "AUTH-04-TC-07", "AUTH-04-TC-08", "AUTH-04-TC-15"]},
-      {"id": "AUTH-04-FR-3", "covered_by": ["AUTH-04-TC-01", "AUTH-04-TC-02", "AUTH-04-TC-10"]},
-      {"id": "AUTH-04-FR-4", "covered_by": ["AUTH-04-TC-04", "AUTH-04-TC-09"]}
+      {
+        "id": "AUTH-04-FR-1",
+        "covered_by": [
+          "AUTH-04-TC-03",
+          "AUTH-04-TC-05"
+        ]
+      },
+      {
+        "id": "AUTH-04-FR-2",
+        "covered_by": [
+          "AUTH-04-TC-06",
+          "AUTH-04-TC-07",
+          "AUTH-04-TC-08",
+          "AUTH-04-TC-15"
+        ]
+      },
+      {
+        "id": "AUTH-04-FR-3",
+        "covered_by": [
+          "AUTH-04-TC-01",
+          "AUTH-04-TC-02",
+          "AUTH-04-TC-10"
+        ]
+      },
+      {
+        "id": "AUTH-04-FR-4",
+        "covered_by": [
+          "AUTH-04-TC-04",
+          "AUTH-04-TC-09"
+        ]
+      }
     ],
     "non_functional_requirements": [
-      {"id": "AUTH-04-NFR-performance", "covered_by": ["AUTH-04-TC-11"]},
-      {"id": "AUTH-04-NFR-security", "covered_by": ["AUTH-04-TC-12"]},
-      {"id": "AUTH-04-NFR-accessibility", "covered_by": ["AUTH-04-TC-14"]},
-      {"id": "AUTH-04-NFR-observability", "covered_by": ["AUTH-04-TC-13"]}
+      {
+        "id": "AUTH-04-NFR-performance",
+        "covered_by": [
+          "AUTH-04-TC-11"
+        ]
+      },
+      {
+        "id": "AUTH-04-NFR-security",
+        "covered_by": [
+          "AUTH-04-TC-12"
+        ]
+      },
+      {
+        "id": "AUTH-04-NFR-accessibility",
+        "covered_by": [
+          "AUTH-04-TC-14"
+        ]
+      },
+      {
+        "id": "AUTH-04-NFR-observability",
+        "covered_by": [
+          "AUTH-04-TC-13"
+        ]
+      }
     ],
     "uncovered": []
   }

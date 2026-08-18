@@ -11,7 +11,12 @@
   "design_artifact": "docs/features/AUTH-04/DESIGN.md",
   "design_provider": "none",
   "design_iteration": 0,
-  "phase": "plan-implementation",
+  "phase": "review",
+  "impl": "complete",
+  "impl_branch": "feature/AUTH-04",
+  "validation": "passed",
+  "validation_summary": "2026-08-18 P=12/15, 3 partial (expected, pending AUTH-05) in 2 rounds",
+  "adrs_referenced": ["ADR-1", "ADR-2", "ADR-3"],
   "gate": "APPROVE",
   "plan": "complete",
   "plan_validation": "PASS",
@@ -54,5 +59,93 @@
       "created_by": "plan-implementation/plan-authoring"
     }
   ],
-  "last_updated": "2026-08-17T22:45:00Z"
+  "impl_tasks": [
+    {"task_id": "T-01", "status": "done", "completed_at": "2026-08-18T00:00:00Z", "files_touched": ["frontend/package.json"]},
+    {"task_id": "T-02", "status": "done", "completed_at": "2026-08-18T00:00:00Z", "files_touched": ["frontend/src/services/userApi.js"]},
+    {"task_id": "T-03", "status": "done", "completed_at": "2026-08-18T00:00:00Z", "files_touched": ["frontend/src/App.jsx"]},
+    {"task_id": "T-04", "status": "done", "completed_at": "2026-08-18T00:00:00Z", "files_touched": ["frontend/src/services/__tests__/userApi.auth.test.js"]},
+    {"task_id": "T-05", "status": "done", "completed_at": "2026-08-18T00:00:00Z", "files_touched": ["frontend/src/__tests__/App.auth.test.jsx", "frontend/src/pages/__tests__/App.routing.test.jsx"]},
+    {"task_id": "T-06", "status": "done", "completed_at": "2026-08-18T00:00:00Z", "files_touched": ["frontend/src/__tests__/App.auth.perf.test.jsx"]},
+    {"task_id": "T-07", "status": "done", "completed_at": "2026-08-18T00:00:00Z", "files_touched": ["docs/config/project-commands.yaml"]}
+  ],
+  "impl_evidence": {
+    "session_ended_at": "2026-08-18T00:00:00Z",
+    "rounds": 1,
+    "checks": {
+      "typecheck": {"status": "N/A", "source": "project-commands.yaml typecheck:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": "AF-01", "ran_at": null},
+      "unit_tests": {"status": "PASS", "source": "project-commands.yaml test_unit:/test:", "command": "(cd frontend && npm run test) && (cd backend && pytest)", "exit_code": 0, "evidence_path": "docs/features/AUTH-04/evidence/unit-tests-frontend.log", "flag_id": null, "ran_at": "2026-08-18T00:00:00Z", "extra_evidence_path": "docs/features/AUTH-04/evidence/unit-tests-backend.log"},
+      "lint": {"status": "N/A", "source": "project-commands.yaml lint:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": "AF-02", "ran_at": null},
+      "runtime": {"status": "PASS", "source": "stack-smoke.md Run:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": null, "ran_at": "2026-08-18T00:00:00Z", "stacks": [
+        {"stack": "fastapi", "status": "PASS", "command": "uvicorn app.main:app --port 8000", "exit_code": 0, "evidence_path": "docs/features/AUTH-04/evidence/runtime-fastapi.log", "boot_log_scan": "clean"},
+        {"stack": "react", "status": "PASS", "command": "npm run dev -- --port 5173", "exit_code": 0, "evidence_path": "docs/features/AUTH-04/evidence/runtime-react.log", "boot_log_scan": "clean"}
+      ]},
+      "compile": {"status": "PASS", "source": "project-commands.yaml build:", "command": "cd frontend && npm run build", "exit_code": 0, "evidence_path": "docs/features/AUTH-04/evidence/compile.log", "flag_id": null, "ran_at": "2026-08-18T00:00:00Z"},
+      "design_check": {"status": "N/A", "source": "project-commands.yaml design_check:", "command": null, "exit_code": null, "evidence_path": null, "flag_id": "AF-03", "ran_at": null}
+    }
+  },
+  "agent_flags": [
+    {
+      "flag_id": "AF-01",
+      "kind": "other",
+      "summary": "typecheck dimension N/A — pre-existing repo-wide gap",
+      "source": "docs/config/project-commands.yaml",
+      "task_id": null,
+      "raised_at": "2026-08-18T00:00:00Z",
+      "raised_by": "implementation-agent",
+      "status": "defer",
+      "decision": "Deferred — out of scope for this story.",
+      "decided_by": "yaswanth.panthangi@apexon.com",
+      "decided_at": "2026-08-18T06:58:40Z",
+      "rationale": "Adding a type checker repo-wide is unrelated to AUTH-04's scope.",
+      "carry_forward_ref": null
+    },
+    {
+      "flag_id": "AF-02",
+      "kind": "other",
+      "summary": "lint dimension N/A — pre-existing repo-wide gap",
+      "source": "docs/config/project-commands.yaml",
+      "task_id": null,
+      "raised_at": "2026-08-18T00:00:00Z",
+      "raised_by": "implementation-agent",
+      "status": "defer",
+      "decision": "Deferred — out of scope for this story.",
+      "decided_by": "yaswanth.panthangi@apexon.com",
+      "decided_at": "2026-08-18T06:58:40Z",
+      "rationale": "Adding a linter repo-wide is unrelated to AUTH-04's scope.",
+      "carry_forward_ref": null
+    },
+    {
+      "flag_id": "AF-03",
+      "kind": "other",
+      "summary": "design_check dimension N/A — no new rendered UI surface, no design tooling in repo",
+      "source": "docs/config/project-commands.yaml",
+      "task_id": null,
+      "raised_at": "2026-08-18T00:00:00Z",
+      "raised_by": "implementation-agent",
+      "status": "reject",
+      "decision": "Flag rejected as noise — same rationale as SRF-01/USR-01/AUTH-02/AUTH-03 precedent.",
+      "decided_by": "yaswanth.panthangi@apexon.com",
+      "decided_at": "2026-08-18T06:58:40Z",
+      "rationale": "integrations.design=none was an explicit /arh-init decision; not a gap for this story to fix.",
+      "carry_forward_ref": null
+    },
+    {
+      "flag_id": "AF-04",
+      "kind": "risky-pattern",
+      "summary": "TC-02/TC-10/TC-14 can only be partially verified today — App.jsx doesn't yet gate rendering on isAuthenticated and LoginScreen doesn't exist yet (deferred to AUTH-05/AUTH-01 per PLAN.md's explicit scope note; TC-14 disclosure gap corrected in round-2 fix per VALIDATION-20260818-1420.md)",
+      "source": "frontend/src/__tests__/App.auth.test.jsx",
+      "task_id": "T-05",
+      "raised_at": "2026-08-18T00:00:00Z",
+      "raised_by": "implementation-agent",
+      "status": "defer",
+      "decision": "Deferred — expected scope boundary, not a defect in this story.",
+      "decided_by": "yaswanth.panthangi@apexon.com",
+      "decided_at": "2026-08-18T06:58:40Z",
+      "rationale": "Full TC-02/TC-10 behavior requires AUTH-05's conditional render; this story correctly tests the observable proxies available today and will need a follow-up verification pass once AUTH-05 lands.",
+      "carry_forward_ref": "AUTH-05-impl"
+    }
+  ],
+  "review": "PASS WITH WARNINGS",
+  "review_report": "docs/features/AUTH-04/REVIEW.md",
+  "last_updated": "2026-08-18T15:00:00Z"
 }
