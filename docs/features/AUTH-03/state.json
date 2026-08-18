@@ -11,7 +11,21 @@
   "design_artifact": "docs/features/AUTH-03/DESIGN.md",
   "design_provider": "none",
   "design_iteration": 0,
-  "phase": "review",
+  "phase": "security-reviewed",
+  "impl": "complete",
+  "impl_branch": "feature/AUTH-03",
+  "validation": "passed",
+  "validation_summary": "2026-08-18 P=11/11 in 1 round (1 manual TC not counted)",
+  "adrs_referenced": ["ADR-1"],
+  "security": "PASS",
+  "security_findings": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 2,
+    "tool_missing": ["pip-audit"]
+  },
+  "security_report": "docs/features/AUTH-03/SECURITY-20260818.md",
   "review": "PASS WITH WARNINGS",
   "review_report": "docs/features/AUTH-03/REVIEW.md",
   "gate": "APPROVE",
@@ -138,5 +152,5 @@
       "carry_forward_ref": null
     }
   ],
-  "last_updated": "2026-08-18T06:20:00Z"
+  "last_updated": "2026-08-18T06:32:00Z"
 }

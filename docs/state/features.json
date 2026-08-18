@@ -85,10 +85,13 @@
     "tracker_research": null,
     "rtm_source_sha": "5a019873bdc1df059c68aa5c582baf9511ca7414",
     "gate": "APPROVE",
-    "phase": "review",
+    "phase": "security-reviewed",
+    "impl": "complete",
+    "validation": "passed",
     "review": "PASS",
     "review_report": "docs/features/AUTH-02/REVIEW.md",
-    "last_updated": "2026-08-18T18:48:07Z",
+    "security": "BLOCKED",
+    "last_updated": "2026-08-18T06:41:00Z",
     "plan": "complete",
     "plan_validation": "PASS"
   },
@@ -101,12 +104,15 @@
     "design": "n/a",
     "rtm_source_sha": "5a019873bdc1df059c68aa5c582baf9511ca7414",
     "gate": "APPROVE",
-    "phase": "review",
+    "phase": "security-reviewed",
+    "impl": "complete",
+    "validation": "passed",
     "review": "PASS WITH WARNINGS",
     "review_report": "docs/features/AUTH-03/REVIEW.md",
+    "security": "PASS",
     "plan": "complete",
     "plan_validation": "PASS",
-    "last_updated": "2026-08-18T06:20:00Z"
+    "last_updated": "2026-08-18T06:32:00Z"
   },
   "AUTH-04": {
     "story": "validated",
